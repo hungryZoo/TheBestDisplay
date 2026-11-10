@@ -97,6 +97,8 @@
 | `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]`, `tbdctl reconnect [<ID>]` | 논리적 연결 해제와 재연결 |
 | `tbdctl virtual <폭>x<높이> [--hidpi] [--name <이름>] [--seconds <초>]` | 가상 디스플레이를 만들고 지정 시간 동안 유지한 뒤 삭제 |
 | `tbdctl profile list \| show <이름> \| save <이름> [--replace] \| apply <이름> [--timeout <초>] [--yes] \| rename <이름> <새 이름> \| delete <이름>` | 구성 프로파일 저장, 조회, 적용, 이름 변경, 삭제 |
+| `tbdctl profile check <이름>` | 프로파일과 현재 구성의 차이 조회. 차이가 있으면 종료 코드 1 |
+| `tbdctl profile protect <이름>`, `profile unprotect`, `profile protection` | 구성 보호 설정, 해제, 상태 조회. 복원은 창 앱 실행 중에 수행 |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정자: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
@@ -237,6 +239,7 @@
 | PRD-PRF-001 | 현재 구성(모드, 색 모드, HDR, 회전, 배치, 미러, 밝기)의 프로파일 저장 | P5 | 필수 | MRD-SCP-013, MRD-SCN-006 |
 | PRD-PRF-002 | 프로파일 적용, 이름 변경, 삭제. 적용 결과의 항목별 성공과 실패 표시 | P5 | 필수 | MRD-SCP-013 |
 | PRD-PRF-003 | 프로파일의 디스플레이 식별: UUID 우선, 제조사와 제품 코드와 일련번호 차선 | P5 | 필수 | MRD-SCP-013 |
+| PRD-PRF-004 | 구성 보호: 지정한 프로파일의 구성(해상도와 주사율, 색 모드, HDR, 회전, 미러, 배치)에서 벗어나면 다시 적용. 앱 실행 중에만 동작. 이 앱에서 구성을 바꾸면 일시 중지, 60초 안에 3회 복원한 뒤에도 구성이 바뀌면 일시 중지. 프로파일과 현재 구성의 차이 조회 제공 | P6 | 권장 | MRD-SCP-013 |
 
 ### 6.15 안전장치 (SAF)
 

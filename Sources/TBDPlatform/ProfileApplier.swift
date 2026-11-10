@@ -30,10 +30,12 @@ public enum ProfileApplier {
     }
 
     /// 프로파일 적용. 단계 순서는 `ProfileStepKind`의 정의 순서. 한 단계가 실패해도 나머지 단계는 계속 수행하고 결과에 기록.
-    public static func apply(_ profile: DisplayProfile) -> [ProfileStepResult] {
+    /// - Parameter only: 지정하면 해당 종류의 단계만 수행 (구성 보호의 복원에 사용).
+    public static func apply(_ profile: DisplayProfile, only kinds: Set<ProfileStepKind>? = nil) -> [ProfileStepResult] {
         var displays = DisplayCatalog.displays()
         let current = capture(name: "현재", displays: displays)
-        let plan = ProfilePlanner.plan(profile, current: current, displays: displays)
+        var plan = ProfilePlanner.plan(profile, current: current, displays: displays)
+        if let kinds { plan.steps = plan.steps.filter { kinds.contains($0.kind) } }
         var results: [ProfileStepResult] = plan.unmatched.map {
             ProfileStepResult(kind: .mode, displayName: $0.ref.name, outcome: .skipped, detail: "연결되지 않은 디스플레이")
         }

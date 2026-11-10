@@ -73,7 +73,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 색 조정 | 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
 | 배치 | 회전, 미러, 메인 지정, 위치 편집, 논리적 연결 해제와 재연결, 언더스캔 |
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
-| 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제 |
+| 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
 
 ### 동작 구조
 
@@ -145,7 +145,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | 배치 | 위치 편집, 회전, 메인 지정, 미러, 연결 해제 |
 | 연결 진단 | 발견 항목, 포트와 연결 경로, 이벤트 기록, 보고서 내보내기 |
 | 가상 디스플레이 | 가상 디스플레이 추가, 켜기와 끄기, 삭제 |
-| 프로파일 | 현재 구성 저장, 적용, 이름 변경, 삭제 |
+| 프로파일 | 현재 구성 저장, 적용, 이름 변경, 삭제, 구성 보호 |
 
 <img width="780" src="docs/images/link.jpg" alt="링크 탭: 링크 속도, 레인 수, 대역폭 사용률">
 
@@ -186,6 +186,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl reconnect [<디스플레이 ID>]` | 연결 해제한 디스플레이 재연결 |
 | `tbdctl virtual <폭>x<높이> [--hidpi] [--name <이름>] [--seconds <초>]` | 가상 디스플레이 생성과 유지 |
 | `tbdctl profile <list\|show\|save\|apply\|rename\|delete> [<이름>] [<새 이름>] [--replace] [--timeout <초>] [--yes]` | 구성 프로파일 |
+| `tbdctl profile check <이름>` | 프로파일과 현재 구성의 차이 조회 |
+| `tbdctl profile protect <이름>`, `profile unprotect`, `profile protection` | 구성 보호 설정, 해제, 상태 조회 |
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 |
 
 - 공통 옵션: `--json`
@@ -223,6 +225,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `profiles.json` | 구성 프로파일 |
 | `virtual-displays.json` | 가상 디스플레이 구성 |
 | `pending-revert.json` | 확인 대기 중인 변경의 복귀 정보. 확정하거나 복귀하면 삭제 |
+| `protection.json` | 구성 보호 대상 프로파일과 보호 항목. 보호를 끄면 삭제 |
 
 - 사용자 정의 스케일 해상도는 `/Library/Displays/Contents/Resources/Overrides/` 아래 오버라이드 파일에 저장 (관리자 인증 필요)
 

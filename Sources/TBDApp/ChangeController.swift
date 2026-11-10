@@ -44,6 +44,8 @@ final class ChangeController {
     @ObservationIgnored private let store = PendingRevertStore.standard
     @ObservationIgnored private var pendingTarget: UInt32?
     @ObservationIgnored var onChanged: () -> Void = {}
+    /// 사용자가 이 앱에서 구성 변경을 요청할 때 호출 (구성 보호의 일시 중지에 사용).
+    @ObservationIgnored var onUserChange: () -> Void = {}
 
     init(timeout: TimeInterval = 15) {
         coordinator = RevertCoordinator(timeout: timeout, timer: FoundationRevertTimer(), store: store)
@@ -60,6 +62,7 @@ final class ChangeController {
     /// 변경 요청. 진행 중이면 거부 알림.
     func request(_ change: RevertCoordinator.Change, targetDisplayID: UInt32?) {
         pendingTarget = targetDisplayID
+        onUserChange()
         coordinator.request(change)
         isBusy = coordinator.state != .idle
         onChanged()

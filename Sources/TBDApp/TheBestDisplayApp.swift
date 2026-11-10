@@ -8,15 +8,21 @@ struct TheBestDisplayApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var store = DisplayStore()
     @State private var changes = ChangeController()
+    @State private var protection = ProtectionController()
 
     var body: some Scene {
         Window("TheBestDisplay", id: "main") {
             ContentView()
                 .environment(store)
                 .environment(changes)
+                .environment(protection)
                 .onAppear {
                     changes.onChanged = { [store] in store.scheduleRefresh() }
-                    store.onDisplaysChanged = { [changes] ids in changes.displaysChanged(onlineIDs: ids) }
+                    changes.onUserChange = { [protection] in protection.userChangedConfiguration() }
+                    store.onDisplaysChanged = { [changes, protection] ids in
+                        changes.displaysChanged(onlineIDs: ids)
+                        protection.displaysChanged(isBusy: changes.isBusy)
+                    }
                 }
                 .frame(minWidth: 860, minHeight: 560)
         }

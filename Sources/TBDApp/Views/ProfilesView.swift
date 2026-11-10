@@ -2,10 +2,11 @@ import SwiftUI
 import TBDCore
 import TBDPlatform
 
-/// 프로파일 화면: 현재 구성 저장, 적용, 이름 변경, 삭제, 적용 결과. (PRD-PRF-001-003)
+/// 프로파일 화면: 현재 구성 저장, 적용, 이름 변경, 삭제, 적용 결과, 구성 보호. (PRD-PRF-001-004)
 struct ProfilesView: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
+    @Environment(ProtectionController.self) private var protection
     @State private var profiles: [DisplayProfile] = []
     @State private var newName = ""
     @State private var renaming: DisplayProfile?
@@ -40,13 +41,23 @@ struct ProfilesView: View {
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             Spacer()
+                            if protection.setting?.profileID == profile.id { Badge(text: "보호 중", color: .blue) }
                             Button("적용") { apply(profile) }
                                 .disabled(changes.isBusy)
+                            if protection.setting?.profileID == profile.id {
+                                Button("보호 해제") { protection.disable() }
+                            } else {
+                                Button("보호") { protection.enable(profile: profile) }
+                                    .help("구성이 이 프로파일에서 벗어나면 다시 적용 (해상도, 색 모드, HDR, 회전, 미러, 배치)")
+                            }
                             Button("이름 변경") {
                                 renameText = profile.name
                                 renaming = profile
                             }
-                            Button("삭제", systemImage: "trash", role: .destructive) { perform { try profileStore.delete(profile.id) } }
+                            Button("삭제", systemImage: "trash", role: .destructive) {
+                                if protection.setting?.profileID == profile.id { protection.disable() }
+                                perform { try profileStore.delete(profile.id) }
+                            }
                                 .labelStyle(.iconOnly)
                                 .buttonStyle(.borderless)
                         }
@@ -59,6 +70,30 @@ struct ProfilesView: View {
                     }
                     .padding(.vertical, 2)
                 }
+            }
+            Section("구성 보호") {
+                LabeledContent("상태", value: protection.statusText)
+                if protection.isSuspended {
+                    Button("보호 다시 켜기") { protection.resume() }
+                }
+                if let at = protection.lastRestoreAt {
+                    LabeledContent("마지막 복원") {
+                        Text(at, format: .dateTime.hour().minute().second())
+                    }
+                    ForEach(protection.lastResults) { result in
+                        LabeledContent {
+                            Text(result.detail).font(.callout)
+                        } label: {
+                            HStack(spacing: 6) {
+                                Badge(text: result.outcome.title, color: Self.color(result.outcome))
+                                Text("\(result.kind.title), \(result.displayName)")
+                            }
+                        }
+                    }
+                }
+                Text("시스템이나 다른 프로그램이 구성을 바꾸면 보호 중인 프로파일의 해상도, 색 모드, HDR, 회전, 미러, 배치를 다시 적용. 앱 실행 중에만 동작. 이 앱에서 구성을 바꾸면 일시 중지, 60초 안에 3회 복원해도 다시 바뀌면 일시 중지")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             if !results.isEmpty {
                 Section("적용 결과: \(resultTitle)") {

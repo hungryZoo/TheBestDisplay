@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 75 |
-| SRS 설계 요구사항 | 49 |
-| TC | 68 |
+| PRD 요구사항 | 76 |
+| SRS 설계 요구사항 | 50 |
+| TC | 70 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -86,6 +86,7 @@
 | PRD-PRF-001 | P5 | 필수 | MRD-SCP-013, MRD-SCN-006 | SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift` | 통과 1 |
 | PRD-PRF-002 | P5 | 필수 | MRD-SCP-013 | SRS-PRF-002 | TC-PRF-002 | `Sources/TBDPlatform/ProfileApplier.swift`<br>`Sources/TBDCore/Profile.swift` | 통과 1 |
 | PRD-PRF-003 | P5 | 필수 | MRD-SCP-013 | SRS-INF-001, SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift`<br>`Sources/TBDPlatform/DisplayCatalog.swift` | 통과 1 |
+| PRD-PRF-004 | P6 | 권장 | MRD-SCP-013 | SRS-PRF-003 | TC-PRF-003, TC-PRF-004 | `Sources/TBDCore/Protection.swift`<br>`Sources/TBDApp/ProtectionController.swift` | 통과 2 |
 | PRD-SAF-001 | P2 | 필수 | MRD-SCP-014, MRD-DIF-004, MRD-RSK-002, MRD-SCN-004 | SRS-SAF-001 | TC-MOD-003, TC-COL-004, TC-HDR-002, TC-SAF-001 | `Sources/TBDCore/RevertGuard.swift` | 통과 4 |
 | PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
