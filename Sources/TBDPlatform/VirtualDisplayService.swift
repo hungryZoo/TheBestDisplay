@@ -46,6 +46,10 @@ public final class VirtualDisplayService: @unchecked Sendable {
     public func create(_ config: VirtualDisplayConfig, timeout: TimeInterval = 5, symbols: PrivateSymbols = .shared) throws -> CGDirectDisplayID {
         let issues = config.validationIssues()
         guard issues.isEmpty else { throw DisplayChangeError.unavailable(issues.joined(separator: ", ")) }
+        // 구성 검증과 별개의 최종 방어: 상한을 넘는 크기를 윈도우 서버에 넘기면 WindowServer가 중단될 수 있음 (T50 실측).
+        guard config.pixelWidth <= VirtualDisplayConfig.maxPixelWidth, config.pixelHeight <= VirtualDisplayConfig.maxPixelHeight else {
+            throw DisplayChangeError.unavailable("가상 디스플레이 크기가 상한 \(VirtualDisplayConfig.maxPixelWidth) x \(VirtualDisplayConfig.maxPixelHeight) 픽셀 초과")
+        }
         lock.lock()
         let existing = active[config.id]?.displayID
         lock.unlock()

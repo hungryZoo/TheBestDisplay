@@ -48,7 +48,7 @@
 | 37 | 연결 관리 | 디스플레이 재초기화, 재감지 | 구현 | PRD-EDO-004, PRD-ARR-009 |  |
 | 38 | 연결 관리 | 구성 보호 | 구현 | PRD-PRF-004 | 프로파일 주사율은 모드 단계에 포함 |
 | 39 | 가상 디스플레이 | 가상 스크린 생성(프리셋, 커스텀 종횡비, HiDPI) | 구현 | PRD-VRT-001 |  |
-| 40 | 가상 디스플레이 | HDR, 고주사율, 8K 초과 가상 스크린 | 부분 | PRD-VRT-001, PRD-VRT-004 | HDR과 주사율 지정 제공. 백킹 폭 상한 7680픽셀로 8K 초과 없음 |
+| 40 | 가상 디스플레이 | HDR, 고주사율, 8K 초과 가상 스크린 | 부분 | PRD-VRT-001, PRD-VRT-004, PRD-VRT-005 | HDR과 주사율 지정 제공. 8K 초과는 시스템이 거부하거나 WindowServer를 중단시켜 제외 (E-12) |
 | 41 | EDID | EDID 조회(OS 제공, I2C 직접), 해석, 내보내기 | 구현 | PRD-INF-002, PRD-INF-003, PRD-INF-005 |  |
 | 42 | EDID | EDID 리포트(CTA, DisplayID, tiled display 디코딩) | 구현 | PRD-INF-002, PRD-INF-006 | 타일 배치는 합성 자료로만 확인 |
 | 43 | EDID | 커스텀 EDID 적용과 원복 | 구현 | PRD-EDO-001-003 | LG TV에서 적용과 복귀 확인 (TC-EDO-003) |

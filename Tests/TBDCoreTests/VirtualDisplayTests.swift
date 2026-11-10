@@ -104,3 +104,24 @@ struct VirtualDisplayHDRTests {
         #expect(config.label == "1920 x 1080 HiDPI, 60 Hz")
     }
 }
+
+/// TC-VRT-004: 가상 디스플레이 크기 상한. 상한을 넘는 크기는 생성 전에 거부.
+@Suite("TC-VRT-004 가상 디스플레이 크기 상한")
+struct VirtualDisplayLimitTests {
+    @Test func 상한을_넘는_크기는_거부() {
+        // T50 실측에서 WindowServer를 중단시킨 크기와 시스템이 다른 모드로 대체한 크기.
+        #expect(!VirtualDisplayConfig(name: "큰 화면", width: 16384, height: 8640, hiDPI: false).validationIssues().isEmpty)
+        #expect(!VirtualDisplayConfig(name: "큰 화면", width: 10240, height: 5760, hiDPI: false).validationIssues().isEmpty)
+        // HiDPI는 백킹 크기로 판단.
+        let hiDPI = VirtualDisplayConfig(name: "큰 화면", width: 4096, height: 2304, hiDPI: true)
+        #expect(hiDPI.validationIssues().contains { $0.contains("백킹 폭 8192픽셀") })
+        let tall = VirtualDisplayConfig(name: "세로", width: 2000, height: 2400, hiDPI: true)
+        #expect(tall.validationIssues() == ["백킹 높이 4800픽셀이 상한 4320픽셀 초과"])
+    }
+
+    @Test func 상한_이내의_크기는_허용() {
+        #expect(VirtualDisplayConfig(name: "8K", width: 7680, height: 4320, hiDPI: false).validationIssues().isEmpty)
+        #expect(VirtualDisplayConfig(name: "4K HiDPI", width: 3840, height: 2160, hiDPI: true).validationIssues().isEmpty)
+        #expect(VirtualDisplayConfig.maxPixelWidth == 7680 && VirtualDisplayConfig.maxPixelHeight == 4320)
+    }
+}

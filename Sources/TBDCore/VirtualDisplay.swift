@@ -64,6 +64,10 @@ public struct VirtualDisplayConfig: Codable, Hashable, Sendable, Identifiable {
     public static let heightRange = 480...4320
     /// 백킹 폭 상한. 조사 문서 기준 보급형 칩의 HiDPI 렌더링 폭 한도는 6144픽셀, 상위 칩은 7680픽셀. 칩별 실제 한도는 생성 결과로 확인.
     public static let maxPixelWidth = 7680
+    /// 백킹 높이 상한.
+    /// 상한을 넘는 크기는 만들지 않음: 10240x5760 요청은 시스템이 1920x1080 모드로 대체했고,
+    /// 16384x8640 요청은 WindowServer가 모드 목록 생성 중 단언 실패로 중단되어 로그인 세션이 종료됨 (T50 실측, 2026-11-10).
+    public static let maxPixelHeight = 4320
 
     /// 구성의 문제 목록. 비어 있으면 유효.
     public func validationIssues() -> [String] {
@@ -72,6 +76,7 @@ public struct VirtualDisplayConfig: Codable, Hashable, Sendable, Identifiable {
         if !Self.widthRange.contains(width) { issues.append("폭은 \(Self.widthRange.lowerBound)-\(Self.widthRange.upperBound) 범위") }
         if !Self.heightRange.contains(height) { issues.append("높이는 \(Self.heightRange.lowerBound)-\(Self.heightRange.upperBound) 범위") }
         if pixelWidth > Self.maxPixelWidth { issues.append("백킹 폭 \(pixelWidth)픽셀이 상한 \(Self.maxPixelWidth)픽셀 초과") }
+        if pixelHeight > Self.maxPixelHeight { issues.append("백킹 높이 \(pixelHeight)픽셀이 상한 \(Self.maxPixelHeight)픽셀 초과") }
         if !(24...240).contains(refreshRate) { issues.append("주사율은 24-240 Hz 범위") }
         return issues
     }

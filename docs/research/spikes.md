@@ -185,3 +185,5 @@
 | T40 | `SLSConfigureDisplayEnabled`로 LG TV가 온라인인 상태에서 내장 디스플레이 해제와 재연결 확인 (재연결은 7초 안) |
 | T46 | 실험 04 (`spikes/04_virtual_hdr_probe`): `CGVirtualDisplayMode`의 전달 함수 값 0, 1, 2로 가상 디스플레이 생성. 값 1만 `SLSDisplaySupportsHDRMode` 참, HDR 켜짐. 0과 2는 HDR 미지원 |
 | T46 | CoreDisplay의 `CoreDisplay_Display_GetDisplayBrightnessInNits` 등 nits 함수는 디스플레이 ID가 아닌 내부 객체 포인터를 첫 인자로 받음 (역어셈블). 객체를 얻는 공개 근거가 없어 사용하지 않음 |
+| T50 | 가상 디스플레이 크기 실험 (상한을 16384 x 8640으로 올린 상태): 10240x5760 요청은 디스플레이가 온라인이 되었으나 모드가 1920x1080으로 대체됨. 16384x8640 요청은 `applySettings:`가 거짓을 반환하고 WindowServer가 중단됨. 충돌 보고서 `WindowServer-2026-11-10-214214.ips`: SIGABRT, 메인 스레드 호출 순서는 `CGXVirtualDisplayApply` → `WSVirtualDisplayApplyWithDictionary` → `CAWSManager::virtualDisplayApplyWithDictionary` → `set_display_digital_modes` → `SLCADisplay::process_display_connect` → `reevaluate_modes` → `GenerateModeListForDisplay` → `__assert_rtn`. 단언 문구는 보고서에 없음. 상한을 백킹 7680 x 4320으로 복원 |
+| T49 | `SLSConfigureDisplayEnabled`로 온라인 상태의 LG TV를 해제하고 2초 뒤 재연결: 약 3초 안에 온라인 복귀, 모드와 HDR과 색 프로파일 유지 |

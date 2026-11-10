@@ -261,8 +261,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 104건 중 통과 98건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 43행, 부분 12행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 106건 중 통과 100건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 44행, 부분 11행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 
@@ -274,6 +274,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | EDID 오버라이드 | 외장 디스플레이 한정. 재시동하면 원본 EDID로 복귀. 디스플레이 저장 장치 쓰기는 미제공. 독 경유 LG TV에서 적용과 복귀 확인 |
 | 사용자 정의 타이밍 | 가상 EDID에 상세 타이밍을 추가하는 방식. 시스템과 디스플레이의 수용 여부는 구성에 따라 다름. 독 경유 LG TV에서 2560x1440 100 Hz 추가 확인 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
+| 가상 디스플레이 크기 | 백킹 7680 x 4320 픽셀 이하. 더 큰 크기는 시스템이 다른 모드로 대체하거나 WindowServer를 중단시켜 사전 거부 |
 | 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드와 DSC 전환, 언더스캔 변경 (장비 없음). 사용자 정의 스케일 해상도 반영 (관리자 인증 필요) |
 | 모드 전환 경로 | SkyLight 직접 호출 경로는 독 경유 TV에서 미출력을 유발한 사례가 있어 기본 경로에서 제외 (`docs/adr/0005-mode-switch-path.md`) |
 
