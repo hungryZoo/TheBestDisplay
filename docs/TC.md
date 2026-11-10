@@ -66,6 +66,8 @@
 | TC-DDC-001 | DDC 패킷 구성과 응답 해석 확인 | PRD-DDC-003, SRS-DDC-001 | 없음 | VCP 0x10 읽기 요청 패킷 생성, 쓰기 패킷 생성, 정상 응답과 체크섬 오류 응답 해석 | 요청 바이트열과 체크섬이 기대값과 일치. 정상 응답에서 현재값과 최댓값 추출. 오류 응답 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-DDC-002 | DDC 미응답 탐지 확인 | PRD-DDC-001, SRS-DDC-001 | DDC 미응답 디스플레이 (LG TV) 온라인 | `tbdctl ddc <외장> probe` | 미응답 판정과 사유 문구 출력. 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 미실행 | LG TV 분리 상태. 재연결 후 실행 |
 | TC-DDC-003 | DDC 제어 확인 | PRD-DDC-002, PRD-BRT-002, SRS-DDC-001 | DDC 지원 모니터 온라인 | 밝기, 대비, 볼륨 읽기와 쓰기 후 복원 | 재조회 값이 설정값과 일치 | 통합 | macOS 26, Apple Silicon | 보류 | DDC 지원 모니터 필요 |
+| TC-DDC-004 | DDC capabilities 해석 확인 | PRD-DDC-004, SRS-DDC-002 | 없음 | 요청 바이트열, 응답 조각, 문자열 해석 | 요청 `83 F3 00 00 4F`. 조각의 오프셋과 자료 추출, 체크섬 오류 거부. 문자열에서 VCP 코드 10개와 선택값 추출, 잘린 문자열도 읽은 부분까지 해석 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-DDC-005 | DDC capabilities 조회 확인 | PRD-DDC-004, SRS-DDC-002 | DDC 지원 모니터 온라인 | `tbdctl ddc <외장> caps` | 모델, MCCS 판, VCP 코드 목록 출력 | 통합 | macOS 26, Apple Silicon | 보류 | DDC 지원 모니터 필요. 내장 디스플레이 대상 거부(종료 코드 3)는 확인 |
 | TC-CLR-001 | 색 프로파일 열거와 지정 확인 | PRD-CLR-001, SRS-CLR-002 | 디스플레이 온라인. 사용자에게 사전 알림 | `swift test`의 TC-CLR-001 묶음: 프로파일 목록 조회, sRGB 프로파일 지정, 재조회, 원래 프로파일 복원 | 목록 1개 이상이며 경로 중복 없음. 재조회 값이 지정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-CLR-002 | Night Shift와 True Tone 제어 확인 | PRD-CLR-003, PRD-CLR-004, SRS-CLR-003 | 내장 디스플레이 온라인. 사용자에게 사전 알림 | `swift test`의 TC-CLR-002 묶음: Night Shift 켜짐 상태와 강도, True Tone 상태를 각각 조회, 변경, 재조회, 복원 | 재조회 값이 변경값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-CLR-003 | 프리셋 지정 해석 확인 | PRD-CLR-005, SRS-CLR-004 | 없음 | 번호, 이름 일부, 없는 값, 여러 개와 맞는 이름으로 해석 | 번호와 유일한 이름은 해당 프리셋 반환. 없는 번호와 모호한 이름은 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |

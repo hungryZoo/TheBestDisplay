@@ -64,6 +64,37 @@ public enum DDCService {
         }
     }
 
+    /// capabilities 문자열 읽기: 오프셋을 올려 가며 조각을 모으고 빈 조각에서 종료. 응답이 없으면 nil. (SRS-DDC-002)
+    public static func capabilities(service: AVService, symbols: PrivateSymbols = .shared) -> DDCCapabilities? {
+        guard let io = functions(symbols) else { return nil }
+        return queue.sync {
+            var collected: [UInt8] = []
+            var failures = 0
+            while collected.count < 4096, failures < retries {
+                var request = DDCCapabilities.request(offset: collected.count)
+                guard io.write(service.ref, chipAddress, dataAddress, &request, UInt32(request.count)) == 0 else {
+                    failures += 1
+                    usleep(retryDelay)
+                    continue
+                }
+                usleep(replyDelay)
+                var reply = [UInt8](repeating: 0, count: 40)
+                guard io.read(service.ref, chipAddress, dataAddress, &reply, UInt32(reply.count)) == 0,
+                      let fragment = DDCCapabilities.parseFragment(reply), fragment.offset == collected.count
+                else {
+                    failures += 1
+                    usleep(retryDelay)
+                    continue
+                }
+                if fragment.data.isEmpty { break }
+                collected += fragment.data
+                failures = 0
+            }
+            guard !collected.isEmpty else { return nil }
+            return DDCCapabilities.parse(String(decoding: collected, as: UTF8.self))
+        }
+    }
+
     /// DDC 지원 탐지: 밝기, 대비, 볼륨, 입력 소스를 읽어 응답한 코드 수집. (PRD-DDC-001)
     public static func probe(for display: DisplaySummary, symbols: PrivateSymbols = .shared) -> DDCProbe {
         guard !display.identity.isBuiltin else { return DDCProbe(status: .notApplicable) }

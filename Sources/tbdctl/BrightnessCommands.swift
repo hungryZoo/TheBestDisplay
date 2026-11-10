@@ -87,8 +87,30 @@ func runDDC(_ command: ParsedCommand, json: Bool) {
         return
     }
 
+    if action == "caps" {
+        guard !display.identity.isBuiltin, let service = SignalService.avService(for: display) else {
+            writeError("오류: \(DDCProbe(status: display.identity.isBuiltin ? .notApplicable : .noChannel).reason)")
+            exit(.unsupported)
+        }
+        guard let caps = DDCService.capabilities(service: service) else {
+            writeError("오류: capabilities 응답 없음")
+            exit(.unsupported)
+        }
+        if json {
+            printJSON(caps)
+        } else {
+            print("\(display.identity.name) [id:\(display.id)] DDC capabilities: 모델 \(caps.model ?? "미보고"), MCCS \(caps.mccsVersion ?? "미보고"), VCP 코드 \(caps.vcpCodes.count)개")
+            for code in caps.vcpCodes {
+                let name = VCPCode(rawValue: code)?.title ?? "VCP"
+                let values = caps.vcpValues[code].map { " 선택값 " + $0.map { String(format: "%02X", $0) }.joined(separator: " ") } ?? ""
+                print("  0x\(String(format: "%02X", code)) \(name)\(values)")
+            }
+        }
+        return
+    }
+
     guard action == "get" || action == "set" else {
-        writeError("오류: 두 번째 인자는 probe, get, set 중 하나")
+        writeError("오류: 두 번째 인자는 probe, caps, get, set 중 하나")
         exit(.usage)
     }
     guard command.positionals.count > 2, let code = VCPCode.parse(command.positionals[2]) else {

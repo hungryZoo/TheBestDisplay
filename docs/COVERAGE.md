@@ -29,7 +29,7 @@
 | 18 | 색 모드 | 색 모드 유지(변경 감지 후 복원) | 구현 | PRD-PRF-004 | 프로파일 단위 구성 보호. 색 모드 복원 실측 없음 |
 | 19 | 색 모드 | GPU 디더링 토글 | 미구현 |  | `IOMobileFramebufferEnableDisableDithering` 심볼은 있으나 시그니처 미확인 |
 | 20 | DDC | 밝기, 대비, 볼륨, 음소거, RGB gain, 입력 전환, 전원 | 구현 | PRD-BRT-002, PRD-DDC-002, PRD-DDC-003 | RGB gain은 임의 VCP로 지정. DDC 지원 모니터 미보유로 보류 (TC-DDC-003) |
-| 21 | DDC | capabilities 탐지와 자동 구성, 임의 VCP 읽기 및 쓰기 | 부분 | PRD-DDC-001, PRD-DDC-003 | 응답 탐지와 임의 VCP 제공. capabilities 문자열 해석 없음 |
+| 21 | DDC | capabilities 탐지와 자동 구성, 임의 VCP 읽기 및 쓰기 | 부분 | PRD-DDC-001, PRD-DDC-003, PRD-DDC-004 | 응답 탐지, capabilities 해석, 임의 VCP 제공. capabilities 기반 화면 자동 구성 없음. 실제 모니터 조회는 보류 (TC-DDC-005) |
 | 22 | DDC | 내장 HDMI 포트 DDC | 미구현 |  | 내장 HDMI 경로의 칩 주소 실측 필요 (HDMI 직결 구성 없음) |
 | 23 | 밝기 | 하드웨어, 소프트웨어, 결합 밝기와 nits 표시 | 부분 | PRD-BRT-001-003 | 하드웨어와 소프트웨어 밝기 제공. nits는 EDID 최대 휘도만 표시 |
 | 24 | 밝기 | 소프트웨어 디밍(색 테이블, 오버레이), 0% 미만 디밍 | 부분 | PRD-BRT-003 | 색 테이블 디밍 (하한 10%). 오버레이 방식 없음 |

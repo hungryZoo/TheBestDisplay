@@ -215,6 +215,7 @@
 | PRD-DDC-001 | DDC 응답 여부 탐지와 미응답 시 사유 안내 | P4 | 필수 | MRD-SCP-009 |
 | PRD-DDC-002 | 대비, 볼륨, 음소거, 입력 소스, 전원 모드 제어 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 |
 | PRD-DDC-003 | 임의 VCP 코드 읽기와 쓰기 | P4 | 권장 | MRD-SCP-009 |
+| PRD-DDC-004 | DDC capabilities 조회와 해석: 모델, MCCS 판, 지원 VCP 코드와 코드별 선택값 목록 | P6 | 권장 | MRD-SCP-009 |
 
 ### 6.11 색 조정 (CLR)
 
