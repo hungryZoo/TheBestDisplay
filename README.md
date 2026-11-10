@@ -141,7 +141,7 @@ scripts/build_app.sh
 
 - 결과물: `build/TheBestDisplay.app` (ad-hoc 서명). 번들의 `Contents/MacOS/tbdctl`에 명령행 도구 포함
 - 명령행 도구만 빌드: `swift build -c release --product tbdctl`
-- DMG와 체크섬, cask 파일 생성: `scripts/build_dmg.sh` (결과물은 `dist/`)
+- DMG와 체크섬, cask 파일 생성: `scripts/build_dmg.sh` (결과물은 `dist/`). 릴리스 뒤 cask 등록: `scripts/publish_cask.sh`
 
 ### 업데이트
 
