@@ -6,12 +6,18 @@
 
 해상도, HiDPI, 주사율, HDR, 색 모드(RGB, YCbCr), DSC 상태를 조회하고 바꾸며, 화면이 나오지 않거나 원하는 모드를 고를 수 없는 이유를 수치로 표시
 
-![platform](https://img.shields.io/badge/platform-macOS%2015%2B%20Apple%20Silicon-blue?style=flat-square)
-![built with](https://img.shields.io/badge/built%20with-Swift%2C%20SwiftUI-orange?style=flat-square&logo=swift)
+[![Release](https://img.shields.io/github/v/release/hungryZoo/TheBestDisplay?style=flat-square)](https://github.com/hungryZoo/TheBestDisplay/releases/latest)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![Built with](https://img.shields.io/badge/built%20with-Swift%20%2B%20SwiftUI-F05138?style=flat-square&logo=swift&logoColor=white)](Package.swift)
 
 ```bash
-scripts/build_app.sh && open build/TheBestDisplay.app
+brew install hungryZoo/tap/thebestdisplay
+xattr -dr com.apple.quarantine "/Applications/TheBestDisplay.app"
+open -a "TheBestDisplay"
 ```
+
+[![macOS 15+](https://img.shields.io/badge/macOS-15%2B-000000?style=flat-square&logo=apple&logoColor=white)](#6-지원-범위)
+[![Apple Silicon](https://img.shields.io/badge/arch-Apple%20Silicon%20(arm64)-000000?style=flat-square)](#6-지원-범위)
 
 <img width="780" src="docs/images/diagnostics.jpg" alt="연결 진단 화면: 발견 항목 3건과 포트별 연결 경로">
 
@@ -33,7 +39,11 @@ scripts/build_app.sh && open build/TheBestDisplay.app
    - [기능](#기능)
    - [동작 구조](#동작-구조)
 2. [설치](#2-설치)
+   - [Homebrew (권장)](#homebrew-권장)
+   - [DMG 수동 설치](#dmg-수동-설치)
    - [소스 빌드](#소스-빌드)
+   - [업데이트](#업데이트)
+   - [삭제](#삭제)
    - [요구 사항](#요구-사항)
 3. [빠른 시작](#3-빠른-시작)
 4. [사용법](#4-사용법)
@@ -74,6 +84,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 배치 | 회전, 미러, 메인 지정, 위치 편집, 16방향 정렬, 논리적 연결 해제와 재연결, 외장 연결 시 내장 자동 해제, 언더스캔 |
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
 | 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
+| 업데이트 | 하루 1회 새 버전 확인, 업데이트 창(패치 노트, 이 버전 건너뛰기, 다음에, 예), Homebrew 설치본의 자동 갱신 |
 
 ### 동작 구조
 
@@ -90,6 +101,38 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 
 ## 2. 설치
 
+### Homebrew (권장)
+
+```bash
+brew install hungryZoo/tap/thebestdisplay
+xattr -dr com.apple.quarantine "/Applications/TheBestDisplay.app"
+open -a "TheBestDisplay"
+```
+
+- 앱은 ad-hoc 서명이며 Apple 공증을 받지 않음. 격리 속성이 남아 있으면 macOS가 첫 실행을 차단하므로 `xattr` 줄로 속성 제거
+- `xattr` 대신 시스템 설정의 개인정보 보호 및 보안에서 "그래도 열기"로 승인 가능
+- 전체 이름(`hungryZoo/tap/thebestdisplay`)으로 설치하면 tap 추가와 cask 선택은 Homebrew가 처리
+- 명령행 도구 `tbdctl`은 Homebrew의 `bin`에 함께 연결됨
+- cask 정의: [hungryZoo/homebrew-tap](https://github.com/hungryZoo/homebrew-tap)
+
+### DMG 수동 설치
+
+- (1) [최신 릴리스](https://github.com/hungryZoo/TheBestDisplay/releases/latest)에서 `TheBestDisplay-<버전>.dmg` 내려받기
+- (2) DMG를 열어 `TheBestDisplay.app`을 응용 프로그램 폴더로 복사
+- (3) 격리 속성 제거 후 실행
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/TheBestDisplay.app"
+```
+
+체크섬 검증은 같은 릴리스의 `.sha256` 파일을 함께 내려받은 폴더에서 실행:
+
+```bash
+shasum -a 256 -c TheBestDisplay-<버전>.dmg.sha256
+```
+
+명령행 도구는 번들 안에 있음: `/Applications/TheBestDisplay.app/Contents/MacOS/tbdctl`
+
 ### 소스 빌드
 
 ```bash
@@ -98,7 +141,45 @@ scripts/build_app.sh
 
 - 결과물: `build/TheBestDisplay.app` (ad-hoc 서명). 번들의 `Contents/MacOS/tbdctl`에 명령행 도구 포함
 - 명령행 도구만 빌드: `swift build -c release --product tbdctl`
-- 배포판과 패키지 관리자 설치는 미제공
+- DMG와 체크섬, cask 파일 생성: `scripts/build_dmg.sh` (결과물은 `dist/`)
+
+### 업데이트
+
+앱은 하루 1회 백그라운드에서 GitHub의 최신 릴리스를 조회하고, 새 버전이 있으면 메인 창을 연 직후 업데이트 창을 표시. 창에는 새 버전, 현재 버전, 패치 노트(릴리스 본문)가 나옴.
+
+| 버튼 | 동작 |
+| --- | --- |
+| 이 버전 건너뛰기 | 해당 버전을 다시 알리지 않음. 더 새 버전이 나오면 다시 표시 |
+| 다음에 | 창만 닫음. 다음 실행 때 다시 표시 |
+| 예 | 설치 방식에 따라 갱신 (아래 표) |
+
+| 설치 방식 | 판정 근거 | 예를 눌렀을 때 |
+| --- | --- | --- |
+| Homebrew | 앱이 `/Applications` 또는 `~/Applications`에 있고 `/opt/homebrew/Caskroom/thebestdisplay`가 있음 | 앱을 종료하고 터미널에서 `brew update`, `brew upgrade hungryZoo/tap/thebestdisplay`, `xattr`, `open` 실행 |
+| DMG, 소스 빌드 | 위 조건에 해당하지 않음 | 브라우저에서 릴리스 페이지 열기 |
+
+- 설정(Command + ,)의 업데이트 자동 확인을 끄면 자동 확인과 창 표시가 모두 멈춤
+- 설정의 지금 확인과 도움말 메뉴의 업데이트 확인은 주기와 건너뛴 버전에 관계없이 바로 확인
+- 확인 결과 캐시: `~/Library/Caches/TheBestDisplay/update-check.json`
+- 조회 요청 외의 정보는 보내지 않음
+
+수동 업데이트 (앱을 종료한 뒤 실행. `xattr` 단계는 공증 전까지 업데이트마다 필요):
+
+```bash
+brew update
+brew upgrade hungryZoo/tap/thebestdisplay
+xattr -dr com.apple.quarantine "/Applications/TheBestDisplay.app"
+```
+
+Homebrew 7은 신뢰하지 않은 서드파티 tap을 이름 없는 `brew upgrade`에서 건너뛰므로 전체 이름으로 실행.
+
+### 삭제
+
+```bash
+brew uninstall hungryZoo/tap/thebestdisplay
+```
+
+설정과 캐시까지 지우려면 `brew uninstall --zap hungryZoo/tap/thebestdisplay`. 사용자 정의 스케일 해상도를 등록했다면 `/Library/Displays/Contents/Resources/Overrides/` 아래 파일은 별도로 삭제.
 
 ### 요구 사항
 
@@ -106,15 +187,16 @@ scripts/build_app.sh
 | --- | --- |
 | 기기 | Apple Silicon Mac |
 | macOS | 15 이상 (검증은 macOS 26.5에서 수행) |
-| 빌드 도구 | Xcode의 Swift 6 도구 모음 |
+| 빌드 도구 (소스 빌드 시) | Xcode의 Swift 6 도구 모음 |
 | 외부 패키지 | 없음 |
+| Homebrew | 7 이상 기준으로 안내 작성 |
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 
 ## 3. 빠른 시작
 
 ```bash
-scripts/build_app.sh && open build/TheBestDisplay.app
+open -a "TheBestDisplay"
 ```
 
 - (1) 사이드바에서 디스플레이 선택
@@ -125,7 +207,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 명령행에서 같은 정보 확인:
 
 ```bash
-build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
+tbdctl diagnose
 ```
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
@@ -206,6 +288,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl profile check <이름>` | 프로파일과 현재 구성의 차이 조회 |
 | `tbdctl profile protect <이름>`, `profile unprotect`, `profile protection` | 구성 보호 설정, 해제, 상태 조회 |
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 |
+| `tbdctl --version`, `tbdctl version` | 버전 표시 |
+| `tbdctl check-update` | GitHub 최신 릴리스 조회와 현재 버전 비교 |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
@@ -228,6 +312,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | Command + R | 전체 새로 고침 |
 | Command + E | 진단 보고서 내보내기 |
+| Command + , | 설정 (업데이트 자동 확인) |
 | Return | 확인 대화상자의 유지 |
 | Escape | 확인 대화상자의 복귀 |
 
@@ -246,13 +331,16 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `mode-favorites.json` | 디스플레이별 즐겨찾기 모드 |
 | `auto-disconnect.json` | 내장 자동 연결 해제 설정과 해제해 둔 내장 디스플레이 ID |
 | `hdr-profiles.json` | 디스플레이별 SDR과 HDR 상태의 색 프로파일 지정 |
+| `luminance-reference.json` | 디스플레이별 최대 휘도 기준값 |
+| `saturation.json`, `Profiles/` | 채도 조정의 기준 프로파일 기록과 만들어 지정한 색 프로파일 파일 |
 
 - 사용자 정의 스케일 해상도는 `/Library/Displays/Contents/Resources/Overrides/` 아래 오버라이드 파일에 저장 (관리자 인증 필요)
 
 - 가상 디스플레이, HiDPI 스케일링, 소프트웨어 디밍, 소프트웨어 색 조정, XDR 밝기 업스케일은 앱 실행 중에만 유지
 - 가상 EDID는 재시동 전까지 유지
 - HiDPI 스케일링 중에는 대상 디스플레이의 HDR이 꺼짐 (LG TV 실측: RGB 8 bpc SDR 송출)
-- 모드, 색 프로파일, HDR, 회전, 배치는 시스템이 저장하므로 앱을 종료해도 유지
+- 모드, 색 프로파일(채도 조정 포함), HDR, 회전, 배치는 시스템이 저장하므로 앱을 종료해도 유지
+- 그 밖의 저장 위치: 앱 설정(자동 확인, 건너뛴 버전, 마지막 탭 등)은 `~/Library/Preferences/dev.thebestdisplay.app.plist`, 업데이트 확인 캐시는 `~/Library/Caches/TheBestDisplay/`
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 
@@ -278,7 +366,9 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | 사용자 정의 타이밍 | 가상 EDID에 상세 타이밍을 추가하는 방식. 시스템과 디스플레이의 수용 여부는 구성에 따라 다름. 독 경유 LG TV에서 2560x1440 100 Hz 추가 확인 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
 | 가상 디스플레이 크기 | 백킹 7680 x 4320 픽셀 이하. 더 큰 크기는 시스템이 다른 모드로 대체하거나 WindowServer를 중단시켜 사전 거부 |
-| 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드와 DSC 전환, 언더스캔 변경 (장비 없음). 사용자 정의 스케일 해상도 반영 (관리자 인증 필요) |
+| 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드와 DSC 전환, 언더스캔 변경 (장비 없음) |
+| 서명과 공증 | ad-hoc 서명만 적용. 내려받은 뒤 첫 실행과 업데이트마다 `xattr` 단계 필요 |
+| 비공개 API | macOS 판에 따라 일부 기능이 비활성으로 표시될 수 있음 (`tbdctl capabilities`로 확인) |
 | 모드 전환 경로 | SkyLight 직접 호출 경로는 독 경유 TV에서 미출력을 유발한 사례가 있어 기본 경로에서 제외 (`docs/adr/0005-mode-switch-path.md`) |
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
@@ -295,7 +385,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `Sources/tbdctl` | 명령행 도구 |
 | `Tests` | 단위 테스트와 통합 테스트, IORegistry와 EDID 픽스처 |
 | `docs` | 명세(MRD, PRD, SRS, TC), ADR, 조사 문서, 로드맵 |
-| `scripts` | 앱 번들 조립, 테스트 실행, 추적성 검사 |
+| `scripts` | 앱 번들 조립, DMG와 cask 생성, 테스트 실행, 추적성 검사 |
+| `.github/release-notes` | 버전별 릴리스 노트 |
 | `spikes` | 선행 실험 코드 |
 
 ### 테스트
@@ -332,14 +423,17 @@ uv run scripts/trace_check.py
 - [x] P6 DSC 전환, EDID 오버라이드, 사용자 정의 타이밍, 사용자 정의 스케일 해상도, XDR 밝기 업스케일, 주사율 측정, 구성 보호, 디스플레이 프리셋, 즐겨찾기와 슬라이더, 밝기 동기화, 포트 부가 정보, 타이밍 직접 선택, HDCP 능력 표시, 16방향 정렬, DDC capabilities 해석, notch 모드 전환
 - [x] 외장 디스플레이 실측: 회전, DDC 미응답 탐지, 가상 EDID 적용, 사용자 정의 타이밍 적용, 타이밍 직접 선택
 - [x] 실제 외장 디스플레이 대상 HiDPI 스케일링 실측
-- [ ] 사용자 조작이 필요한 실측: 사용자 정의 스케일 해상도 반영(관리자 인증)
+- [x] 사용자 정의 스케일 해상도 반영 실측 (관리자 인증)
+- [x] P7 출시: 버전 정보와 업데이트 확인, 릴리스 빌드, Homebrew cask
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
 - [ ] 미구현 기능 3행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
+- [ ] EDID에 HDR 선언 추가 (HDR 미선언 디스플레이의 HDR 사용)
+- [ ] Developer ID 서명과 공증
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 
 ## 9. 라이선스
 
-미정. 라이선스 파일 없음.
+MIT. [LICENSE](LICENSE) 참고.
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>

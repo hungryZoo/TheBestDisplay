@@ -16,12 +16,12 @@ extension RegistryFixture {
     }
 
     static let lgTV = DisplaySummary(
-        identity: DisplayIdentity(displayID: 2, uuid: "5217ECC3", vendorID: 7789, productID: 49352, serialNumber: 16843009, name: "LG TV SSCR2", isBuiltin: false),
+        identity: DisplayIdentity(displayID: 2, uuid: "TESTUUID2", vendorID: 7789, productID: 49352, serialNumber: 16843009, name: "LG TV SSCR2", isBuiltin: false),
         isMain: true, isActive: true, mirrorsDisplayID: nil, pointWidth: 2304, pointHeight: 1296, pixelWidth: 4608, pixelHeight: 2592,
         refreshRate: 120, rotationDegrees: 0, originX: 0, originY: 0, physicalWidthMM: 1600, physicalHeightMM: 900
     )
     static let builtin = DisplaySummary(
-        identity: DisplayIdentity(displayID: 1, uuid: "37D8832A", vendorID: 1552, productID: 41054, serialNumber: 1, name: "내장 디스플레이", isBuiltin: true),
+        identity: DisplayIdentity(displayID: 1, uuid: "TESTUUID1", vendorID: 1552, productID: 41054, serialNumber: 1, name: "내장 디스플레이", isBuiltin: true),
         isMain: false, isActive: true, mirrorsDisplayID: nil, pointWidth: 1512, pointHeight: 982, pixelWidth: 3024, pixelHeight: 1964,
         refreshRate: 120, rotationDegrees: 0, originX: 0, originY: 0, physicalWidthMM: 301, physicalHeightMM: 196
     )

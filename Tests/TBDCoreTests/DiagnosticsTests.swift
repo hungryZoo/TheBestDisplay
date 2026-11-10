@@ -382,7 +382,7 @@ struct ReportExporterTests {
         #expect(hex.hasPrefix("00ffffffffffff001e6dc8c000000000011f"))
         let json = String(decoding: try ReportExporter.json(report), as: UTF8.self)
         #expect(!json.contains("16843009"))
-        #expect(!json.contains("5217ECC3"))
+        #expect(!json.contains("TESTUUID2"))
         // 가린 뒤에도 진단 결과는 원본 기준과 동일.
         #expect(report.result == DiagnosticEngine.evaluate(try SnapshotFixture.normal()))
     }
