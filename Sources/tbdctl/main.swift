@@ -1,0 +1,88 @@
+import Foundation
+import TBDCore
+import TBDPlatform
+
+// tbdctl: TheBestDisplay 명령행 도구. (SRS-CLI-001)
+
+let parser = CommandLineParser(specs: [
+    CommandSpec(name: "list", summary: "디스플레이 목록"),
+    CommandSpec(name: "capabilities", summary: "기능별 가용성"),
+    CommandSpec(name: "help", summary: "사용법"),
+])
+
+func writeError(_ text: String) {
+    FileHandle.standardError.write(Data((text + "\n").utf8))
+}
+
+func exit(_ code: ExitCode) -> Never {
+    Foundation.exit(code.rawValue)
+}
+
+func printJSON<T: Encodable>(_ value: T) {
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+    encoder.dateEncodingStrategy = .iso8601
+    guard let data = try? encoder.encode(value), let text = String(data: data, encoding: .utf8) else {
+        writeError("JSON 변환 실패")
+        exit(.failure)
+    }
+    print(text)
+}
+
+let arguments = Array(CommandLine.arguments.dropFirst())
+if arguments.isEmpty || arguments.contains("--help") || arguments.contains("-h") {
+    print(parser.usage)
+    exit(arguments.isEmpty ? .usage : .success)
+}
+
+let command: ParsedCommand
+do {
+    command = try parser.parse(arguments)
+} catch let error as CommandLineError {
+    writeError("오류: \(error.message)")
+    writeError(parser.usage)
+    exit(error.exitCode)
+} catch {
+    writeError("오류: \(error)")
+    exit(.failure)
+}
+
+let json = command.has("--json")
+
+switch command.name {
+case "help":
+    print(parser.usage)
+
+case "list":
+    let displays = DisplayCatalog.displays()
+    if json {
+        printJSON(displays)
+    } else if displays.isEmpty {
+        print("온라인 디스플레이 없음")
+    } else {
+        for (index, d) in displays.enumerated() {
+            var tags: [String] = [d.identity.isBuiltin ? "내장" : "외장"]
+            if d.isMain { tags.append("메인") }
+            if let mirror = d.mirrorsDisplayID { tags.append("미러 대상 id:\(mirror)") }
+            if d.rotationDegrees != 0 { tags.append("회전 \(Int(d.rotationDegrees))도") }
+            print("\(index + 1). \(d.identity.name) [id:\(d.identity.displayID)] (\(tags.joined(separator: ", ")))")
+            print("   \(d.modeDescription), 픽셀 \(d.pixelWidth) x \(d.pixelHeight), 위치 (\(d.originX), \(d.originY))")
+        }
+    }
+
+case "capabilities":
+    let statuses = PrivateSymbols.shared.allStatuses()
+    if json {
+        printJSON(statuses)
+    } else {
+        for s in statuses {
+            print("\(s.isAvailable ? "가용  " : "미가용") \(s.capability.title)" + (s.isAvailable ? "" : " — 누락: \(s.missingSymbols.joined(separator: ", "))"))
+        }
+    }
+
+default:
+    writeError("오류: 미구현 명령 \(command.name)")
+    exit(.unsupported)
+}
+
+exit(.success)

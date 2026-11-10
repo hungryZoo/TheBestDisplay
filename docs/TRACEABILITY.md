@@ -22,12 +22,12 @@
 
 | PRD | 단계 | 우선순위 | MRD | SRS | TC | 구현 위치 | TC 결과 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| PRD-APP-001 | P1 | 필수 | MRD-SCP-001, MRD-DIF-001 | SRS-ARC-001, SRS-ARC-003, SRS-UI-002 | TC-APP-001 | `Package.swift`<br>`Sources/TBDApp/TheBestDisplayApp.swift`<br>`scripts/build_app.sh` | 미실행 1 |
-| PRD-APP-002 | P1 | 필수 | MRD-SCP-001 | SRS-UI-001 | TC-APP-002 | `Sources/TBDApp/Views/` | 미실행 1 |
-| PRD-APP-003 | P1 | 필수 | MRD-SCP-001, MRD-PRB-005 | SRS-UI-001 | TC-APP-002 | `Sources/TBDApp/Views/` | 미실행 1 |
+| PRD-APP-001 | P1 | 필수 | MRD-SCP-001, MRD-DIF-001 | SRS-ARC-001, SRS-ARC-003, SRS-UI-002 | TC-APP-001 | `Package.swift`<br>`Sources/TBDApp/TheBestDisplayApp.swift`<br>`scripts/build_app.sh` | 통과 1 |
+| PRD-APP-002 | P1 | 필수 | MRD-SCP-001 | SRS-UI-001 | TC-APP-002 | `Sources/TBDApp/Views/` | 통과 1 |
+| PRD-APP-003 | P1 | 필수 | MRD-SCP-001, MRD-PRB-005 | SRS-UI-001 | TC-APP-002 | `Sources/TBDApp/Views/` | 통과 1 |
 | PRD-APP-004 | P1 | 필수 | MRD-SCP-001 | SRS-ARC-004 | TC-APP-003 | `Sources/TBDApp/DisplayStore.swift` | 미실행 1 |
-| PRD-APP-005 | P1 | 필수 | MRD-RSK-001, MRD-RSK-003 | SRS-ARC-002 | TC-APP-004 | `Sources/TBDPlatform/PrivateSymbols.swift` | 미실행 1 |
-| PRD-INF-001 | P1 | 필수 | MRD-SCP-002 | SRS-INF-001 | TC-INF-001 | `Sources/TBDPlatform/DisplayCatalog.swift` | 미실행 1 |
+| PRD-APP-005 | P1 | 필수 | MRD-RSK-001, MRD-RSK-003 | SRS-ARC-002 | TC-APP-004 | `Sources/TBDPlatform/PrivateSymbols.swift` | 통과 1 |
+| PRD-INF-001 | P1 | 필수 | MRD-SCP-002 | SRS-INF-001 | TC-INF-001 | `Sources/TBDPlatform/DisplayCatalog.swift` | 통과 1 |
 | PRD-INF-002 | P1 | 필수 | MRD-SCP-002 | SRS-INF-002 | TC-INF-002, TC-INF-003 | `Sources/TBDCore/EDID/` | 미실행 2 |
 | PRD-INF-003 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 | SRS-INF-003 | TC-INF-005 | `Sources/TBDPlatform/EDIDSource.swift` | 미실행 1 |
 | PRD-INF-004 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 | SRS-INF-002 | TC-INF-003 | `Sources/TBDCore/EDID/` | 미실행 1 |
@@ -87,4 +87,4 @@
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
 | PRD-CLI-001 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-001 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1 |
 | PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1 |
-| PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1 |
+| PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |

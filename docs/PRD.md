@@ -65,6 +65,7 @@
 | 명령 | 내용 |
 | --- | --- |
 | `tbdctl list` | 디스플레이 목록 |
+| `tbdctl capabilities` | 기능별 가용성과 누락 심볼 |
 | `tbdctl info <디스플레이>` | 제품 정보와 EDID 해석 |
 | `tbdctl modes <디스플레이>` | 전체 모드 목록 |
 | `tbdctl signal <디스플레이>` | 현재 신호 형식과 색 모드 목록 |
@@ -221,6 +222,6 @@
 
 | ID | 요구사항 | 단계 | 우선순위 | MRD 근거 |
 | --- | --- | --- | --- | --- |
-| PRD-CLI-001 | 조회 명령 제공: `list`, `info`, `modes`, `signal`, `link`, `ports`, `diagnose`, `report`. `--json` 출력 지원 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 |
+| PRD-CLI-001 | 조회 명령 제공: `list`, `capabilities`, `info`, `modes`, `signal`, `link`, `ports`, `diagnose`, `report`. `--json` 출력 지원 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 |
 | PRD-CLI-002 | 설정 명령 제공: `set-mode`, `set-color`, `hdr`, `brightness`, `ddc`, `rotate`, `mirror`, `profile` | P2 | 권장 | MRD-SCP-015, MRD-USR-003 |
 | PRD-CLI-003 | 종료 코드 규약 준수: 0 성공, 1 실행 실패, 2 사용법 오류, 3 미지원 기능 또는 대상 없음 | P1 | 필수 | MRD-SCP-015 |

@@ -10,11 +10,11 @@
 
 | ID | 목적 | 관련 ID | 사전 조건 | 절차 및 입력 | 기대 결과 | 유형 | 플랫폼 | 결과 | 이슈 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| TC-APP-001 | 창 앱 실행과 종료 확인 | PRD-APP-001, SRS-ARC-001, SRS-ARC-003, SRS-UI-002 | 앱 번들 빌드 완료 | `scripts/build_app.sh` 실행 후 앱 실행, 메뉴 막대 확인, 창 닫기 | 창 1개 표시, 메뉴 막대 상태 항목 없음, 창 닫기 후 프로세스 종료 | 수동 | macOS 26, Apple Silicon | 미실행 | |
-| TC-APP-002 | 사이드바와 탭 구성 확인 | PRD-APP-002, PRD-APP-003, SRS-UI-001 | 디스플레이 2대 온라인 | 앱 실행 후 사이드바 항목과 디스플레이별 탭 확인 | 디스플레이 2대, 연결 진단, 프로파일 항목 표시. 탭 7종 표시 | 수동 | macOS 26, Apple Silicon | 미실행 | |
-| TC-APP-003 | 구성 변경 자동 갱신 확인 | PRD-APP-004, SRS-ARC-004 | 앱 실행 중 | 시스템 설정에서 해상도 변경 | 1초 이내 앱 표시값 갱신 | 수동 | macOS 26, Apple Silicon | 미실행 | |
-| TC-APP-004 | 누락 심볼 처리 확인 | PRD-APP-005, SRS-ARC-002 | 없음 | 존재하지 않는 심볼 이름으로 조회, 존재하는 심볼 이름으로 조회 | 누락 심볼은 nil과 미가용 판정, 존재 심볼은 가용 판정. 충돌 없음 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-INF-001 | 디스플레이 식별 정보 확인 | PRD-INF-001, SRS-INF-001 | 디스플레이 2대 온라인 | `tbdctl list --json` 결과를 `system_profiler SPDisplaysDataType`와 비교 | 디스플레이 수, 이름, 내장 여부, 해상도 일치 | 통합 | macOS 26, Apple Silicon | 미실행 | |
+| TC-APP-001 | 창 앱 실행과 종료 확인 | PRD-APP-001, SRS-ARC-001, SRS-ARC-003, SRS-UI-002 | 앱 번들 빌드 완료 | `scripts/build_app.sh` 실행 후 앱 실행, `scripts/window_probe.swift`로 상태 항목 창 수 확인, 창 닫기 | 창 1개 표시, 메뉴 막대 상태 항목 없음, 창 닫기 후 프로세스 종료 | 수동 | macOS 26, Apple Silicon | 통과 | |
+| TC-APP-002 | 사이드바와 탭 구성 확인 | PRD-APP-002, PRD-APP-003, SRS-UI-001 | 디스플레이 2대 온라인 | 앱 실행 후 사이드바 항목과 디스플레이별 탭 확인 | 디스플레이 2대, 연결 진단, 프로파일 항목 표시. 탭 7종 표시 | 수동 | macOS 26, Apple Silicon | 통과 | |
+| TC-APP-003 | 구성 변경 자동 갱신 확인 | PRD-APP-004, SRS-ARC-004 | 앱 실행 중 | 시스템 설정에서 해상도 변경 | 1초 이내 앱 표시값 갱신 | 수동 | macOS 26, Apple Silicon | 미실행 | 모드 전환 기능(T04) 구현 후 실행 |
+| TC-APP-004 | 누락 심볼 처리 확인 | PRD-APP-005, SRS-ARC-002 | 없음 | 존재하지 않는 심볼 이름으로 조회, 존재하는 심볼 이름으로 조회 | 누락 심볼은 nil과 미가용 판정, 존재 심볼은 가용 판정. 충돌 없음 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-INF-001 | 디스플레이 식별 정보 확인 | PRD-INF-001, SRS-INF-001 | 디스플레이 2대 온라인 | `swift test`의 TC-INF-001 묶음: `DisplayCatalog` 결과를 `system_profiler SPDisplaysDataType -json`과 비교 | 디스플레이 수, 이름, 내장 여부, 해상도 일치 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-INF-002 | EDID 기본 블록 해석 확인 | PRD-INF-002, SRS-INF-002 | LG TV EDID 픽스처 | 픽스처 384바이트 해석 | 제조사 GSM, 제품 코드 49352, 제조 연도 2021, 제품명 LG TV SSCR2, 상세 타이밍 3840x2160 포함 | 단위 | macOS 26, Apple Silicon | 미실행 | |
 | TC-INF-003 | EDID 확장 블록과 싱크 능력 해석 확인 | PRD-INF-002, PRD-INF-004, SRS-INF-002 | LG TV EDID 픽스처 | CTA-861 확장과 DisplayID 확장 해석 | HDR 정적 메타데이터(PQ, HLG), BT.2020 색 공간, HDMI VSDB, HF-VSDB 항목 추출. 주사율 범위 24-120 Hz | 단위 | macOS 26, Apple Silicon | 미실행 | |
 | TC-INF-004 | 손상 EDID 내성 확인 | SRS-INF-002 | 없음 | 빈 입력, 127바이트, 체크섬 오류, 확장 블록 길이 초과, 무작위 바이트 1,000건 | 충돌 없음. 오류 목록과 부분 결과 반환 | 단위 | macOS 26, Apple Silicon | 미실행 | |
@@ -62,7 +62,7 @@
 | TC-SAF-002 | 복귀 정보 파일 확인 | PRD-SAF-002, SRS-SAF-002 | 임시 폴더 | 기록, 조회, 삭제. 손상 파일 조회 | 기록 후 조회값 동일. 삭제 후 없음. 손상 파일은 없음으로 처리 | 단위 | macOS 26, Apple Silicon | 미실행 | |
 | TC-CLI-001 | 조회 명령 확인 | PRD-CLI-001, SRS-CLI-001 | 디스플레이 온라인 | `list`, `info`, `modes`, `signal`, `link`, `ports`, `diagnose`를 `--json`으로 실행 | 전 명령 종료 코드 0. 출력이 유효한 JSON | 통합 | macOS 26, Apple Silicon | 미실행 | |
 | TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
-| TC-CLI-003 | 인자 해석과 종료 코드 확인 | PRD-CLI-003, SRS-CLI-001 | 없음 | 알 수 없는 명령, 인자 누락, 없는 디스플레이 지정, 정상 명령 해석 | 사용법 오류 2, 대상 없음 3, 정상 해석 결과 일치 | 단위 | macOS 26, Apple Silicon | 미실행 | |
+| TC-CLI-003 | 인자 해석과 종료 코드 확인 | PRD-CLI-003, SRS-CLI-001 | 없음 | 알 수 없는 명령, 인자 누락, 없는 디스플레이 지정, 정상 명령 해석 | 사용법 오류 2, 대상 없음 3, 정상 해석 결과 일치 | 단위 | macOS 26, Apple Silicon | 통과 | |
 
 ## 2. 선행 검증 대응 표
 
