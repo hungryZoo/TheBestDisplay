@@ -31,6 +31,12 @@ final class DisplayStore {
     private(set) var diagnosticSnapshot: DiagnosticSnapshot?
     private(set) var diagnosis = DiagnosticResult(findings: [], portDiagnoses: [])
     private(set) var eventLog = EventLog()
+    /// 가상 디스플레이 구성과 켜진 가상 디스플레이의 ID.
+    private(set) var virtualConfigs: [VirtualDisplayConfig] = []
+    private(set) var activeVirtualIDs: [UUID: UInt32] = [:]
+    /// HiDPI 스케일링 중인 실제 디스플레이와 그 가상 디스플레이 구성.
+    private(set) var scalingConfigs: [UInt32: VirtualDisplayConfig] = [:]
+    @ObservationIgnored private let virtualStore = VirtualDisplayStore.standard
     /// 이 앱에서 연결 해제한 디스플레이 (ID와 이름). 재연결 항목 표시에 사용.
     private(set) var disconnected: [UInt32: String] = [:]
     @ObservationIgnored private var lastEventState: EventState?
@@ -55,6 +61,7 @@ final class DisplayStore {
             capabilities[status.capability] = status
         }
         refresh()
+        loadVirtualDisplays()
         startMonitoring()
     }
 
@@ -133,10 +140,98 @@ final class DisplayStore {
         let state = EventState(diagnostic)
         if let previous = lastEventState { eventLog.record(from: previous, to: state, at: diagnostic.capturedAt) }
         lastEventState = state
+        syncVirtualState()
         refreshCount += 1
         // 재구성 뒤 시스템이 전달 테이블을 초기화하므로 소프트웨어 조정 값 재적용.
         GammaService.shared.reapply(onlineDisplays: snapshot.displays.map(\.id))
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))
+    }
+
+    // MARK: - 가상 디스플레이 (PRD-VRT-001-003)
+
+    /// 저장된 구성을 읽고 실행 시 복원 대상 생성.
+    func loadVirtualDisplays() {
+        virtualConfigs = virtualStore.load()
+        let restoring = virtualConfigs.filter(\.restoreAtLaunch)
+        guard !restoring.isEmpty else { return }
+        Task {
+            for config in restoring { _ = await setVirtual(config, active: true) }
+        }
+    }
+
+    private func syncVirtualState() {
+        let active = VirtualDisplayService.shared.activeDisplayIDs
+        activeVirtualIDs = active.filter { id, _ in virtualConfigs.contains { $0.id == id } }
+        var scaling: [UInt32: VirtualDisplayConfig] = [:]
+        for display in snapshot.displays {
+            if let config = VirtualDisplayService.shared.scalingConfig(for: display.id) { scaling[display.id] = config }
+        }
+        scalingConfigs = scaling
+    }
+
+    /// 구성 추가와 생성. 실패 사유 반환.
+    func addVirtual(_ config: VirtualDisplayConfig) async -> String? {
+        virtualConfigs.append(config)
+        try? virtualStore.save(virtualConfigs)
+        return await setVirtual(config, active: true)
+    }
+
+    /// 켜기와 끄기. 생성은 온라인 대기가 있으므로 메인 스레드 밖에서 수행.
+    func setVirtual(_ config: VirtualDisplayConfig, active: Bool) async -> String? {
+        var failure: String?
+        if active {
+            failure = await Task.detached { () -> String? in
+                do {
+                    try VirtualDisplayService.shared.create(config)
+                    return nil
+                } catch {
+                    return RevertCoordinator.describe(error)
+                }
+            }.value
+        } else {
+            VirtualDisplayService.shared.destroy(config.id)
+        }
+        syncVirtualState()
+        scheduleRefresh()
+        return failure
+    }
+
+    func removeVirtual(_ id: UUID) -> String? {
+        VirtualDisplayService.shared.destroy(id)
+        virtualConfigs.removeAll { $0.id == id }
+        do {
+            try virtualStore.save(virtualConfigs)
+        } catch {
+            return RevertCoordinator.describe(error)
+        }
+        syncVirtualState()
+        scheduleRefresh()
+        return nil
+    }
+
+    func isVirtual(_ display: UInt32) -> Bool {
+        VirtualDisplayService.shared.isVirtual(display)
+    }
+
+    /// HiDPI 스케일링 적용 또는 해제의 변경 묶음. `logical`이 nil이면 해제. 복귀는 반대 동작.
+    func scalingChange(display: DisplaySummary, logical: (width: Int, height: Int)?) -> RevertCoordinator.Change {
+        let previous = scalingConfigs[display.id]
+        let name = display.identity.name
+        func apply(_ size: (width: Int, height: Int)?) throws {
+            if let size {
+                try VirtualDisplayService.shared.startScaling(target: display, logicalWidth: size.width, logicalHeight: size.height)
+            } else {
+                try VirtualDisplayService.shared.stopScaling(target: display.id)
+            }
+        }
+        return RevertCoordinator.Change(
+            summary: logical.map { "\(name): HiDPI 스케일링 \($0.width) x \($0.height)" } ?? "\(name): HiDPI 스케일링 해제",
+            // 스케일링은 프로세스 수명에 종속이라 앱이 종료되면 저절로 풀림. 복귀 정보 파일 불필요.
+            pending: nil,
+            apply: { try apply(logical) },
+            commit: {},
+            restore: { try apply(previous.map { ($0.width, $0.height) }) }
+        )
     }
 
     func rememberDisconnected(_ display: DisplaySummary) {

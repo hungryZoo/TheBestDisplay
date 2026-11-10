@@ -5,6 +5,7 @@ import TBDCore
 enum SidebarItem: Hashable {
     case display(UInt32)
     case diagnostics
+    case virtualDisplays
     case profiles
 }
 
@@ -46,6 +47,8 @@ struct ContentView: View {
                 Section("도구") {
                     Label("연결 진단", systemImage: "cable.connector")
                         .tag(SidebarItem.diagnostics)
+                    Label("가상 디스플레이", systemImage: "rectangle.dashed.badge.record")
+                        .tag(SidebarItem.virtualDisplays)
                     Label("프로파일", systemImage: "square.stack.3d.up")
                         .tag(SidebarItem.profiles)
                 }
@@ -94,6 +97,8 @@ struct ContentView: View {
             }
         case .diagnostics:
             DiagnosticsView()
+        case .virtualDisplays:
+            VirtualDisplaysView()
         case .profiles:
             PendingFeatureView(title: "프로파일", systemImage: "square.stack.3d.up", stage: "P5")
         case nil:
@@ -118,12 +123,14 @@ struct ContentView: View {
     private func selectDefault() {
         if case .display(let id) = selection, store.display(id: id) != nil { return }
         if case .diagnostics = selection { return }
+        if case .virtualDisplays = selection { return }
         if case .profiles = selection { return }
         selection = store.displays.first.map { .display($0.id) }
     }
 }
 
 private struct DisplayRow: View {
+    @Environment(DisplayStore.self) private var store
     let display: DisplaySummary
 
     var body: some View {
@@ -131,6 +138,13 @@ private struct DisplayRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(display.identity.name)
+                    if store.isVirtual(display.id) {
+                        Text("가상")
+                            .font(.caption2)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1)
+                            .background(.quaternary, in: Capsule())
+                    }
                     if display.isMain {
                         Text("메인")
                             .font(.caption2)

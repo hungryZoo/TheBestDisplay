@@ -236,8 +236,8 @@ struct HDRServiceTests {
             } else {
                 #expect(!status.isEnabled)
             }
-            let maxEDR = try #require(status.maxEDRHeadroom)
-            #expect(maxEDR >= 1)
+            // 화면 객체가 없는 디스플레이(미러 대상 등)는 헤드룸 조회 불가.
+            if let maxEDR = status.maxEDRHeadroom { #expect(maxEDR >= 1) }
             // 신호의 전달 함수와 HDR 상태 일치 (외장 디스플레이).
             if status.isSupported, let link = SignalService.linkData(for: display) {
                 #expect(link.eotf.isHDR == status.isEnabled)
@@ -469,5 +469,48 @@ struct NightShiftTrueToneTests {
         usleep(600_000)
         #expect(changed?.isEnabled == !original.isEnabled)
         #expect(TrueToneService.status()?.isEnabled == original.isEnabled)
+    }
+}
+
+/// TC-VRT-001 실측: 가상 디스플레이 생성과 삭제.
+@Suite("TC-VRT-001 가상 디스플레이 생성", .serialized)
+struct VirtualDisplayServiceTests {
+    @Test func 생성_후_온라인_목록_증가_삭제_후_원복() throws {
+        let service = VirtualDisplayService()
+        let before = DisplayCatalog.onlineDisplayIDs()
+        let config = VirtualDisplayConfig(name: "TBD 시험용", width: 1920, height: 1080, hiDPI: true)
+        let id = try service.create(config)
+        let during = DisplayCatalog.onlineDisplayIDs()
+        let summary = DisplayCatalog.displays().first { $0.id == id }
+        let modes = ModeService.modes(for: id)
+        // 같은 구성의 재생성 요청은 기존 디스플레이 반환.
+        let again = try service.create(config)
+        service.destroy(config.id)
+        var after = DisplayCatalog.onlineDisplayIDs()
+        for _ in 0..<30 where after.contains(id) {
+            usleep(100_000)
+            after = DisplayCatalog.onlineDisplayIDs()
+        }
+
+        #expect(during.count == before.count + 1)
+        #expect(during.contains(id))
+        #expect(again == id)
+        #expect(summary?.identity.vendorID == VirtualDisplayService.vendorID)
+        #expect(summary?.identity.productID == VirtualDisplayService.productID)
+        #expect(summary?.identity.serialNumber == config.serialNumber)
+        #expect(summary?.identity.isBuiltin == false)
+        #expect(summary.map { ($0.pointWidth, $0.pointHeight) } ?? (0, 0) == (1920, 1080))
+        #expect(summary?.pixelWidth == 3840)
+        #expect(modes.contains { $0.width == 1920 && $0.height == 1080 && $0.isHiDPI })
+        #expect(Set(after) == Set(before))
+        #expect(service.activeDisplayIDs.isEmpty)
+    }
+
+    @Test func 잘못된_구성은_생성_전에_거부() {
+        let service = VirtualDisplayService()
+        #expect(throws: DisplayChangeError.self) {
+            try service.create(VirtualDisplayConfig(name: "", width: 100, height: 100, hiDPI: false))
+        }
+        #expect(service.activeDisplayIDs.isEmpty)
     }
 }

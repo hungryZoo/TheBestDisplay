@@ -126,6 +126,12 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T13 | `CGVirtualDisplay` 형식 부호: `initWithDescriptor:` `@24@0:8@16`, `applySettings:` `B24@0:8@16`, `CGVirtualDisplayMode initWithWidth:height:refreshRate:` `@32@0:8I16I20d24`, `CGVirtualDisplaySettings setHiDPI:` `v20@0:8I16`. 서술자의 `name`, `maxPixelsWide`, `maxPixelsHigh`, `sizeInMillimeters`, `vendorID`, `productID`, `serialNum`, `queue`는 키-값 설정 |
+| T13 | 가상 디스플레이 생성 실측: 1920x1080 HiDPI 구성에서 모드 약 20개 이상 자동 제공(1920x1080 HiDPI의 백킹 3840x2160 포함). 생성 직후 HiDPI 모드로 맞추는 단계 필요. 객체 해제 시 온라인 목록에서 제거 |
+| T13 | 서술자의 `queue`를 메인 큐로 주고 메인 스레드에서 온라인을 기다리면 디스플레이가 나타나지 않음. 전용 큐 사용과 백그라운드 생성으로 해결 |
+| T13 | 실행 루프가 돌지 않는 프로세스(테스트)에서 `CGDisplayCopyDisplayMode`가 방금 추가된 디스플레이에 nil 반환. 윈도우 서버의 현재 모드 번호 조회는 정상이라 대체 경로로 사용. 통합 테스트는 서로 영향을 주지 않도록 `swift test --no-parallel`로 직렬 실행(`scripts/test.sh`) |
+| T13 | 가상 디스플레이를 두 번째 디스플레이로 써서 배치 실측(T12 항목): 위치 이동과 맞닿는 위치 보정((5000, 300) 요청이 (1512, 300)으로 보정), 미러 설정과 5초 뒤 자동 해제, 메인 지정과 원복, `SLSConfigureDisplayEnabled` 연결 해제와 5초 뒤 자동 재연결 모두 정상 |
+| T13 | HiDPI 스케일링(실제 디스플레이를 가상 디스플레이의 미러로 구성)의 실측은 온라인 실제 디스플레이가 내장 1대뿐이라 미실행 |
 | T12 | `MPDisplay canChangeOrientation`은 내장 패널에도 참을 반환. 내장 패널 회전은 시스템 설정에 없는 동작이고 displayplacer에 충돌 경고가 있어 회전 대상에서 제외 |
 | T12 | `SLSGetDisplayList`는 케이블을 분리한 디스플레이의 ID(2, 3)도 계속 반환. 온라인이 아닌 ID 목록만으로는 논리적 연결 해제와 물리적 분리를 구분할 수 없어, 창 앱의 재연결 목록은 이 앱에서 연결 해제한 디스플레이로 한정 |
 | T12 | 마지막 온라인 디스플레이의 연결 해제 요청은 시스템 호출 전에 거부(종료 코드 3) 확인. 회전, 미러, 메인 지정, 위치, 연결 해제와 재연결의 실측은 LG TV 분리 상태라 미실행 |

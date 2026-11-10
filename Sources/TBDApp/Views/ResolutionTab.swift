@@ -18,6 +18,10 @@ struct ResolutionTab: View {
         VStack(spacing: 0) {
             header(modes: modes, current: current, shown: groups.reduce(0) { $0 + $1.modes.count })
             Divider()
+            if !store.isVirtual(display.id), let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first {
+                HiDPIScalingSection(display: display, nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight)
+                Divider()
+            }
             if groups.isEmpty {
                 ContentUnavailableView("조건에 맞는 모드 없음", systemImage: "line.3.horizontal.decrease.circle")
             } else {

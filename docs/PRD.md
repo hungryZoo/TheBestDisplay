@@ -85,6 +85,7 @@
 | `tbdctl mirror <디스플레이> <원본\|off> [--timeout <초>] [--yes]` | 미러 설정과 해제 |
 | `tbdctl main <디스플레이>`, `tbdctl move <디스플레이> <x> <y>` | 메인 디스플레이 지정, 위치 지정 |
 | `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]`, `tbdctl reconnect [<ID>]` | 논리적 연결 해제와 재연결 |
+| `tbdctl virtual <폭>x<높이> [--hidpi] [--name <이름>] [--seconds <초>]` | 가상 디스플레이를 만들고 지정 시간 동안 유지한 뒤 삭제 |
 | `tbdctl profile` | 프로파일 (T14에서 추가) |
 
 - 공통 옵션: `--json`

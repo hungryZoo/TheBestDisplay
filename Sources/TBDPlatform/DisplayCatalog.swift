@@ -38,6 +38,8 @@ public enum DisplayCatalog {
             isBuiltin: builtin
         )
         let mode = CGDisplayCopyDisplayMode(id)
+        // 방금 추가된 디스플레이는 CoreGraphics가 모드를 아직 보고하지 않는 경우가 있어(T13 실측) 윈도우 서버의 현재 모드로 대체.
+        let fallback: DisplayMode? = mode == nil ? ModeService.currentMode(for: id, in: ModeService.modes(for: id)) : nil
         let bounds = CGDisplayBounds(id)
         let size = CGDisplayScreenSize(id)
         let mirror = CGDisplayMirrorsDisplay(id)
@@ -46,11 +48,11 @@ public enum DisplayCatalog {
             isMain: CGDisplayIsMain(id) != 0,
             isActive: CGDisplayIsActive(id) != 0,
             mirrorsDisplayID: mirror == kCGNullDirectDisplay ? nil : mirror,
-            pointWidth: mode?.width ?? Int(bounds.width),
-            pointHeight: mode?.height ?? Int(bounds.height),
-            pixelWidth: mode?.pixelWidth ?? CGDisplayPixelsWide(id),
-            pixelHeight: mode?.pixelHeight ?? CGDisplayPixelsHigh(id),
-            refreshRate: mode?.refreshRate ?? 0,
+            pointWidth: mode?.width ?? fallback?.width ?? Int(bounds.width),
+            pointHeight: mode?.height ?? fallback?.height ?? Int(bounds.height),
+            pixelWidth: mode?.pixelWidth ?? fallback?.pixelWidth ?? CGDisplayPixelsWide(id),
+            pixelHeight: mode?.pixelHeight ?? fallback?.pixelHeight ?? CGDisplayPixelsHigh(id),
+            refreshRate: mode?.refreshRate ?? fallback?.refreshRate ?? 0,
             rotationDegrees: CGDisplayRotation(id),
             originX: Int(bounds.origin.x),
             originY: Int(bounds.origin.y),
