@@ -194,3 +194,20 @@ func runAutoDisconnect(_ command: ParsedCommand) {
     }
     print("내장 자동 연결 해제: \(state.enabled ? "켜짐" : "꺼짐")" + (state.disconnectedBuiltin.map { ", 해제해 둔 내장 디스플레이 id:\($0)" } ?? ""))
 }
+
+/// `tbdctl reinit <디스플레이>` (PRD-ARR-009): 연결 해제 뒤 재연결로 디스플레이 재초기화.
+func runReinit(_ command: ParsedCommand) {
+    let (display, displays) = resolveDisplay(command.positionals[0])
+    if let refusal = ArrangementPlanner.disconnectRefusal(display.id, online: displays.map(\.id)) {
+        writeError("오류: \(refusal)")
+        exit(.unsupported)
+    }
+    print("\(display.identity.name) 재초기화: 연결 해제 뒤 재연결")
+    do {
+        try ArrangementService.reinitialize(display.id)
+        print("재초기화 완료. 디스플레이 온라인")
+    } catch {
+        writeError("오류: \(RevertCoordinatorDescribe(error)). `tbdctl reconnect \(display.id)` 또는 케이블 재연결로 복구")
+        exit(.failure)
+    }
+}

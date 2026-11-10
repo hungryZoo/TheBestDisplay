@@ -97,6 +97,13 @@ struct ArrangementTab: View {
                     Text(message).font(.caption).foregroundStyle(.secondary)
                 }
                 let refusal = ArrangementPlanner.disconnectRefusal(display.id, online: store.displays.map(\.id))
+                LabeledContent("재초기화") {
+                    Button("연결 해제 뒤 재연결") {
+                        perform { try ArrangementService.reinitialize(display.id) }
+                    }
+                    .disabled(refusal != nil || changes.isBusy)
+                    .help("화면이 이상하게 나오거나 설정이 반영되지 않을 때 디스플레이를 다시 구성. 몇 초 동안 화면이 꺼짐")
+                }
                 LabeledContent("논리적 연결 해제") {
                     Button("연결 해제") {
                         // 해제된 디스플레이는 온라인 목록에서 사라지므로 대상 사라짐 감시는 사용하지 않음.

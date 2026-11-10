@@ -195,6 +195,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl main <디스플레이>`, `move <디스플레이> <x> <y>` | 메인 지정, 위치 지정 |
 | `tbdctl align <디스플레이> <기준 디스플레이> <위치>` | 기준 디스플레이 대비 16방향 정렬 |
 | `tbdctl auto-disconnect [on\|off]` | 외장 연결 시 내장 자동 연결 해제 설정 |
+| `tbdctl reinit <디스플레이>` | 디스플레이 재초기화 (연결 해제 뒤 재연결) |
 | `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]` | 논리적 연결 해제 |
 | `tbdctl reconnect [<디스플레이 ID>]` | 연결 해제한 디스플레이 재연결 |
 | `tbdctl virtual <폭>x<높이> [--hidpi] [--hdr] [--name <이름>] [--seconds <초>]` | 가상 디스플레이 생성과 유지 |

@@ -144,3 +144,18 @@ public enum ArrangementService {
         guard bridge.setInt("setUnderscan:", Int32(clamped)) else { throw DisplayChangeError.unavailable("MPDisplay setUnderscan: 없음") }
     }
 }
+
+public extension ArrangementService {
+    /// 디스플레이 재초기화: 논리적 연결 해제 뒤 다시 연결해 시스템이 디스플레이를 새로 구성하게 함. (SRS-ARR-007, PRD-ARR-009)
+    /// 마지막 온라인 디스플레이는 대상이 될 수 없음. 재연결이 제한 시간 안에 되지 않으면 오류.
+    static func reinitialize(_ display: CGDirectDisplayID, pause: TimeInterval = 2, timeout: TimeInterval = 20) throws {
+        try disconnect(display)
+        let offlineDeadline = Date().addingTimeInterval(5)
+        while Date() < offlineDeadline, ModeService.isOnline(display) { usleep(100_000) }
+        usleep(useconds_t(pause * 1_000_000))
+        try reconnect(display, timeout: timeout)
+        guard ModeService.isOnline(display) else {
+            throw DisplayChangeError.system(operation: "재초기화 뒤 재연결", code: -1)
+        }
+    }
+}

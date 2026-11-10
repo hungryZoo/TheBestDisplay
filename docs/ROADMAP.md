@@ -68,6 +68,7 @@
 | T46 | P6 | HDR 가상 디스플레이 옵션, `virtual ... --hdr` | PRD-VRT-004 | TC-VRT-003 | 완료 |
 | T47 | P6 | Night Shift 연동 색온도 (TV용), `night-shift`와 `night-shift-sync` 명령, 색 조정 탭 토글 | PRD-CLR-006 | TC-CLR-005-006 | 완료 |
 | T48 | P6 | SDR과 HDR 상태별 색 프로파일 지정과 자동 전환, `hdr-profile` 명령, `color --set` | PRD-CLR-007 | TC-CLR-007-008 | 완료 |
+| T49 | P6 | 디스플레이 재초기화, `reinit` 명령, 배치 탭 버튼 | PRD-ARR-009 | TC-ARR-010 | 완료 |
 
 ## 3. 사용자 참여 항목
 

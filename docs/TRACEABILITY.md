@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 99 |
-| SRS 설계 요구사항 | 70 |
-| TC | 104 |
+| PRD 요구사항 | 100 |
+| SRS 설계 요구사항 | 71 |
+| TC | 105 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -102,6 +102,7 @@
 | PRD-ARR-006 | P4 | 권장 | MRD-SCP-011 | SRS-ARR-004 | TC-ARR-005 | `Sources/TBDPlatform/ArrangementService.swift` | 보류 1 |
 | PRD-ARR-007 | P6 | 권장 | MRD-SCP-011 | SRS-ARR-005 | TC-ARR-006, TC-ARR-007 | `Sources/TBDCore/Alignment.swift` | 통과 2 |
 | PRD-ARR-008 | P6 | 권장 | MRD-SCP-011 | SRS-ARR-006 | TC-ARR-008, TC-ARR-009 | `Sources/TBDCore/AutoDisconnect.swift`<br>`Sources/TBDApp/AutoDisconnectController.swift` | 통과 2 |
+| PRD-ARR-009 | P6 | 권장 | MRD-SCP-011 | SRS-ARR-007 | TC-ARR-010 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-VRT-001 | P5 | 필수 | MRD-SCP-012 | SRS-VRT-001 | TC-VRT-001 | `Sources/TBDPlatform/VirtualDisplayService.swift`<br>`Sources/TBDCore/VirtualDisplay.swift` | 통과 1 |
 | PRD-VRT-002 | P5 | 필수 | MRD-SCP-012, MRD-SCN-003 | SRS-VRT-002 | TC-VRT-002 | `Sources/TBDPlatform/VirtualDisplayService.swift` | 통과 1 |
 | PRD-VRT-003 | P5 | 권장 | MRD-SCP-012 | SRS-VRT-001 | TC-VRT-001 | `Sources/TBDPlatform/VirtualDisplayService.swift`<br>`Sources/TBDCore/VirtualDisplay.swift` | 통과 1 |
