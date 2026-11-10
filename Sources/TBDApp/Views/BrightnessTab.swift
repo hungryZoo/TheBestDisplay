@@ -136,9 +136,11 @@ final class BrightnessViewModel {
     }
 }
 
-/// 밝기 탭: 밝기, 자동 밝기, XDR 밝기 업스케일, DDC 기능. (PRD-BRT-001-005, PRD-DDC-001-003)
+/// 밝기 탭: 밝기, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 기능. (PRD-BRT-001-006, PRD-DDC-001-003)
 struct BrightnessTab: View {
     @Environment(ChangeController.self) private var changes
+    @Environment(DisplayStore.self) private var store
+    @Environment(BrightnessSyncController.self) private var sync
     let display: DisplaySummary
     @State private var model = BrightnessViewModel()
 
@@ -165,6 +167,24 @@ struct BrightnessTab: View {
                 }
                 if let message = model.message {
                     Label(message, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
+                }
+            }
+            if store.displays.count > 1 {
+                Section("밝기 동기화") {
+                    Toggle("이 디스플레이의 밝기를 다른 디스플레이에 동기화", isOn: Binding(
+                        get: { sync.isSource(display.id) },
+                        set: { isOn in
+                            if isOn { sync.start(source: display.id) } else { sync.stop() }
+                        }
+                    ))
+                    if sync.isSource(display.id) {
+                        ForEach(sync.lastResults, id: \.displayID) { result in
+                            LabeledContent(result.displayName, value: "\(result.method.title) \(Int((result.level * 100).rounded()))%" + (result.failure.map { ", 실패: \($0)" } ?? ""))
+                        }
+                    }
+                    Text("1초마다 이 디스플레이의 밝기를 읽어 나머지 디스플레이에 같은 비율로 적용. 대상은 시스템 밝기 제어, DDC, 소프트웨어 디밍 순으로 방식 선택. 앱 실행 중에만 동작")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             }
             if model.xdrSupported {

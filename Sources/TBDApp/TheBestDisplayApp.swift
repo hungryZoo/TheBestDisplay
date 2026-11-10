@@ -9,6 +9,7 @@ struct TheBestDisplayApp: App {
     @State private var store = DisplayStore()
     @State private var changes = ChangeController()
     @State private var protection = ProtectionController()
+    @State private var brightnessSync = BrightnessSyncController()
 
     var body: some Scene {
         Window("TheBestDisplay", id: "main") {
@@ -16,6 +17,7 @@ struct TheBestDisplayApp: App {
                 .environment(store)
                 .environment(changes)
                 .environment(protection)
+                .environment(brightnessSync)
                 .onAppear {
                     changes.onChanged = { [store] in store.scheduleRefresh() }
                     changes.onUserChange = { [protection] in protection.userChangedConfiguration() }
