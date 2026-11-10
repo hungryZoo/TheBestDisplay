@@ -37,6 +37,11 @@ public struct DisplayOverrideService: Sendable {
 
     static func quoted(_ path: String) -> String { "'" + path.replacingOccurrences(of: "'", with: "'\\''") + "'" }
 
+    /// 비어 있을 때만 폴더를 지우는 셸 명령. 폴더에 내용이 있어도 종료 코드는 0.
+    static func removeEmptyFolderCommand(_ path: String) -> String {
+        "find \(quoted(path)) -maxdepth 0 -type d -empty -delete"
+    }
+
     /// 파일 쓰기. 항목과 다른 키가 모두 없으면 파일 삭제.
     /// 권한이 없으면 `needsPrivilege` 오류로 설치 명령 반환.
     public func write(_ file: DisplayOverrideFile) throws {
@@ -44,10 +49,18 @@ public struct DisplayOverrideService: Sendable {
         let manager = FileManager.default
         if file.entries.isEmpty, !file.hasOtherKeys {
             guard manager.fileExists(atPath: target.path) else { return }
+            let folder = target.deletingLastPathComponent()
             do {
                 try manager.removeItem(at: target)
             } catch {
-                throw ServiceError.needsPrivilege(staged: nil, commands: ["rm \(Self.quoted(target.path))"])
+                throw ServiceError.needsPrivilege(staged: nil, commands: [
+                    "rm \(Self.quoted(target.path))",
+                    Self.removeEmptyFolderCommand(folder.path),
+                ])
+            }
+            // 마지막 파일을 지운 제조사 폴더는 함께 정리. 다른 제품의 파일이 남아 있으면 그대로 둠. (T51 실측)
+            if (try? manager.contentsOfDirectory(atPath: folder.path))?.isEmpty == true {
+                try? manager.removeItem(at: folder)
             }
             return
         }

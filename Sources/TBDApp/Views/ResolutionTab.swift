@@ -23,26 +23,28 @@ struct ResolutionTab: View {
         VStack(spacing: 0) {
             header(modes: modes, current: current, shown: groups.reduce(0) { $0 + $1.modes.count })
             Divider()
-            quickAccess(modes: modes, current: current)
-            Divider()
-            if !store.isVirtual(display.id), let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first {
-                HiDPIScalingSection(display: display, nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight)
-                Divider()
-            }
-            if !store.isVirtual(display.id) {
-                ScaledResolutionSection(display: display)
-                Divider()
-            }
-            if groups.isEmpty {
-                ContentUnavailableView("조건에 맞는 모드 없음", systemImage: "line.3.horizontal.decrease.circle")
-            } else {
-                List(groups) { group in
+            // 도구 구역은 모드 목록과 같은 스크롤 영역에 둠: 구역을 펼쳐 내용이 길어져도 탭의 위쪽이 창 밖으로 밀리지 않음 (T51 실측).
+            List {
+                quickAccess(modes: modes, current: current)
+                    .listRowInsets(EdgeInsets())
+                if !store.isVirtual(display.id), let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first {
+                    HiDPIScalingSection(display: display, nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight)
+                        .listRowInsets(EdgeInsets())
+                }
+                if !store.isVirtual(display.id) {
+                    ScaledResolutionSection(display: display)
+                        .listRowInsets(EdgeInsets())
+                }
+                if groups.isEmpty {
+                    ContentUnavailableView("조건에 맞는 모드 없음", systemImage: "line.3.horizontal.decrease.circle")
+                }
+                ForEach(groups) { group in
                     ModeGroupRow(group: group, current: current, isBusy: changes.isBusy, isMirrored: display.mirrorsDisplayID != nil) { mode in
                         apply(mode, current: current)
                     }
                 }
-                .listStyle(.inset)
             }
+            .listStyle(.inset)
         }
     }
 

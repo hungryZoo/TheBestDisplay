@@ -39,7 +39,7 @@
 | PRD-MOD-004 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 통과 1 |
 | PRD-MOD-005 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-002 | TC-MOD-004 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
 | PRD-MOD-006 | P2 | 권장 | MRD-PRB-001 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 통과 1 |
-| PRD-MOD-007 | P6 | 권장 | MRD-SCP-003, MRD-SCP-012 | SRS-MOD-004 | TC-MOD-005, TC-MOD-006, TC-MOD-007 | `Sources/TBDCore/DisplayOverride.swift`<br>`Sources/TBDPlatform/DisplayOverrideService.swift` | 미실행 1, 통과 2 |
+| PRD-MOD-007 | P6 | 권장 | MRD-SCP-003, MRD-SCP-012 | SRS-MOD-004 | TC-MOD-005, TC-MOD-006, TC-MOD-007 | `Sources/TBDCore/DisplayOverride.swift`<br>`Sources/TBDPlatform/DisplayOverrideService.swift` | 통과 3 |
 | PRD-MOD-008 | P6 | 권장 | MRD-SCP-003 | SRS-MOD-005 | TC-MOD-008, TC-MOD-009 | `Sources/TBDCore/RefreshMeasurement.swift`<br>`Sources/TBDPlatform/RefreshRateMeter.swift` | 통과 2 |
 | PRD-MOD-009 | P6 | 권장 | MRD-SCP-003 | SRS-MOD-006 | TC-MOD-010, TC-MOD-011 | `Sources/TBDCore/ModeExtras.swift` | 통과 2 |
 | PRD-MOD-010 | P6 | 권장 | MRD-SCP-003 | SRS-MOD-006 | TC-MOD-010, TC-MOD-011 | `Sources/TBDCore/ModeExtras.swift` | 통과 2 |

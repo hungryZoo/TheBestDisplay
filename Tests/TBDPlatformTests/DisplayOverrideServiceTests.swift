@@ -29,6 +29,63 @@ struct DisplayOverrideServiceTests {
         try loaded.remove(logicalWidth: 2560, logicalHeight: 1440)
         try service.write(loaded)
         #expect(!FileManager.default.fileExists(atPath: url.path))
+        // 비게 된 제조사 폴더도 함께 정리.
+        #expect(!FileManager.default.fileExists(atPath: url.deletingLastPathComponent().path))
+    }
+
+    @Test func 다른_제품_파일이_있으면_제조사_폴더_유지() throws {
+        let service = DisplayOverrideService(root: try Self.temporaryRoot())
+        var first = DisplayOverrideFile(vendorID: 0x1E6D, productID: 0xC0C8)
+        try first.add(logicalWidth: 2560, logicalHeight: 1440)
+        try service.write(first)
+        var second = DisplayOverrideFile(vendorID: 0x1E6D, productID: 0x0001)
+        try second.add(logicalWidth: 1920, logicalHeight: 1080)
+        try service.write(second)
+
+        try first.remove(logicalWidth: 2560, logicalHeight: 1440)
+        try service.write(first)
+        #expect(!FileManager.default.fileExists(atPath: service.url(vendorID: 0x1E6D, productID: 0xC0C8).path))
+        #expect(FileManager.default.fileExists(atPath: service.url(vendorID: 0x1E6D, productID: 0x0001).path))
+    }
+
+    @Test func 삭제_권한이_없으면_삭제와_빈_폴더_정리_명령_반환() throws {
+        let service = DisplayOverrideService(root: try Self.temporaryRoot())
+        var file = DisplayOverrideFile(vendorID: 0x1E6D, productID: 0xC0C8)
+        try file.add(logicalWidth: 2560, logicalHeight: 1440)
+        try service.write(file)
+        let folder = service.url(vendorID: 0x1E6D, productID: 0xC0C8).deletingLastPathComponent()
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: folder.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: folder.path) }
+
+        try file.remove(logicalWidth: 2560, logicalHeight: 1440)
+        do {
+            try service.write(file)
+            Issue.record("권한 오류 기대")
+        } catch DisplayOverrideService.ServiceError.needsPrivilege(let staged, let commands) {
+            #expect(staged == nil)
+            #expect(commands.count == 2)
+            #expect(commands[0].hasPrefix("rm '") && commands[0].hasSuffix("DisplayVendorID-1e6d/DisplayProductID-c0c8'"))
+            #expect(commands[1].hasPrefix("find '") && commands[1].hasSuffix("DisplayVendorID-1e6d' -maxdepth 0 -type d -empty -delete"))
+        }
+    }
+
+    @Test func 빈_폴더_정리_명령_실행() throws {
+        let root = try Self.temporaryRoot()
+        let empty = root.appendingPathComponent("empty dir", isDirectory: true)
+        let filled = root.appendingPathComponent("filled", isDirectory: true)
+        try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: filled, withIntermediateDirectories: true)
+        try Data("x".utf8).write(to: filled.appendingPathComponent("keep"))
+        for folder in [empty, filled] {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/bin/sh")
+            process.arguments = ["-c", DisplayOverrideService.removeEmptyFolderCommand(folder.path)]
+            try process.run()
+            process.waitUntilExit()
+            #expect(process.terminationStatus == 0)
+        }
+        #expect(!FileManager.default.fileExists(atPath: empty.path))
+        #expect(FileManager.default.fileExists(atPath: filled.appendingPathComponent("keep").path))
     }
 
     @Test func 쓰기_권한이_없으면_설치_명령_반환() throws {

@@ -13,6 +13,7 @@ struct ScaledResolutionSection: View {
     @State private var height = ""
     @State private var message: String?
     @State private var expanded = false
+    @State private var loadedID: UInt32?
 
     private let service = DisplayOverrideService()
 
@@ -55,7 +56,19 @@ struct ScaledResolutionSection: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .task(id: display.id) { reload() }
+        .task(id: display.id) {
+            // 입력값과 안내문은 디스플레이별 상태: 다른 디스플레이로 넘어가면 비움. (T51 실측)
+            // 목록 행이 화면 밖으로 나갔다 돌아올 때도 이 블록이 다시 실행되므로 디스플레이가 바뀐 경우만 비움.
+            if loadedID != display.id {
+                if loadedID != nil {
+                    width = ""
+                    height = ""
+                    message = nil
+                }
+                loadedID = display.id
+            }
+            reload()
+        }
     }
 
     private func reload() {

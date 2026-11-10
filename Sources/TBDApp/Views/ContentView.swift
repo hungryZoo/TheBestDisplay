@@ -15,6 +15,8 @@ struct ContentView: View {
     @Environment(ChangeController.self) private var changes
     @State private var selection: SidebarItem?
     @State private var reconnectFailure: String?
+    /// 선택한 디스플레이가 사라져 다른 항목으로 넘어간 기록: 사라진 디스플레이 ID와 대신 선택한 항목.
+    @State private var lostSelection: (lost: UInt32, substitute: SidebarItem?)?
 
     var body: some View {
         NavigationSplitView {
@@ -120,12 +122,24 @@ struct ContentView: View {
     }
 
     /// 선택이 없거나 선택한 디스플레이가 사라진 경우 첫 디스플레이 선택.
+    /// 사라진 디스플레이가 돌아오면(재초기화, 재연결) 다시 선택. 그 사이 사용자가 다른 항목을 고른 경우는 그대로 둠. (T51 실측)
     private func selectDefault() {
+        if let record = lostSelection {
+            if selection != record.substitute {
+                lostSelection = nil
+            } else if store.display(id: record.lost) != nil {
+                selection = .display(record.lost)
+                lostSelection = nil
+                return
+            }
+        }
         if case .display(let id) = selection, store.display(id: id) != nil { return }
         if case .diagnostics = selection { return }
         if case .virtualDisplays = selection { return }
         if case .profiles = selection { return }
-        selection = store.displays.first.map { .display($0.id) }
+        let substitute = store.displays.first.map { SidebarItem.display($0.id) }
+        if case .display(let id) = selection { lostSelection = (id, substitute) }
+        selection = substitute
     }
 }
 
