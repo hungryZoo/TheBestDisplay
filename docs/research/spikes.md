@@ -126,6 +126,8 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T14 | 프로파일 적용 실측(가상 디스플레이를 두 번째 디스플레이로 사용): 저장 뒤 가상 디스플레이를 1280x720과 왼쪽 배치로 바꾸고 적용하자 모드와 배치 2단계 수행으로 1920x1080 HiDPI와 원래 위치 복원. 확인 없이 5초 경과 시 적용 전 구성으로 자동 복귀. 같은 구성에서는 변경 없음 보고 |
+| T14 | 적용 단계 순서 결정 근거: 회전 상태에 따라 모드 목록이 달라지고(T04 조사), HDR 전환과 모드 전환 뒤에는 시스템이 색 모드를 다시 선택(T05, T06 실측)하므로 회전, 모드, HDR, 색 모드 순서 |
 | T13 | `CGVirtualDisplay` 형식 부호: `initWithDescriptor:` `@24@0:8@16`, `applySettings:` `B24@0:8@16`, `CGVirtualDisplayMode initWithWidth:height:refreshRate:` `@32@0:8I16I20d24`, `CGVirtualDisplaySettings setHiDPI:` `v20@0:8I16`. 서술자의 `name`, `maxPixelsWide`, `maxPixelsHigh`, `sizeInMillimeters`, `vendorID`, `productID`, `serialNum`, `queue`는 키-값 설정 |
 | T13 | 가상 디스플레이 생성 실측: 1920x1080 HiDPI 구성에서 모드 약 20개 이상 자동 제공(1920x1080 HiDPI의 백킹 3840x2160 포함). 생성 직후 HiDPI 모드로 맞추는 단계 필요. 객체 해제 시 온라인 목록에서 제거 |
 | T13 | 서술자의 `queue`를 메인 큐로 주고 메인 스레드에서 온라인을 기다리면 디스플레이가 나타나지 않음. 전용 큐 사용과 백그라운드 생성으로 해결 |

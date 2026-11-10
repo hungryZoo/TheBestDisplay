@@ -28,6 +28,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "disconnect", summary: "논리적 연결 해제 (자동 복귀 적용)", positionals: ["디스플레이"], valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "reconnect", summary: "연결 해제한 디스플레이 재연결", positionals: ["디스플레이 ID"], optionalPositionals: 1),
     CommandSpec(name: "virtual", summary: "가상 디스플레이를 만들고 지정 시간 동안 유지", positionals: ["해상도"], valueOptions: ["--name", "--seconds"], flags: ["--hidpi"]),
+    CommandSpec(name: "profile", summary: "구성 프로파일 (list, show, save, apply, rename, delete)", positionals: ["동작", "이름", "새 이름"], optionalPositionals: 2, valueOptions: ["--timeout"], flags: ["--yes", "--replace"]),
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
     CommandSpec(name: "help", summary: "사용법"),
 ])
@@ -178,6 +179,9 @@ case "reconnect":
 
 case "virtual":
     runVirtual(command)
+
+case "profile":
+    runProfile(command, json: json)
 
 case "revert-pending":
     runRevertPending(command)

@@ -79,9 +79,9 @@
 | PRD-VRT-001 | P5 | 필수 | MRD-SCP-012 | SRS-VRT-001 | TC-VRT-001 | `Sources/TBDPlatform/VirtualDisplayService.swift`<br>`Sources/TBDCore/VirtualDisplay.swift` | 통과 1 |
 | PRD-VRT-002 | P5 | 필수 | MRD-SCP-012, MRD-SCN-003 | SRS-VRT-002 | TC-VRT-002 | `Sources/TBDPlatform/VirtualDisplayService.swift` | 미실행 1 |
 | PRD-VRT-003 | P5 | 권장 | MRD-SCP-012 | SRS-VRT-001 | TC-VRT-001 | `Sources/TBDPlatform/VirtualDisplayService.swift`<br>`Sources/TBDCore/VirtualDisplay.swift` | 통과 1 |
-| PRD-PRF-001 | P5 | 필수 | MRD-SCP-013, MRD-SCN-006 | SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift` | 미실행 1 |
-| PRD-PRF-002 | P5 | 필수 | MRD-SCP-013 | SRS-PRF-002 | TC-PRF-002 | `Sources/TBDPlatform/ProfileApplier.swift` | 미실행 1 |
-| PRD-PRF-003 | P5 | 필수 | MRD-SCP-013 | SRS-INF-001, SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift`<br>`Sources/TBDPlatform/DisplayCatalog.swift` | 미실행 1 |
+| PRD-PRF-001 | P5 | 필수 | MRD-SCP-013, MRD-SCN-006 | SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift` | 통과 1 |
+| PRD-PRF-002 | P5 | 필수 | MRD-SCP-013 | SRS-PRF-002 | TC-PRF-002 | `Sources/TBDPlatform/ProfileApplier.swift`<br>`Sources/TBDCore/Profile.swift` | 통과 1 |
+| PRD-PRF-003 | P5 | 필수 | MRD-SCP-013 | SRS-INF-001, SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift`<br>`Sources/TBDPlatform/DisplayCatalog.swift` | 통과 1 |
 | PRD-SAF-001 | P2 | 필수 | MRD-SCP-014, MRD-DIF-004, MRD-RSK-002, MRD-SCN-004 | SRS-SAF-001 | TC-MOD-003, TC-COL-004, TC-HDR-002, TC-SAF-001 | `Sources/TBDCore/RevertGuard.swift` | 통과 4 |
 | PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |

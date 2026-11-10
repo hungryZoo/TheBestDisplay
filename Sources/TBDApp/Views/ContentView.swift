@@ -100,7 +100,7 @@ struct ContentView: View {
         case .virtualDisplays:
             VirtualDisplaysView()
         case .profiles:
-            PendingFeatureView(title: "프로파일", systemImage: "square.stack.3d.up", stage: "P5")
+            ProfilesView()
         case nil:
             ContentUnavailableView("디스플레이 선택", systemImage: "display")
         }
