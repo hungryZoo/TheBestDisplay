@@ -180,6 +180,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정 |
 | `tbdctl xdr <디스플레이> [<배율 %>] [--seconds <초>]` | XDR 밝기 업스케일 조회, 지정 시간 동안 적용 |
 | `tbdctl brightness-sync <원본 디스플레이> [--seconds <초>]` | 원본의 밝기를 다른 디스플레이에 동기화 |
+| `tbdctl overlay-dim <디스플레이> <강도 %> [--seconds <초>]` | 오버레이 방식 디밍 |
 | `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
 | `tbdctl ddc <디스플레이> probe \| caps \| get <코드> \| set <코드> <값>` | DDC 탐지, capabilities 조회, VCP 읽기와 쓰기 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 |
@@ -250,8 +251,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 88건 중 통과 76건, 미실행 8건, 보류 4건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 31행, 부분 22행, 미구현 5행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 90건 중 통과 78건, 미실행 8건, 보류 4건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 32행, 부분 21행, 미구현 5행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

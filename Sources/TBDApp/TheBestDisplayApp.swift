@@ -55,6 +55,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 프로세스 수명에 종속된 화면 조정(전달 테이블)을 종료 시 원래대로 복원. (ADR-0004)
     func applicationWillTerminate(_ notification: Notification) {
         XDRBoostService.shared.resetAll()
+        OverlayDimService.shared.resetAll()
         GammaService.shared.resetAll()
         // 가상 디스플레이와 HiDPI 스케일링(미러)을 정리하고 종료.
         for display in DisplayCatalog.displays() { try? VirtualDisplayService.shared.stopScaling(target: display.id) }

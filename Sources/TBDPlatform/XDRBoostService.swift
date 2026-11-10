@@ -19,7 +19,7 @@ public final class XDRBoostService {
     private let device = MTLCreateSystemDefaultDevice()
     private lazy var queue = device?.makeCommandQueue()
 
-    static func screen(for display: CGDirectDisplayID) -> NSScreen? {
+    public static func screen(for display: CGDirectDisplayID) -> NSScreen? {
         NSScreen.screens.first { ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value == display }
     }
 

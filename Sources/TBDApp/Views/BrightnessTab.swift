@@ -24,6 +24,8 @@ final class BrightnessViewModel {
     var xdrMaximum = 1.0
     var xdrBoost = 1.0
     var xdrMessage: String?
+    /// 오버레이 디밍 강도 (0-0.9). (PRD-BRT-007)
+    var overlayStrength = 0.0
 
     @ObservationIgnored private var pendingWrite: Task<Void, Never>?
 
@@ -32,6 +34,7 @@ final class BrightnessViewModel {
         xdrSupported = XDRBoostService.isSupported(display.id)
         xdrMaximum = XDRBoostService.maximumBoost(display.id)
         xdrBoost = XDRBoostService.shared.boost(for: display.id)
+        overlayStrength = OverlayDimService.shared.strength(for: display.id)
         xdrMessage = nil
         rawResult = nil
         autoAvailable = BrightnessService.hasAutoBrightness(display.id)
@@ -87,6 +90,16 @@ final class BrightnessViewModel {
             xdrMessage = nil
         } catch {
             xdrMessage = RevertCoordinator.describe(error)
+        }
+    }
+
+    func setOverlay(_ value: Double, display: DisplaySummary) {
+        overlayStrength = value
+        do {
+            try OverlayDimService.shared.setStrength(value, for: display.id)
+            message = nil
+        } catch {
+            message = RevertCoordinator.describe(error)
         }
     }
 
@@ -168,6 +181,20 @@ struct BrightnessTab: View {
                 if let message = model.message {
                     Label(message, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
                 }
+            }
+            Section("오버레이 디밍") {
+                HStack(spacing: 10) {
+                    Image(systemName: "circle.lefthalf.filled")
+                    Slider(value: Binding(get: { model.overlayStrength }, set: { model.setOverlay($0, display: display) }), in: OverlayDim.range)
+                    Text("\(Int((model.overlayStrength * 100).rounded()))%")
+                        .monospacedDigit()
+                        .frame(width: 44, alignment: .trailing)
+                    Button("끄기") { model.setOverlay(0, display: display) }
+                        .disabled(model.overlayStrength <= 0.001)
+                }
+                Text("화면 위에 검은 창을 덮어 어둡게 함. 하드웨어 밝기 0%보다 더 어둡게 할 때와 전달 테이블을 쓸 수 없는 디스플레이에 사용. 앱을 종료하면 해제")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             if store.displays.count > 1 {
                 Section("밝기 동기화") {
