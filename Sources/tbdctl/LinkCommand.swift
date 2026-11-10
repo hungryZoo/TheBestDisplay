@@ -62,6 +62,8 @@ func runLink(_ command: ParsedCommand, json: Bool) {
         print("DPCD")
         print("  판 \(dpcd.revision ?? "미확인"), 싱크 최대 \(dpcd.maxLaneRateGbps.map { String(format: "%.2f Gbps/레인 (%@)", $0, DPTransportState.rateName($0)) } ?? "미확인") x \(dpcd.maxLaneCount.map(String.init) ?? "미확인")레인")
         print("  채널 부호화: 8b/10b \(describe(dpcd.supports8b10b)), 128b/132b \(describe(dpcd.supports128b132b)). DSC \(describe(dpcd.supportsDSC))\(dpcd.dscRevision.map { " (판 \($0))" } ?? ""), 현재 DSC \(dpcd.dscEnabled.map { $0 ? "사용" : "미사용" } ?? "미확인")")
+        print("  다운스프레드: \(describe(dpcd.supportsDownspread)), 확장 프레이밍: \(describe(dpcd.supportsEnhancedFraming)), TPS3: \(describe(dpcd.supportsTPS3))")
+        print("  HDCP (싱크 능력): \(dpcd.hdcpSummary)")
         if display.identity.isBuiltin {
             print("  레인 상태: 내장 패널은 상태 레지스터를 갱신하지 않아 표시 생략")
         } else if !dpcd.laneStatus.isEmpty {

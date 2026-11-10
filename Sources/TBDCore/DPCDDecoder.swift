@@ -22,8 +22,26 @@ public struct DPCDInfo: Codable, Hashable, Sendable {
     public var laneStatus: [LaneStatus]
     public var interlaneAlignDone: Bool?
     public var dscEnabled: Bool?
+    /// 싱크의 HDCP 1.x 지원 (DPCD 0x68028 Bcaps 비트 0). 읽지 못하면 nil. (PRD-LNK-006)
+    public var hdcp1Capable: Bool?
+    /// 싱크의 HDCP 2.x 지원 (DPCD 0x6921D RxCaps의 HDCP_CAPABLE 비트). 읽지 못하면 nil.
+    public var hdcp2Capable: Bool?
+    /// HDCP 2.x 판 번호 바이트 (0x02는 HDCP 2.2 이상). 지원하지 않으면 nil.
+    public var hdcp2Version: Int?
+    public var hdcpRepeater: Bool?
 
     public init(laneStatus: [LaneStatus] = []) { self.laneStatus = laneStatus }
+
+    /// 예: "HDCP 2.2 지원, HDCP 1.x 지원", "미지원", "읽기 불가"
+    public var hdcpSummary: String {
+        guard hdcp1Capable != nil || hdcp2Capable != nil else { return "읽기 불가" }
+        var parts: [String] = []
+        if hdcp2Capable == true { parts.append(hdcp2Version == 2 ? "HDCP 2.2 지원" : "HDCP 2.x 지원 (판 바이트 \(hdcp2Version ?? 0))") }
+        if hdcp1Capable == true { parts.append("HDCP 1.x 지원") }
+        if parts.isEmpty { return "미지원" }
+        if hdcpRepeater == true { parts.append("리피터") }
+        return parts.joined(separator: ", ")
+    }
 
     public struct LaneStatus: Codable, Hashable, Sendable {
         public var lane: Int
@@ -49,8 +67,23 @@ public enum DPCDDecoder {
     ///   - dscEnable: 160h 1바이트
     ///   - status: 200h부터 8바이트
     ///   - extendedCaps: 2200h부터 16바이트 (있으면 수신기 능력보다 우선)
-    public static func decode(receiverCaps: [UInt8]?, dscCaps: [UInt8]?, linkConfig: [UInt8]?, dscEnable: [UInt8]?, status: [UInt8]?, extendedCaps: [UInt8]?) -> DPCDInfo {
+    /// - Parameters:
+    ///   - hdcpBcaps: DPCD 0x68028 1바이트 (HDCP 1.x: 비트 0 HDCP_CAPABLE, 비트 1 REPEATER).
+    ///   - hdcpRxCaps: DPCD 0x6921D 3바이트 (HDCP 2.x: 첫 바이트 판 번호, 마지막 바이트 비트 1 HDCP_CAPABLE, 비트 0 REPEATER).
+    public static func decode(receiverCaps: [UInt8]?, dscCaps: [UInt8]?, linkConfig: [UInt8]?, dscEnable: [UInt8]?, status: [UInt8]?, extendedCaps: [UInt8]?, hdcpBcaps: [UInt8]? = nil, hdcpRxCaps: [UInt8]? = nil) -> DPCDInfo {
         var info = DPCDInfo(laneStatus: [])
+        if let bcaps = hdcpBcaps?.first {
+            info.hdcp1Capable = bcaps & 0x01 != 0
+            if bcaps & 0x01 != 0 { info.hdcpRepeater = bcaps & 0x02 != 0 }
+        }
+        if let rx = hdcpRxCaps, rx.count >= 3 {
+            let capable = rx[2] & 0x02 != 0
+            info.hdcp2Capable = capable
+            if capable {
+                info.hdcp2Version = Int(rx[0])
+                info.hdcpRepeater = (info.hdcpRepeater ?? false) || rx[2] & 0x01 != 0
+            }
+        }
         // 확장 능력 필드가 유효(판 번호 0 아님)하면 우선 사용.
         let caps = (extendedCaps?.first ?? 0) != 0 ? extendedCaps : receiverCaps
         if let caps, caps.count >= 4, caps[0] != 0 {

@@ -98,6 +98,8 @@ struct LinkTab: View {
                 LabeledContent("싱크 최대 링크", value: (dpcd.maxLaneRateGbps.map { String(format: "%.2f Gbps/레인 (%@)", $0, DPTransportState.rateName($0)) } ?? "미확인") + (dpcd.maxLaneCount.map { " x \($0)레인" } ?? ""))
                 LabeledContent("채널 부호화", value: "8b/10b \(Self.support(dpcd.supports8b10b)), 128b/132b \(Self.support(dpcd.supports128b132b))")
                 LabeledContent("DSC", value: Self.support(dpcd.supportsDSC) + (dpcd.dscRevision.map { " (판 \($0))" } ?? "") + (dpcd.dscEnabled.map { $0 ? ", 현재 사용" : ", 현재 미사용" } ?? ""))
+                LabeledContent("다운스프레드", value: Self.support(dpcd.supportsDownspread))
+                LabeledContent("HDCP (싱크 능력)", value: dpcd.hdcpSummary)
                 if display.identity.isBuiltin {
                     LabeledContent("레인 상태", value: "내장 패널은 상태 레지스터를 갱신하지 않아 표시 생략")
                 } else if !dpcd.laneStatus.isEmpty {

@@ -46,7 +46,7 @@ public enum LinkService {
             return read(device, address, &buffer, UInt32(length)) == 0 ? buffer : nil
         }
         guard let caps = bytes(0x000, 16) else { return nil }
-        return DPCDDecoder.decode(receiverCaps: caps, dscCaps: bytes(0x060, 16), linkConfig: bytes(0x100, 8), dscEnable: bytes(0x160, 1), status: bytes(0x200, 8), extendedCaps: bytes(0x2200, 16))
+        return DPCDDecoder.decode(receiverCaps: caps, dscCaps: bytes(0x060, 16), linkConfig: bytes(0x100, 8), dscEnable: bytes(0x160, 1), status: bytes(0x200, 8), extendedCaps: bytes(0x2200, 16), hdcpBcaps: bytes(0x68028, 1), hdcpRxCaps: bytes(0x6921D, 3))
     }
 
     public static func linkTraining(for display: DisplaySummary, symbols: PrivateSymbols = .shared) -> LinkTrainingData? {

@@ -173,6 +173,7 @@
 | PRD-LNK-003 | DSC와 FEC의 활성 상태 표시 | P3 | 필수 | MRD-SCP-006 |
 | PRD-LNK-004 | HDMI 연결의 TMDS 또는 FRL 속도 표시 | P3 | 권장 | MRD-SCP-006 |
 | PRD-LNK-005 | DPCD 정보 표시(읽기 가능한 경로 한정): DPCD 판, 싱크 최대 속도와 레인, 레인 상태, 심볼 오류 수 | P3 | 권장 | MRD-SCP-006, MRD-RSK-005 |
+| PRD-LNK-006 | 싱크의 HDCP 능력(HDCP 1.x, HDCP 2.x, 리피터 여부)과 다운스프레드 지원 표시. DPCD를 읽을 수 있는 경로 한정 | P6 | 권장 | MRD-SCP-006 |
 
 ### 6.7 포트와 케이블 (PRT)
 

@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 28행, 부분 24행, 미구현 6행
+- 집계: 구현 29행, 부분 24행, 미구현 5행
 
 ## 1. 대조표
 
@@ -53,10 +53,10 @@
 | 42 | EDID | EDID 리포트(CTA, DisplayID, tiled display 디코딩) | 부분 | PRD-INF-003 | CTA와 DisplayID 해석 제공. 타일 배치 블록은 이름만 표시 |
 | 43 | EDID | 커스텀 EDID 적용과 원복 | 구현 | PRD-EDO-001-003 | 실제 적용은 미실행 (TC-EDO-003) |
 | 44 | EDID | EDID 장치 쓰기 | 미구현 |  | 디스플레이 저장 장치 손상 위험으로 제외 |
-| 45 | 링크 진단 | 연결 유형, 전송 모드, link rate, lane 수, 대역폭, 인코딩, downspread | 부분 | PRD-LNK-001-002 | downspread 표시 없음 |
+| 45 | 링크 진단 | 연결 유형, 전송 모드, link rate, lane 수, 대역폭, 인코딩, downspread | 구현 | PRD-LNK-001-002, PRD-LNK-006 |  |
 | 46 | 링크 진단 | DSC 활성 여부와 PPS 필드, payload 추정 | 부분 | PRD-COL-004, PRD-COL-006, PRD-LNK-003 | DSC 활성 여부, 필요 대역폭, 켜기와 끄기 제공. PPS 필드 없음 (DSC 지원 싱크 미보유) |
 | 47 | 링크 진단 | DPCD 덤프와 리포트 | 구현 | PRD-LNK-005 |  |
-| 48 | 링크 진단 | HDCP 지원 버전 표시 | 미구현 |  | 읽기 경로 근거 미확보 |
+| 48 | 링크 진단 | HDCP 지원 버전 표시 | 부분 | PRD-LNK-006 | DisplayPort 싱크의 DPCD 값 표시. HDMI 경로 없음. 외장 디스플레이의 값은 미검증 |
 | 49 | 링크 진단 | 최상 모드 미도달 원인 판정 | 구현 | PRD-DGN-001-003 |  |
 | 50 | 링크 진단 | 디스플레이 정보 리포트 내보내기 | 구현 | PRD-DGN-005 |  |
 | 51 | 케이블/포트 진단 | 포트별 연결 상태, 활성 transport, 플러그 방향 | 구현 | PRD-PRT-001, PRD-PRT-004 | 플러그 방향은 원시 값 표시 |
@@ -84,5 +84,5 @@
 | --- | --- |
 | 외장 디스플레이 재연결 후 실측 | 36 |
 | 추가 장비 (HDMI 직결 구성) | 22 |
-| API 근거 확보 | 5, 19, 48 |
+| API 근거 확보 | 5, 19 |
 | 범위 결정 (디스플레이 저장 장치 손상 위험) | 44 |

@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 83 |
-| SRS 설계 요구사항 | 55 |
-| TC | 80 |
+| PRD 요구사항 | 84 |
+| SRS 설계 요구사항 | 56 |
+| TC | 82 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -56,6 +56,7 @@
 | PRD-LNK-003 | P3 | 필수 | MRD-SCP-006 | SRS-COL-004, SRS-LNK-001 | TC-COL-005 | `Sources/TBDCore/DSCAssessment.swift`<br>`Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/Link.swift` | 통과 1 |
 | PRD-LNK-004 | P3 | 권장 | MRD-SCP-006 | SRS-LNK-003 | TC-LNK-003 | `Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/Link.swift` | 보류 1 |
 | PRD-LNK-005 | P3 | 권장 | MRD-SCP-006, MRD-RSK-005 | SRS-LNK-004 | TC-LNK-004 | `Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/DPCDDecoder.swift` | 통과 1 |
+| PRD-LNK-006 | P6 | 권장 | MRD-SCP-006 | SRS-LNK-005 | TC-LNK-005, TC-LNK-006 | `Sources/TBDCore/DPCDDecoder.swift`<br>`Sources/TBDPlatform/LinkService.swift` | 통과 2 |
 | PRD-PRT-001 | P3 | 필수 | MRD-SCP-007 | SRS-PRT-001 | TC-PRT-001 | `Sources/TBDPlatform/PortService.swift`<br>`Sources/TBDCore/Ports.swift` | 통과 1 |
 | PRD-PRT-002 | P3 | 필수 | MRD-SCP-007 | SRS-PRT-001 | TC-PRT-001 | `Sources/TBDPlatform/PortService.swift`<br>`Sources/TBDCore/Ports.swift` | 통과 1 |
 | PRD-PRT-003 | P3 | 필수 | MRD-SCP-007, MRD-DIF-003 | SRS-PRT-002 | TC-PRT-002 | `Sources/TBDCore/Ports.swift` | 통과 1 |
