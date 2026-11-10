@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>AuthorizationRequired</key>
+		<false/>
+		<key>AutoMatched</key>
+		<false/>
+		<key>BuiltIn</key>
+		<true/>
+		<key>ConnectionActive</key>
+		<false/>
+		<key>ConnectionCount</key>
+		<integer>0</integer>
+		<key>Description</key>
+		<string>Port-HDMI@3</string>
+		<key>FeaturesEnabled</key>
+		<array/>
+		<key>FeaturesSupported</key>
+		<array/>
+		<key>HDMIPortID</key>
+		<integer>0</integer>
+		<key>HDMI_HPD</key>
+		<false/>
+		<key>HDMI_HPD-Debounced</key>
+		<integer>0</integer>
+		<key>IODPHDMIControllerPortUserInterfaceSupported</key>
+		<true/>
+		<key>IOObjectClass</key>
+		<string>AppleHDMIPortController</string>
+		<key>IOObjectRetainCount</key>
+		<integer>12</integer>
+		<key>IORegistryEntryID</key>
+		<integer>4294969932</integer>
+		<key>IORegistryEntryLocation</key>
+		<string>3</string>
+		<key>IORegistryEntryName</key>
+		<string>Port-HDMI</string>
+		<key>IOServiceBusyState</key>
+		<integer>0</integer>
+		<key>IOServiceBusyTime</key>
+		<integer>3973791</integer>
+		<key>IOServiceState</key>
+		<integer>30</integer>
+		<key>IOUserClientClass</key>
+		<string>IODPHDMIPortUserClient</string>
+		<key>Metadata</key>
+		<dict/>
+		<key>PortDescription</key>
+		<string>Port-HDMI@3</string>
+		<key>PortNumber</key>
+		<integer>3</integer>
+		<key>PortType</key>
+		<integer>6</integer>
+		<key>PortTypeDescription</key>
+		<string>HDMI</string>
+		<key>TransportsActive</key>
+		<array/>
+		<key>TransportsProvisioned</key>
+		<array>
+			<string>DisplayPort</string>
+		</array>
+		<key>TransportsSupported</key>
+		<array>
+			<string>DisplayPort</string>
+		</array>
+		<key>UserAuthorizationStatus</key>
+		<integer>0</integer>
+		<key>UserAuthorizationStatusDescription</key>
+		<string>Not Required</string>
+	</dict>
+</array>
+</plist>

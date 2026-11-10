@@ -126,6 +126,10 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T07 | 재연결 후에는 외장(독 터널링) 경로에서도 `IODPDeviceReadDPCD` 성공: DPCD 1.4, HBR3 x 4레인, 8b/10b만 지원, DSC 미지원, 4레인 훈련 완료. Phase 0의 0xe00002ca 실패는 일시 상태였으며 실패 허용 설계 유지 |
+| T07 | 내장 패널의 링크 훈련 속도 부호는 0x17(6.21 Gbps/레인, 비표준). 4레인 유효 대역폭 19.87 Gbps, 현재 모드 필요 19.31 Gbps |
+| T07 | LG TV 3840x2160 120 Hz: 유효 25.92 Gbps, 현재 모드(YCbCr 4:2:2 12 bpc) 25.71 Gbps, 사용률 99.2%. RGB 10 bpc는 32.14 Gbps로 초과. 시스템이 제공하는 색 모드 15개는 전부 유효 대역폭 이내이고 싱크 선언 형식 중 미제공 형식은 전부 초과 (계산과 시스템 목록 일치) |
+| T07 | 터널링 구성에서 `AppleDPTXController` 노드는 전원 꺼짐 상태. FEC 상태를 특정할 수 없어 미확인으로 표시 |
 | T06 | `SLSDisplaySetHDRModeEnabled`는 인자 2개(x0 디스플레이 ID, x1 켜기 여부), 조회 함수 2종은 인자 1개 (SkyLight 디스어셈블) |
 | T06 | HDR 전환 실측: `MPDisplay setPreferHDRModes:` 경로로 LG TV의 HDR 끄기와 켜기 각 2회, 디스플레이 온라인 유지. `SLSDisplayIsHDRModeEnabled`와 `MPDisplay preferHDRModes` 값 일치 |
 | T06 | HDR을 끄면 시스템이 3840x2160 120 Hz에서 RGB 4:4:4, 8 bpc, Full, SDR(ID 100)을 자동 선택. HDR을 켜면 YCbCr 4:2:2, 12 bpc, Limited, PQ(ID 122) 선택. HDR을 끈 상태에서 RGB Full과 Limited 간 색 모드 전환과 자동 복귀 정상 |

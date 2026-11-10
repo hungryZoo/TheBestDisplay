@@ -20,6 +20,16 @@ final class DisplayStore {
     private(set) var signals: [UInt32: SignalInfo] = [:]
     private(set) var dscAssessments: [UInt32: DSCAssessment] = [:]
     private(set) var hdrStatuses: [UInt32: HDRStatus] = [:]
+    /// 디스플레이 ID별 링크 보고와 DPCD, 링크 훈련 결과.
+    private(set) var linkReports: [UInt32: LinkReport] = [:]
+    private(set) var linkDetails: [UInt32: LinkDetails] = [:]
+    /// 전 포트의 DisplayPort 전송 상태.
+    private(set) var transportStates: [DPTransportState] = []
+
+    struct LinkDetails {
+        var dpcd: DPCDInfo?
+        var training: LinkTrainingData?
+    }
     /// 온라인 목록이 바뀔 때 호출.
     @ObservationIgnored var onDisplaysChanged: (Set<UInt32>) -> Void = { _ in }
 
@@ -69,6 +79,15 @@ final class DisplayStore {
         }
         signals = signalMap
         dscAssessments = dscMap
+        transportStates = LinkService.transportStates()
+        var reports: [UInt32: LinkReport] = [:]
+        var details: [UInt32: LinkDetails] = [:]
+        for display in snapshot.displays {
+            reports[display.id] = LinkService.report(for: display, signal: signalMap[display.id], dsc: dscMap[display.id], states: transportStates)
+            details[display.id] = LinkDetails(dpcd: LinkService.dpcd(for: display), training: LinkService.linkTraining(for: display))
+        }
+        linkReports = reports
+        linkDetails = details
         hdrStatuses = Dictionary(uniqueKeysWithValues: snapshot.displays.map { ($0.id, HDRService.status(for: $0, edid: edidRecords[$0.id]?.parsed)) })
         refreshCount += 1
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))

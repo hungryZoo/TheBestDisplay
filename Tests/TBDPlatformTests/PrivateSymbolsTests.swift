@@ -237,3 +237,51 @@ struct HDRServiceTests {
         }
     }
 }
+
+/// TC-LNK-001: 링크 정보 조회. 읽기 전용.
+@Suite("TC-LNK-001 링크 정보 조회")
+struct LinkServiceTests {
+    @Test func 외장_디스플레이의_전송_상태가_레지스트리_값과_일치() throws {
+        let displays = DisplayCatalog.displays()
+        let externals = displays.filter { !$0.identity.isBuiltin }
+        try #require(!externals.isEmpty, "외장 디스플레이 없음")
+        // 레지스트리 원시 속성.
+        let raw: [[String: Any]] = IORegistry.forEachService(matching: "IOPortTransportStateDisplayPort") { IORegistry.properties($0) }
+        for display in externals {
+            let state = try #require(LinkService.transportState(for: display), "전송 상태 대응 실패: \(display.identity.name)")
+            let node = try #require(raw.first { ($0["TransportDescription"] as? String) == state.transportDescription })
+            #expect(state.isActive)
+            #expect(state.laneCount == (node["LaneCount"] as? NSNumber)?.intValue)
+            #expect(state.maxLaneCount == (node["MaxLaneCount"] as? NSNumber)?.intValue)
+            #expect(state.isTunneled == (node["Tunneled"] as? NSNumber)?.boolValue)
+            #expect(state.hpdDescription == node["HPD_StateDescription"] as? String)
+            #expect(state.linkRateDescription == node["LinkRateDescription"] as? String)
+            #expect(state.productName == display.identity.name)
+            #expect(state.hasLink)
+            let rate = try #require(state.laneRateGbps)
+            #expect(state.linkRateDescription.hasPrefix(String(format: "%.1f", rate)))
+
+            let signal = SignalService.signalInfo(for: display)
+            let report = LinkService.report(for: display, signal: signal, dsc: nil)
+            let available = try #require(report.availableGbps)
+            let required = try #require(report.requiredGbps)
+            // 무압축 송출 중이면 필요 대역폭이 유효 대역폭 이내.
+            #expect(required <= available)
+            // 링크 훈련 데이터와 전송 상태의 레인 수 일치.
+            if let training = LinkService.linkTraining(for: display) {
+                #expect(training.laneCount == state.laneCount)
+            }
+        }
+    }
+
+    @Test func 내장_패널은_링크_훈련_데이터로_보고() throws {
+        let displays = DisplayCatalog.displays()
+        guard let builtin = displays.first(where: { $0.identity.isBuiltin }) else { return }
+        #expect(LinkService.transportState(for: builtin) == nil)
+        let report = LinkService.report(for: builtin, signal: SignalService.signalInfo(for: builtin), dsc: nil)
+        #expect(report.transportName == "내장 패널 (eDP)")
+        if let available = report.availableGbps, let required = report.requiredGbps {
+            #expect(required <= available)
+        }
+    }
+}

@@ -25,7 +25,7 @@
 | T04 | P2 | 자동 복귀 안전장치, 모드 열거와 전환, 해상도 탭, `modes`와 `set-mode` 명령 | PRD-MOD-001-006, PRD-SAF-001-002 | TC-MOD-001-004, TC-SAF-001-002, TC-APP-003 | 완료 |
 | T05 | P2 | 타이밍과 색 요소 해석, 현재 신호 조회, 색 모드 전환, DSC 판정, 색 모드 탭, `signal`과 `set-color` 명령 | PRD-COL-001-005 | TC-COL-001-005 | 완료 |
 | T06 | P2 | HDR 상태, 전환, 정보, `hdr` 명령 | PRD-HDR-001-003, PRD-CLI-002 | TC-HDR-001-002, TC-CLI-002 | 완료 (TC-CLI-002는 밝기 명령 추가 후 T10에서 마감) |
-| T07 | P3 | 링크 정보, 대역폭 계산, DPCD, HDMI 링크, 링크 탭, `link` 명령 | PRD-LNK-001-005 | TC-LNK-001-004 | 예정 |
+| T07 | P3 | 링크 정보, 대역폭 계산, DPCD, HDMI 링크, 링크 탭, `link` 명령 | PRD-LNK-001-005 | TC-LNK-001-004 | 완료 (TC-LNK-003은 HDMI 직결 장비 필요로 보류) |
 | T08 | P3 | 포트와 케이블 정보, 연결 경로, 연결 진단 화면, `ports` 명령 | PRD-PRT-001-003 | TC-PRT-001-002 | 예정 |
 | T09 | P3 | 진단 규칙 엔진, 이벤트 기록, 보고서 내보내기, `diagnose`와 `report` 명령 | PRD-DGN-001-006 | TC-DGN-001-005, TC-CLI-001 | 예정 |
 | T10 | P4 | 밝기(DisplayServices, 소프트웨어 디밍, 자동 밝기), DDC 패킷과 제어, 밝기 탭 | PRD-BRT-001-004, PRD-DDC-001-003 | TC-BRT-001-003, TC-DDC-001-003 | 예정 |
