@@ -168,6 +168,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 조회와 전환 |
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 조회와 전환 |
 | `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약 |
+| `tbdctl edid <디스플레이> i2c [--out <파일>]` | I2C로 EDID를 직접 읽어 시스템 제공 EDID와 비교 |
 | `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | EDID 편집, 편집본 저장, 가상 EDID 적용 |
 | `tbdctl edid <디스플레이> timing <타이밍> [--preferred] [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | 사용자 정의 타이밍 계산과 EDID 추가 |
 | `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]` | EDID 파일을 가상 EDID로 적용 |
@@ -251,8 +252,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 90건 중 통과 83건, 미실행 2건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 32행, 부분 21행, 미구현 5행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 91건 중 통과 84건, 미실행 2건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 33행, 부분 20행, 미구현 5행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

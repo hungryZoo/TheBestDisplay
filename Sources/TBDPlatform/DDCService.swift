@@ -21,6 +21,30 @@ public enum DDCService {
         return (read, write)
     }
 
+    /// I2C로 EDID 직접 읽기 (칩 주소 0x50). 기본 블록과 선언된 확장 블록을 128바이트씩 읽음.
+    /// 응답이 없으면 nil. (SRS-INF-004)
+    public static func readEDID(service: AVService, symbols: PrivateSymbols = .shared) -> Data? {
+        guard let io = functions(symbols) else { return nil }
+        return queue.sync {
+            func block(_ index: Int) -> [UInt8]? {
+                for _ in 0..<retries {
+                    var buffer = [UInt8](repeating: 0, count: 128)
+                    if io.read(service.ref, 0x50, UInt32(index * 128), &buffer, 128) == 0, buffer.contains(where: { $0 != 0 }) { return buffer }
+                    usleep(retryDelay)
+                }
+                return nil
+            }
+            guard let base = block(0), Array(base[0..<8]) == [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00] else { return nil }
+            var bytes = base
+            // 확장 블록: 체크섬이 맞는 블록까지만 이어 붙임. 256바이트 이후는 연결에 따라 읽히지 않을 수 있음.
+            for index in 1...max(1, Int(base[126])) where base[126] > 0 {
+                guard let next = block(index), next.reduce(0, { ($0 + Int($1)) & 0xFF }) == 0 else { break }
+                bytes += next
+            }
+            return Data(bytes)
+        }
+    }
+
     /// VCP 값 읽기. 응답이 없거나 해석할 수 없으면 nil.
     public static func read(_ code: UInt8, service: AVService, symbols: PrivateSymbols = .shared) -> DDCPacket.Reply? {
         guard let io = functions(symbols) else { return nil }

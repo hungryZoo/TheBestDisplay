@@ -144,6 +144,40 @@ func runEDID(_ command: ParsedCommand, json: Bool) {
         }
         runEDIDEdit([.addTiming(spec, preferred: command.has("--preferred"))], command: command, display: display, displays: displays, json: json)
 
+    case "i2c":
+        // I2C 직접 읽기와 시스템 제공 EDID의 비교. (PRD-INF-005)
+        guard !display.identity.isBuiltin, let service = EDIDOverrideService.service(for: display, among: displays) else {
+            writeError("오류: \(display.identity.isBuiltin ? "내장 패널은 I2C EDID 읽기 대상이 아님" : "디스플레이에 대응하는 AV 서비스를 찾을 수 없음")")
+            exit(.unsupported)
+        }
+        guard let direct = DDCService.readEDID(service: service) else {
+            writeError("오류: I2C EDID 응답 없음 (독, 허브, 변환 어댑터가 I2C를 전달하지 않거나 디스플레이가 응답하지 않음)")
+            exit(.unsupported)
+        }
+        let system = EDIDSource.record(for: display, among: displays)?.data
+        let issues = EDIDEditor.validate(direct)
+        let comparable = system.map { $0.prefix(direct.count) }
+        let differing = comparable.map { sys in zip(direct, sys).enumerated().filter { $0.element.0 != $0.element.1 }.map(\.offset) } ?? []
+        if let path = command.options["--out"] {
+            do {
+                try direct.write(to: URL(fileURLWithPath: path))
+            } catch {
+                writeError("오류: 파일 저장 실패: \(error.localizedDescription)")
+                exit(.failure)
+            }
+        }
+        if json {
+            struct Output: Encodable { var byteCount: Int; var issues: [String]; var systemByteCount: Int?; var differingOffsets: [Int] }
+            printJSON(Output(byteCount: direct.count, issues: issues, systemByteCount: system?.count, differingOffsets: differing))
+        } else {
+            print("I2C 직접 읽기: \(direct.count)바이트\(issues.isEmpty ? ", 읽은 범위의 블록 체크섬 정상" : "")")
+            for issue in issues { print("  참고: \(issue)") }
+            if let system {
+                print("시스템 제공 EDID: \(system.count)바이트. 앞 \(direct.count)바이트 비교: \(differing.isEmpty ? "일치" : "다른 바이트 \(differing.count)개 (오프셋 \(differing.prefix(12).map(String.init).joined(separator: ", ")))")")
+            }
+            if let path = command.options["--out"] { print("저장: \(path)") }
+        }
+
     case "apply":
         guard let value else {
             writeError("오류: 인자 누락: <파일>")
@@ -172,7 +206,7 @@ func runEDID(_ command: ParsedCommand, json: Bool) {
         }
 
     default:
-        writeError("오류: 동작은 check, patch, timing, apply, reset 중 하나")
+        writeError("오류: 동작은 check, i2c, patch, timing, apply, reset 중 하나")
         exit(.usage)
     }
 }

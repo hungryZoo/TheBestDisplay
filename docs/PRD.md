@@ -85,6 +85,7 @@
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 상태와 정보 조회, 켜기와 끄기 |
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 상태와 전환 가능 여부 조회, 켜기와 끄기 |
 | `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약. 파일 또는 현재 디스플레이의 EDID 대상 |
+| `tbdctl edid <디스플레이> i2c [--out <파일>]` | I2C로 EDID를 직접 읽어 검증하고 시스템 제공 EDID와 비교 |
 | `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | EDID 편집. 편집 목록은 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`. `--apply`는 편집본을 가상 EDID로 적용 |
 | `tbdctl edid <디스플레이> timing <타이밍> [--preferred] [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | 사용자 정의 타이밍 계산과 EDID 추가. 형식은 `<폭>x<높이>@<주사율>[:rb\|:rb2]` 또는 `raw:<수평 활성>,<프런트 포치>,<동기>,<백 포치>,<수직 활성>,<프런트 포치>,<동기>,<백 포치>,<픽셀 클록 kHz>[,+h\|-h][,+v\|-v]` |
 | `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]` | EDID 파일을 가상 EDID로 적용 |
@@ -131,6 +132,7 @@
 | PRD-INF-002 | EDID 해석 표시: 기본 블록(제조사, 제품 코드, 색도, 감마, 상세 타이밍), CTA-861 확장(VIC, HDR 정적 메타데이터, 색 공간, HDMI VSDB와 HF-VSDB), DisplayID 확장 | P1 | 필수 | MRD-SCP-002 |
 | PRD-INF-003 | EDID 원본의 16진 표시와 파일 저장 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 |
 | PRD-INF-004 | 싱크 능력 요약 표시: HDR 형식, 최대 휘도, VRR 범위, 최대 주사율, 최대 TMDS와 FRL 속도, DSC 지원 여부 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 |
+| PRD-INF-005 | I2C 직접 EDID 읽기: 디스플레이에서 직접 읽은 EDID의 검증, 시스템 제공 EDID와의 비교, 파일 저장 | P6 | 권장 | MRD-SCP-002 |
 
 ### 6.3 해상도와 주사율 (MOD)
 

@@ -178,3 +178,4 @@
 | T37 | 가상 EDID에 넣은 DisplayID 상세 타이밍(2560x1440 100 Hz, CVT-RB2)이 싱크 타이밍 목록(새 ID 98)과 윈도우 서버 모드 목록에 반영됨 |
 | T37 | `IOMobileFramebufferSetDigitalOutMode`에 다른 타이밍 ID(60, 3840x2160 59.94 Hz)를 주면 링크가 그 타이밍으로 전환 (링크 데이터 59.94 Hz, 593.41 MHz). 디스플레이 온라인 유지. 윈도우 서버의 현재 모드 표기는 120 Hz로 남음 |
 | T37 | `MPDisplay setOrientation:`으로 LG TV 90도 회전과 복귀 확인. LG TV의 `supportsUnderscan`은 거짓 |
+| T38 | LG TV(독 경유)에서 `IOAVServiceReadI2C` 칩 주소 0x50으로 EDID 384바이트 전체 읽기 성공 (오프셋 256의 셋째 블록 포함). 시스템 제공 EDID(`IOAVServiceCopyEDID`)와 전 바이트 일치, 일련번호 바이트 포함. DDC/CI(칩 주소 0x37)는 같은 경로에서 응답 없음 |
