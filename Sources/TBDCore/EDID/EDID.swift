@@ -181,6 +181,27 @@ public struct EDID: Codable, Hashable, Sendable {
         public var productType: Int = 0
         public var dataBlocks: [String] = []
         public var adaptiveSyncRanges: [AdaptiveSyncRange] = []
+        /// 타일 배치. 여러 패널(타일)로 한 화면을 이루는 디스플레이가 선언. (PRD-INF-006)
+        public var tiledTopology: TiledTopology?
+    }
+
+    /// DisplayID 타일 배치 블록의 내용.
+    public struct TiledTopology: Codable, Hashable, Sendable {
+        public var horizontalTiles: Int
+        public var verticalTiles: Int
+        /// 이 타일의 위치 (0부터).
+        public var horizontalLocation: Int
+        public var verticalLocation: Int
+        public var tileWidth: Int
+        public var tileHeight: Int
+        public var singleEnclosure: Bool
+        /// 타일 묶음 식별자 (제조사, 제품 코드, 일련번호 바이트의 16진 표기).
+        public var topologyID: String
+
+        /// 예: "2 x 1 타일 중 (1, 1) 위치, 타일 크기 2560 x 2880, 전체 5120 x 2880"
+        public var summary: String {
+            "\(horizontalTiles) x \(verticalTiles) 타일 중 (\(horizontalLocation + 1), \(verticalLocation + 1)) 위치, 타일 크기 \(tileWidth) x \(tileHeight), 전체 \(tileWidth * horizontalTiles) x \(tileHeight * verticalTiles)\(singleEnclosure ? ", 단일 외함" : "")"
+        }
     }
 
     public struct AdaptiveSyncRange: Codable, Hashable, Sendable {

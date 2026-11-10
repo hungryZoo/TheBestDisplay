@@ -259,3 +259,49 @@ struct EDIDRobustnessTests {
         }
     }
 }
+
+/// TC-INF-007: DisplayID 타일 배치 블록 해석.
+@Suite("TC-INF-007 EDID 타일 배치")
+struct TiledTopologyTests {
+    /// 2 x 1 타일 중 오른쪽 타일, 타일 2560 x 2880.
+    static let payload: [UInt8] = [
+        0x82,                   // 능력: 단일 외함
+        0x10, 0x10, 0x00,       // 가로 2개, 세로 1개 / 가로 위치 1, 세로 위치 0
+        0xFF, 0x09, 0x3F, 0x0B, // 폭 2560 - 1, 높이 2880 - 1
+        0x00, 0x00, 0x00, 0x00, 0x00,
+        0x10, 0xAC, 0x00, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12,
+    ]
+
+    @Test func 타일_수_위치_크기() throws {
+        let tiled = try #require(EDIDParser.tiledTopology(Self.payload))
+        #expect(tiled.horizontalTiles == 2 && tiled.verticalTiles == 1)
+        #expect(tiled.horizontalLocation == 1 && tiled.verticalLocation == 0)
+        #expect(tiled.tileWidth == 2560 && tiled.tileHeight == 2880)
+        #expect(tiled.singleEnclosure)
+        #expect(tiled.topologyID == "10AC00341278563412")
+        #expect(tiled.summary == "2 x 1 타일 중 (2, 1) 위치, 타일 크기 2560 x 2880, 전체 5120 x 2880, 단일 외함")
+    }
+
+    @Test func 상위_비트를_쓰는_타일_수와_짧은_블록() throws {
+        var large = Self.payload
+        large[1] = 0x31   // 하위: 가로 4 - 1, 세로 2 - 1
+        large[3] = 0x50   // 상위: 가로 +16, 세로 +16
+        let tiled = try #require(EDIDParser.tiledTopology(large))
+        #expect(tiled.horizontalTiles == 20 && tiled.verticalTiles == 18)
+        #expect(EDIDParser.tiledTopology([0x00, 0x10]) == nil)
+    }
+
+    @Test func DisplayID_확장_블록에서_해석() throws {
+        // DisplayID 1.2 확장 블록에 타일 배치 블록(태그 0x12) 하나를 담음.
+        var block: [UInt8] = [0x70, 0x12, 0x79, 0x00, 0x00, 0x12, 0x00, UInt8(Self.payload.count)] + Self.payload
+        block += [UInt8](repeating: 0, count: 128 - block.count)
+        var edid = [UInt8](try Fixture.lgTV().prefix(128))
+        edid[126] = 1
+        let data = Fixture.sealed(edid) + Fixture.sealed(block)
+        let parsed = EDIDParser.parse(data)
+        #expect(parsed.displayID?.tiledTopology?.horizontalTiles == 2)
+        #expect(parsed.displayID?.dataBlocks == ["타일 배치"])
+        // 실측 EDID에는 타일 블록이 없음.
+        #expect(EDIDParser.parse(try Fixture.lgTV()).displayID?.tiledTopology == nil)
+    }
+}

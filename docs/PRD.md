@@ -135,6 +135,7 @@
 | PRD-INF-003 | EDID 원본의 16진 표시와 파일 저장 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 |
 | PRD-INF-004 | 싱크 능력 요약 표시: HDR 형식, 최대 휘도, VRR 범위, 최대 주사율, 최대 TMDS와 FRL 속도, DSC 지원 여부 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 |
 | PRD-INF-005 | I2C 직접 EDID 읽기: 디스플레이에서 직접 읽은 EDID의 검증, 시스템 제공 EDID와의 비교, 파일 저장 | P6 | 권장 | MRD-SCP-002 |
+| PRD-INF-006 | EDID의 타일 배치 해석 표시: 가로와 세로 타일 수, 이 타일의 위치, 타일 크기, 전체 크기 | P6 | 권장 | MRD-SCP-002 |
 
 ### 6.3 해상도와 주사율 (MOD)
 

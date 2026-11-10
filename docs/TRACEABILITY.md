@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 92 |
-| SRS 설계 요구사항 | 64 |
-| TC | 96 |
+| PRD 요구사항 | 93 |
+| SRS 설계 요구사항 | 65 |
+| TC | 97 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -32,6 +32,7 @@
 | PRD-INF-003 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 | SRS-INF-003 | TC-INF-005 | `Sources/TBDPlatform/EDIDSource.swift` | 통과 1 |
 | PRD-INF-004 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 | SRS-INF-002 | TC-INF-003 | `Sources/TBDCore/EDID/` | 통과 1 |
 | PRD-INF-005 | P6 | 권장 | MRD-SCP-002 | SRS-INF-004 | TC-INF-006 | `Sources/TBDPlatform/DDCService.swift` | 통과 1 |
+| PRD-INF-006 | P6 | 권장 | MRD-SCP-002 | SRS-INF-005 | TC-INF-007 | `Sources/TBDCore/EDID/EDIDParser.swift` | 통과 1 |
 | PRD-MOD-001 | P2 | 필수 | MRD-SCP-003, MRD-PRB-001 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 통과 1 |
 | PRD-MOD-002 | P2 | 권장 | MRD-SCP-003 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 통과 1 |
 | PRD-MOD-003 | P2 | 필수 | MRD-SCP-003, MRD-KPI-001 | SRS-MOD-002 | TC-MOD-003 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |

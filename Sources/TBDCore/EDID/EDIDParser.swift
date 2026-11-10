@@ -396,13 +396,35 @@ public enum EDIDParser {
             case (true, 0x20), (false, 0x00): did.dataBlocks.append("제품 식별")
             case (false, 0x01): did.dataBlocks.append("디스플레이 매개변수")
             case (false, 0x09): did.dataBlocks.append("주사율 범위")
-            case (false, 0x12), (true, 0x28): did.dataBlocks.append("타일 배치")
+            case (false, 0x12), (true, 0x28):
+                did.dataBlocks.append("타일 배치")
+                did.tiledTopology = tiledTopology(payload)
             case (_, 0x81): did.dataBlocks.append("CTA 데이터 블록")
             case (_, 0x7E), (_, 0x7F): did.dataBlocks.append("제조사 블록")
             default: did.dataBlocks.append(String(format: "태그 0x%02X", tag))
             }
         }
         edid.displayID = did
+    }
+
+    /// 타일 배치 블록 본문: 능력 1바이트, 배치 3바이트, 타일 크기 4바이트, 베젤 5바이트, 묶음 식별자.
+    /// 배치 바이트: [0] 상위 4비트 가로 타일 수 - 1, 하위 4비트 세로 타일 수 - 1. [1] 상위 가로 위치, 하위 세로 위치.
+    /// [2] 비트 7-6 가로 타일 수 상위, 5-4 세로 타일 수 상위, 3-2 가로 위치 상위, 1-0 세로 위치 상위.
+    static func tiledTopology(_ p: [UInt8]) -> EDID.TiledTopology? {
+        guard p.count >= 8 else { return nil }
+        let topo = Array(p[1...3]), size = Array(p[4...7])
+        let hTiles = Int(topo[0] >> 4) | Int((topo[2] >> 6) & 0x3) << 4
+        let vTiles = Int(topo[0] & 0xF) | Int((topo[2] >> 4) & 0x3) << 4
+        let hLocation = Int(topo[1] >> 4) | Int((topo[2] >> 2) & 0x3) << 4
+        let vLocation = Int(topo[1] & 0xF) | Int(topo[2] & 0x3) << 4
+        let idBytes = p.count > 13 ? Array(p[13...]) : []
+        return EDID.TiledTopology(
+            horizontalTiles: hTiles + 1, verticalTiles: vTiles + 1,
+            horizontalLocation: hLocation, verticalLocation: vLocation,
+            tileWidth: (Int(size[0]) | Int(size[1]) << 8) + 1, tileHeight: (Int(size[2]) | Int(size[3]) << 8) + 1,
+            singleEnclosure: p[0] & 0x80 != 0,
+            topologyID: idBytes.map { String(format: "%02X", $0) }.joined()
+        )
     }
 
     static func displayIDTiming(_ d: [UInt8], clockUnitHz: Double) -> EDID.DetailedTiming? {

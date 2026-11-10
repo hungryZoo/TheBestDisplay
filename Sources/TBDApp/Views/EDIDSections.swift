@@ -59,6 +59,9 @@ struct EDIDSections: View {
                 if let did = edid.displayID {
                     DisclosureGroup("DisplayID 확장 (판 \(did.version))") {
                         LabeledContent("데이터 블록", value: did.dataBlocks.isEmpty ? "없음" : did.dataBlocks.joined(separator: ", "))
+                        if let tiled = did.tiledTopology {
+                            LabeledContent("타일 배치", value: tiled.summary)
+                        }
                         ForEach(did.adaptiveSyncRanges, id: \.self) { range in
                             LabeledContent("Adaptive-Sync", value: "\(range.minHz)-\(range.maxHz) Hz")
                         }

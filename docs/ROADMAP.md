@@ -62,6 +62,7 @@
 | T40 | P6 | 외장 연결 시 내장 자동 연결 해제, `auto-disconnect` 명령, 배치 탭 토글 | PRD-ARR-008 | TC-ARR-008-009 | 완료 (외장 케이블 분리 시 재연결은 실측 전) |
 | T41 | P6 | GPU 디더링 조회와 전환, `dither` 명령, 색 모드 탭 토글 | PRD-COL-008 | TC-COL-010 | 완료 |
 | T42 | P6 | Thunderbolt 스위치 토폴로지와 레인 구성 판정 | PRD-PRT-006 | TC-PRT-005-006 | 완료 |
+| T43 | P6 | EDID 타일 배치 해석 | PRD-INF-006 | TC-INF-007 | 완료 |
 
 ## 3. 사용자 참여 항목
 

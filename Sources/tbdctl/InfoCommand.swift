@@ -68,6 +68,7 @@ func runInfo(_ command: ParsedCommand, json: Bool) {
     }
     if let did = edid.displayID {
         print("  DisplayID \(did.version): \(did.dataBlocks.joined(separator: ", "))")
+        if let tiled = did.tiledTopology { print("    타일 배치: \(tiled.summary)") }
     }
     if command.has("--hex") {
         print("  원본")
