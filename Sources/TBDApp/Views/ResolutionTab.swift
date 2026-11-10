@@ -2,7 +2,7 @@ import SwiftUI
 import TBDCore
 import TBDPlatform
 
-/// 해상도 탭: 전체 모드 목록, 필터, 모드 전환. (PRD-MOD-001-006)
+/// 해상도 탭: 전체 모드 목록, 필터, 모드 전환, 사용자 정의 스케일 해상도. (PRD-MOD-001-007)
 struct ResolutionTab: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
@@ -20,6 +20,10 @@ struct ResolutionTab: View {
             Divider()
             if !store.isVirtual(display.id), let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first {
                 HiDPIScalingSection(display: display, nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight)
+                Divider()
+            }
+            if !store.isVirtual(display.id) {
+                ScaledResolutionSection(display: display)
                 Divider()
             }
             if groups.isEmpty {

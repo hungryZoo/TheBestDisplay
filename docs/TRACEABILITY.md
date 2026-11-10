@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 72 |
-| SRS 설계 요구사항 | 46 |
-| TC | 61 |
+| PRD 요구사항 | 73 |
+| SRS 설계 요구사항 | 47 |
+| TC | 64 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -37,6 +37,7 @@
 | PRD-MOD-004 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 통과 1 |
 | PRD-MOD-005 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-002 | TC-MOD-004 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
 | PRD-MOD-006 | P2 | 권장 | MRD-PRB-001 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 통과 1 |
+| PRD-MOD-007 | P6 | 권장 | MRD-SCP-003, MRD-SCP-012 | SRS-MOD-004 | TC-MOD-005, TC-MOD-006, TC-MOD-007 | `Sources/TBDCore/DisplayOverride.swift`<br>`Sources/TBDPlatform/DisplayOverrideService.swift` | 미실행 1, 통과 2 |
 | PRD-COL-001 | P2 | 필수 | MRD-SCP-004, MRD-PRB-002, MRD-KPI-002 | SRS-COL-002 | TC-COL-002 | `Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-002 | P2 | 필수 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-003 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-003 | TC-COL-004 | `Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
