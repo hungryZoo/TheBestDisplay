@@ -144,3 +144,28 @@ struct EDIDSourceTests {
         }
     }
 }
+
+/// TC-MOD-001: 전체 모드 열거. 읽기 전용.
+@Suite("TC-MOD-001 모드 열거")
+struct ModeServiceTests {
+    @Test func 전체_모드가_공개_API_이상이고_현재_모드가_1개() throws {
+        let displays = DisplayCatalog.displays()
+        try #require(!displays.isEmpty)
+        for display in displays {
+            let modes = ModeService.modes(for: display.id)
+            let publicCount = ModeService.publicCGModes(for: display.id, includeDuplicates: true).count
+            #expect(modes.count >= publicCount, "\(display.identity.name)")
+            #expect(Set(modes.map(\.modeNumber)).count == modes.count, "모드 번호 중복")
+            let current = try #require(ModeService.currentMode(for: display.id, in: modes))
+            #expect(modes.filter { $0.modeNumber == current.modeNumber }.count == 1)
+            // 현재 모드가 CoreGraphics 보고값과 일치.
+            #expect(current.width == display.pointWidth)
+            #expect(current.height == display.pointHeight)
+            #expect(current.pixelWidth == display.pixelWidth)
+            #expect(abs(current.refreshRate - display.refreshRate) < 0.01)
+            // 시스템 판정: 원본 모드 1개 이상, 현재 모드는 서술로 다시 찾을 수 있음.
+            #expect(modes.contains { $0.isNative })
+            #expect(current.descriptor.find(in: modes)?.modeNumber == current.modeNumber)
+        }
+    }
+}

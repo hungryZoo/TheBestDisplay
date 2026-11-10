@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Address</key>
+		<integer>1</integer>
+		<key>Address Description</key>
+		<string>SOP</string>
+		<key>AddressDescription</key>
+		<string>SOP</string>
+		<key>ComponentName</key>
+		<string>SOP</string>
+		<key>Description</key>
+		<string>Port-USB-C@4/CC/SOP</string>
+		<key>IOObjectClass</key>
+		<string>IOPortTransportComponentCCUSBPDSOP</string>
+		<key>IOObjectRetainCount</key>
+		<integer>8</integer>
+		<key>IORegistryEntryID</key>
+		<integer>4295341522</integer>
+		<key>IORegistryEntryName</key>
+		<string>SOP</string>
+		<key>IOServiceBusyState</key>
+		<integer>0</integer>
+		<key>IOServiceBusyTime</key>
+		<integer>8895583</integer>
+		<key>IOServiceState</key>
+		<integer>30</integer>
+		<key>Metadata</key>
+		<dict>
+			<key>Product ID</key>
+			<integer>21779</integer>
+			<key>VDO Count</key>
+			<integer>4</integer>
+			<key>VDOs</key>
+			<array>
+				<data>
+				AABATA==
+				</data>
+				<data>
+				AAAAAA==
+				</data>
+				<data>
+				AAATVQ==
+				</data>
+				<data>
+				kwaATQ==
+				</data>
+			</array>
+			<key>Vendor ID</key>
+			<integer>0</integer>
+			<key>bcdDevice</key>
+			<integer>0</integer>
+		</dict>
+		<key>ParentBuiltInPortNumber</key>
+		<integer>4</integer>
+		<key>ParentBuiltInPortType</key>
+		<integer>2</integer>
+		<key>ParentBuiltInPortTypeDescription</key>
+		<string>USB-C</string>
+		<key>ParentPortNumber</key>
+		<integer>4</integer>
+		<key>ParentPortType</key>
+		<integer>2</integer>
+		<key>ParentPortTypeDescription</key>
+		<string>USB-C</string>
+		<key>ParentTransportType</key>
+		<integer>1</integer>
+		<key>ParentTransportTypeDescription</key>
+		<string>Port-USB-C@4/CC</string>
+		<key>Product ID</key>
+		<integer>21779</integer>
+		<key>Specification Revision</key>
+		<integer>3</integer>
+		<key>Vendor ID</key>
+		<integer>0</integer>
+	</dict>
+</array>
+</plist>

@@ -11,6 +11,7 @@ enum SidebarItem: Hashable {
 /// 사이드바와 상세 영역. (SRS-UI-001, PRD-APP-002)
 struct ContentView: View {
     @Environment(DisplayStore.self) private var store
+    @Environment(ChangeController.self) private var changes
     @State private var selection: SidebarItem?
 
     var body: some View {
@@ -36,6 +37,20 @@ struct ContentView: View {
             .navigationSplitViewColumnWidth(min: 230, ideal: 260)
         } detail: {
             detail
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if let banner = changes.banner {
+                        BannerView(banner: banner) { changes.dismissBanner() }
+                    }
+                }
+        }
+        .sheet(item: confirmationBinding) { item in
+            ChangeConfirmationSheet(confirmation: item.value)
+        }
+        .alert("이전 실행에서 확인하지 않은 변경", isPresented: pendingBinding, presenting: changes.pendingFromPreviousRun) { _ in
+            Button("복귀") { changes.applyPendingFromPreviousRun(displays: store.displays) }
+            Button("현재 설정 유지", role: .cancel) { changes.discardPendingFromPreviousRun() }
+        } message: { pending in
+            Text(pending.summary)
         }
         .toolbar {
             ToolbarItem {
@@ -63,6 +78,19 @@ struct ContentView: View {
         case nil:
             ContentUnavailableView("디스플레이 선택", systemImage: "display")
         }
+    }
+
+    private struct ConfirmationItem: Identifiable {
+        let value: ChangeController.Confirmation
+        var id: String { value.summary }
+    }
+
+    private var confirmationBinding: Binding<ConfirmationItem?> {
+        Binding(get: { changes.confirmation.map(ConfirmationItem.init) }, set: { _ in })
+    }
+
+    private var pendingBinding: Binding<Bool> {
+        Binding(get: { changes.pendingFromPreviousRun != nil && changes.confirmation == nil }, set: { _ in })
     }
 
     /// 선택이 없거나 선택한 디스플레이가 사라진 경우 첫 디스플레이 선택.

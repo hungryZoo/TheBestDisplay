@@ -13,6 +13,11 @@ final class DisplayStore {
     private(set) var refreshCount = 0
     /// 디스플레이 ID별 EDID 원본과 해석 결과. 내장 패널은 없음.
     private(set) var edidRecords: [UInt32: EDIDRecord] = [:]
+    /// 디스플레이 ID별 전체 모드와 현재 모드.
+    private(set) var modes: [UInt32: [DisplayMode]] = [:]
+    private(set) var currentModes: [UInt32: DisplayMode] = [:]
+    /// 온라인 목록이 바뀔 때 호출.
+    @ObservationIgnored var onDisplaysChanged: (Set<UInt32>) -> Void = { _ in }
 
     @ObservationIgnored private var pendingRefresh: Task<Void, Never>?
     @ObservationIgnored private var observer: NSObjectProtocol?
@@ -41,7 +46,17 @@ final class DisplayStore {
     func refresh() {
         snapshot = DisplayCatalog.snapshot()
         edidRecords = Dictionary(EDIDSource.records(for: snapshot.displays).map { ($0.displayID, $0) }, uniquingKeysWith: { first, _ in first })
+        var allModes: [UInt32: [DisplayMode]] = [:]
+        var current: [UInt32: DisplayMode] = [:]
+        for display in snapshot.displays {
+            let list = ModeService.modes(for: display.id)
+            allModes[display.id] = list
+            current[display.id] = ModeService.currentMode(for: display.id, in: list)
+        }
+        modes = allModes
+        currentModes = current
         refreshCount += 1
+        onDisplaysChanged(Set(snapshot.displays.map(\.id)))
     }
 
     func scheduleRefresh() {

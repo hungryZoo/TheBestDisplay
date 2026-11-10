@@ -8,6 +8,9 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "list", summary: "디스플레이 목록"),
     CommandSpec(name: "capabilities", summary: "기능별 가용성"),
     CommandSpec(name: "info", summary: "제품 정보와 EDID 해석", positionals: ["디스플레이"], valueOptions: ["--edid-out"], flags: ["--hex"]),
+    CommandSpec(name: "modes", summary: "전체 모드 목록", positionals: ["디스플레이"], flags: ["--hidpi", "--outside-default"]),
+    CommandSpec(name: "set-mode", summary: "모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "모드"], valueOptions: ["--timeout", "--method"], flags: ["--yes"]),
+    CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
     CommandSpec(name: "help", summary: "사용법"),
 ])
 
@@ -97,6 +100,15 @@ case "capabilities":
 
 case "info":
     runInfo(command, json: json)
+
+case "modes":
+    runModes(command, json: json)
+
+case "set-mode":
+    runSetMode(command)
+
+case "revert-pending":
+    runRevertPending(command)
 
 default:
     writeError("오류: 미구현 명령 \(command.name)")

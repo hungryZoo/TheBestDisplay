@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>BranchDeviceID</key>
+		<string></string>
+		<key>BranchIEEEOUI</key>
+		<integer>0</integer>
+		<key>CFBundleIdentifier</key>
+		<string>com.apple.driver.DCPDPFamilyProxy</string>
+		<key>CFBundleIdentifierKernel</key>
+		<string>com.apple.driver.DCPDPFamilyProxy</string>
+		<key>IOClass</key>
+		<string>DCPDPDeviceProxy</string>
+		<key>IODPDeviceUserInterfaceSupported</key>
+		<true/>
+		<key>IOMatchCategory</key>
+		<string>IODefaultMatchCategory</string>
+		<key>IOMatchedAtBoot</key>
+		<true/>
+		<key>IOObjectClass</key>
+		<string>DCPDPDeviceProxy</string>
+		<key>IOObjectRetainCount</key>
+		<integer>6</integer>
+		<key>IOPersonalityPublisher</key>
+		<string>com.apple.driver.DCPDPFamilyProxy</string>
+		<key>IOProbeScore</key>
+		<integer>0</integer>
+		<key>IOPropertyMatch</key>
+		<dict>
+			<key>EPICName</key>
+			<string>dcpdp-device-epic</string>
+		</dict>
+		<key>IOProviderClass</key>
+		<string>AFKEndpointInterface</string>
+		<key>IORegistryEntryID</key>
+		<integer>4295343696</integer>
+		<key>IORegistryEntryName</key>
+		<string>DCPDPDeviceProxy</string>
+		<key>IOServiceBusyState</key>
+		<integer>0</integer>
+		<key>IOServiceBusyTime</key>
+		<integer>4852583</integer>
+		<key>IOServiceState</key>
+		<integer>30</integer>
+		<key>IOUserClientClass</key>
+		<string>DCPDPDeviceProxyUserClient</string>
+		<key>Location</key>
+		<string>Embedded</string>
+		<key>SinkDeviceID</key>
+		<string>A41054</string>
+		<key>SinkIEEEOUI</key>
+		<integer>16388096</integer>
+		<key>Unit</key>
+		<integer>0</integer>
+	</dict>
+</array>
+</plist>

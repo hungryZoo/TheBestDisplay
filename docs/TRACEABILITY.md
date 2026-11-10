@@ -7,7 +7,7 @@
 
 | 항목 | 값 |
 | --- | --- |
-| MRD 항목 | 52 |
+| MRD 항목 | 53 |
 | PRD 요구사항 | 66 |
 | SRS 설계 요구사항 | 42 |
 | TC | 53 |
@@ -25,18 +25,18 @@
 | PRD-APP-001 | P1 | 필수 | MRD-SCP-001, MRD-DIF-001 | SRS-ARC-001, SRS-ARC-003, SRS-UI-002 | TC-APP-001 | `Package.swift`<br>`Sources/TBDApp/TheBestDisplayApp.swift`<br>`scripts/build_app.sh` | 통과 1 |
 | PRD-APP-002 | P1 | 필수 | MRD-SCP-001 | SRS-UI-001 | TC-APP-002 | `Sources/TBDApp/Views/` | 통과 1 |
 | PRD-APP-003 | P1 | 필수 | MRD-SCP-001, MRD-PRB-005 | SRS-UI-001 | TC-APP-002 | `Sources/TBDApp/Views/` | 통과 1 |
-| PRD-APP-004 | P1 | 필수 | MRD-SCP-001 | SRS-ARC-004 | TC-APP-003 | `Sources/TBDApp/DisplayStore.swift` | 미실행 1 |
+| PRD-APP-004 | P1 | 필수 | MRD-SCP-001 | SRS-ARC-004 | TC-APP-003 | `Sources/TBDApp/DisplayStore.swift` | 통과 1 |
 | PRD-APP-005 | P1 | 필수 | MRD-RSK-001, MRD-RSK-003 | SRS-ARC-002 | TC-APP-004 | `Sources/TBDPlatform/PrivateSymbols.swift` | 통과 1 |
 | PRD-INF-001 | P1 | 필수 | MRD-SCP-002 | SRS-INF-001 | TC-INF-001 | `Sources/TBDPlatform/DisplayCatalog.swift` | 통과 1 |
 | PRD-INF-002 | P1 | 필수 | MRD-SCP-002 | SRS-INF-002 | TC-INF-002, TC-INF-003 | `Sources/TBDCore/EDID/` | 통과 2 |
 | PRD-INF-003 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 | SRS-INF-003 | TC-INF-005 | `Sources/TBDPlatform/EDIDSource.swift` | 통과 1 |
 | PRD-INF-004 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 | SRS-INF-002 | TC-INF-003 | `Sources/TBDCore/EDID/` | 통과 1 |
-| PRD-MOD-001 | P2 | 필수 | MRD-SCP-003, MRD-PRB-001 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 미실행 1 |
-| PRD-MOD-002 | P2 | 권장 | MRD-SCP-003 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 미실행 1 |
-| PRD-MOD-003 | P2 | 필수 | MRD-SCP-003, MRD-KPI-001 | SRS-MOD-002 | TC-MOD-003 | `Sources/TBDPlatform/ModeService.swift` | 미실행 1 |
-| PRD-MOD-004 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 미실행 1 |
-| PRD-MOD-005 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-002 | TC-MOD-004 | `Sources/TBDPlatform/ModeService.swift` | 미실행 1 |
-| PRD-MOD-006 | P2 | 권장 | MRD-PRB-001 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 미실행 1 |
+| PRD-MOD-001 | P2 | 필수 | MRD-SCP-003, MRD-PRB-001 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 통과 1 |
+| PRD-MOD-002 | P2 | 권장 | MRD-SCP-003 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 통과 1 |
+| PRD-MOD-003 | P2 | 필수 | MRD-SCP-003, MRD-KPI-001 | SRS-MOD-002 | TC-MOD-003 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
+| PRD-MOD-004 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 통과 1 |
+| PRD-MOD-005 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-002 | TC-MOD-004 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
+| PRD-MOD-006 | P2 | 권장 | MRD-PRB-001 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 통과 1 |
 | PRD-COL-001 | P2 | 필수 | MRD-SCP-004, MRD-PRB-002, MRD-KPI-002 | SRS-COL-002 | TC-COL-002 | `Sources/TBDPlatform/SignalService.swift` | 미실행 1 |
 | PRD-COL-002 | P2 | 필수 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/SignalDecoder.swift` | 미실행 1 |
 | PRD-COL-003 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-003 | TC-COL-004 | `Sources/TBDPlatform/SignalService.swift` | 미실행 1 |
@@ -82,8 +82,8 @@
 | PRD-PRF-001 | P5 | 필수 | MRD-SCP-013, MRD-SCN-006 | SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift` | 미실행 1 |
 | PRD-PRF-002 | P5 | 필수 | MRD-SCP-013 | SRS-PRF-002 | TC-PRF-002 | `Sources/TBDPlatform/ProfileApplier.swift` | 미실행 1 |
 | PRD-PRF-003 | P5 | 필수 | MRD-SCP-013 | SRS-INF-001, SRS-PRF-001 | TC-PRF-001 | `Sources/TBDCore/Profile.swift`<br>`Sources/TBDPlatform/DisplayCatalog.swift` | 미실행 1 |
-| PRD-SAF-001 | P2 | 필수 | MRD-SCP-014, MRD-DIF-004, MRD-RSK-002, MRD-SCN-004 | SRS-SAF-001 | TC-MOD-003, TC-COL-004, TC-HDR-002, TC-SAF-001 | `Sources/TBDCore/RevertGuard.swift` | 미실행 4 |
-| PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDPlatform/PendingRevertStore.swift` | 미실행 1 |
+| PRD-SAF-001 | P2 | 필수 | MRD-SCP-014, MRD-DIF-004, MRD-RSK-002, MRD-SCN-004 | SRS-SAF-001 | TC-MOD-003, TC-COL-004, TC-HDR-002, TC-SAF-001 | `Sources/TBDCore/RevertGuard.swift` | 미실행 2, 통과 2 |
+| PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
 | PRD-CLI-001 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-001 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1 |
 | PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1 |

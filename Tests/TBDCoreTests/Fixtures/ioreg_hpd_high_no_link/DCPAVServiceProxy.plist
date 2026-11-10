@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>CFBundleIdentifier</key>
+		<string>com.apple.driver.DCPAVFamilyProxy</string>
+		<key>CFBundleIdentifierKernel</key>
+		<string>com.apple.driver.DCPAVFamilyProxy</string>
+		<key>IOAVServiceUserInterfaceSupported</key>
+		<true/>
+		<key>IOClass</key>
+		<string>DCPAVServiceProxy</string>
+		<key>IOMatchCategory</key>
+		<string>IODefaultMatchCategory</string>
+		<key>IOMatchedAtBoot</key>
+		<true/>
+		<key>IOObjectClass</key>
+		<string>DCPAVServiceProxy</string>
+		<key>IOObjectRetainCount</key>
+		<integer>8</integer>
+		<key>IOPersonalityPublisher</key>
+		<string>com.apple.driver.DCPAVFamilyProxy</string>
+		<key>IOProbeScore</key>
+		<integer>0</integer>
+		<key>IOPropertyMatch</key>
+		<dict>
+			<key>EPICName</key>
+			<string>dcpav-service-epic</string>
+		</dict>
+		<key>IOProviderClass</key>
+		<string>AFKEndpointInterface</string>
+		<key>IORegistryEntryID</key>
+		<integer>4295343693</integer>
+		<key>IORegistryEntryName</key>
+		<string>DCPAVServiceProxy</string>
+		<key>IOServiceBusyState</key>
+		<integer>0</integer>
+		<key>IOServiceBusyTime</key>
+		<integer>4503000</integer>
+		<key>IOServiceState</key>
+		<integer>30</integer>
+		<key>IOUserClientClass</key>
+		<string>DCPAVServiceProxyUserClient</string>
+		<key>Location</key>
+		<string>Embedded</string>
+		<key>Unit</key>
+		<integer>0</integer>
+	</dict>
+</array>
+</plist>

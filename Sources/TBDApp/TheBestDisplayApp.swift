@@ -6,11 +6,17 @@ import SwiftUI
 struct TheBestDisplayApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var store = DisplayStore()
+    @State private var changes = ChangeController()
 
     var body: some Scene {
         Window("TheBestDisplay", id: "main") {
             ContentView()
                 .environment(store)
+                .environment(changes)
+                .onAppear {
+                    changes.onChanged = { [store] in store.scheduleRefresh() }
+                    store.onDisplaysChanged = { [changes] ids in changes.displaysChanged(onlineIDs: ids) }
+                }
                 .frame(minWidth: 860, minHeight: 560)
         }
         .defaultSize(width: 1040, height: 680)

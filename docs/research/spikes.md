@@ -121,3 +121,9 @@
 | --- | --- |
 | T03 | 독의 DP 경로로 받은 LG TV EDID(384바이트)는 기본 블록, CTA-861 확장, DisplayID 1.2 확장으로 구성. HDMI VSDB와 HF-VSDB 없음. 3840x2160 120 Hz 타이밍은 DisplayID Type I 상세 타이밍에만 존재 (픽셀 클록 1,071.36 MHz, 링크 데이터 실측값과 일치) |
 | T03 | EDID 기본 블록 바이트 20은 0xC5: 디지털, 12 bpc, DisplayPort |
+| T04 | `MPDisplay`의 `allModes`가 윈도우 서버 모드와 같은 번호 체계로 319개 전체 제공. 모드별 `isUserVisible`(외장 219개), `isNativeMode`(외장 14개), `isDefaultMode`, `isSafeMode` 조회 가능. 공개 API 기본 열거는 HiDPI 변형을 숨겨 시스템 설정 목록 판정 근거로 부적합 |
+| T04 | `MPDisplay` 메서드 형식 부호: `setModeNumber:` `i20@0:8i16`, `setOrientation:` `v20@0:8i16`, `setPreferHDRModes:` `v20@0:8B16`, `setUnderscan:` `v20@0:8i16`, `setMirrorMaster:` `v20@0:8B16` |
+| T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
+| T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
+| T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T04 | MonitorPanel 경로 실측: 주사율 전환 3회, 해상도 전환 2회(2560x1440 HiDPI, 시스템 설정 목록 밖 1344x756 HiDPI), 창 앱 전환 1회 모두 디스플레이 온라인 유지와 자동 복귀 정상 |

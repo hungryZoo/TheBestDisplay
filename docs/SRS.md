@@ -163,9 +163,9 @@ public protocol DisplayApplying {
 | SRS-INF-001 | `DisplayCatalog`: `CGGetOnlineDisplayList`, CoreGraphics 속성, `CoreDisplay_DisplayCreateInfoDictionary`, 프레임버퍼 노드 대응으로 `DisplayIdentity`와 물리 정보 구성 | PRD-INF-001, PRD-PRF-003 | `Sources/TBDPlatform/DisplayCatalog.swift` |
 | SRS-INF-002 | `EDIDParser`: 기본 블록, CTA-861 확장(데이터 블록 전체 순회, HDMI VSDB, HF-VSDB, HDR 정적 메타데이터, 색 공간), DisplayID 확장 해석. 블록별 체크섬 검증. 손상 입력에서 충돌 없이 부분 결과 반환 | PRD-INF-002, PRD-INF-004 | `Sources/TBDCore/EDID/` |
 | SRS-INF-003 | EDID 원본 획득 순서: `IOAVServiceCopyEDID`, `IOPortTransportStateDisplayPort`의 `EDID` 키. 둘 다 실패 시 EDID 없음으로 표시. 디스플레이 대응은 EDID 머리의 제조사, 제품 코드, 일련번호와 CoreGraphics 값 대조. 일련번호 불일치 시 같은 제품이 1대일 때만 제조사와 제품 코드로 대응. 내장 패널은 EDID 없음 | PRD-INF-003 | `Sources/TBDPlatform/EDIDSource.swift` |
-| SRS-MOD-001 | `ModeService` 열거: `SLSGetDisplayModeDescriptionOfLength`의 212바이트 구조체 해석. 심볼 미가용 시 `CGDisplayCopyAllDisplayModes` 대체 | PRD-MOD-001, PRD-MOD-004 | `Sources/TBDPlatform/ModeService.swift` |
-| SRS-MOD-002 | 모드 전환: `CGBeginDisplayConfiguration`, `SLSConfigureDisplayMode`, `CGCompleteDisplayConfiguration` 순서. 대체 경로는 `CGDisplaySetDisplayMode` | PRD-MOD-003, PRD-MOD-005 | `Sources/TBDPlatform/ModeService.swift` |
-| SRS-MOD-003 | `ModeCatalog`: 해상도별 묶음, HiDPI 판정(배율 2 이상), 필터, 시스템 기본 목록 포함 여부 판정(공개 API 기본 열거 결과와 대조) | PRD-MOD-002, PRD-MOD-006 | `Sources/TBDCore/ModeCatalog.swift` |
+| SRS-MOD-001 | `ModeService` 열거: `SLSGetDisplayModeDescriptionOfLength`의 212바이트 구조체 해석(`DisplayMode.decode`). 심볼 미가용 시 `CGDisplayCopyAllDisplayModes` 대체. 모드별 시스템 설정 표시 여부, 원본, 기본 판정은 `MPDisplay`의 `allModes`에서 조회 | PRD-MOD-001, PRD-MOD-004 | `Sources/TBDPlatform/ModeService.swift` |
+| SRS-MOD-002 | 모드 전환 경로 순서: `MPDisplay setModeNumber:`, 공개 API `CGConfigureDisplayWithDisplayMode`. `SLSConfigureDisplayMode` 직접 호출은 명시 지정 시에만 사용 (ADR-0005). 복귀와 확정은 모드 번호가 아닌 모드 서술(해상도, HiDPI, 주사율, 가변 여부)로 대상 모드 재탐색 | PRD-MOD-003, PRD-MOD-005 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` |
+| SRS-MOD-003 | `ModeCatalog`: 해상도별 묶음, HiDPI 판정(배율 2 이상), 필터(배율, 주사율, 종횡비, 시스템 설정 목록 밖). 시스템 설정 목록 포함 여부는 `MPDisplay` 판정 사용, 조회 불가 시 공개 API 기본 열거 결과와 대조. 명령행 모드 지정 해석은 `ModeSpec` | PRD-MOD-002, PRD-MOD-006 | `Sources/TBDCore/ModeCatalog.swift` |
 | SRS-COL-001 | `SignalDecoder`: 프레임버퍼 노드의 `TimingElements`, `ColorElements` 사전을 `TimingElement`, `ColorElement`로 변환. 열거형 값은 spikes 문서 2.2절 표 사용 | PRD-COL-002, PRD-COL-005 | `Sources/TBDCore/SignalDecoder.swift` |
 | SRS-COL-002 | 현재 신호 조회: `IOMobileFramebufferGetDigitalOutMode`의 색 ID와 타이밍 ID, `IOAVServiceGetLinkData`의 0x110바이트 구조체 해석(spikes 문서 2.1절 오프셋) | PRD-COL-001 | `Sources/TBDPlatform/SignalService.swift` |
 | SRS-COL-003 | 색 모드 전환: `IOMobileFramebufferSetDigitalOutMode(색 ID, 타이밍 ID)`. 반환 코드 0 이외는 오류로 보고 | PRD-COL-003 | `Sources/TBDPlatform/SignalService.swift` |
@@ -193,6 +193,6 @@ public protocol DisplayApplying {
 | SRS-VRT-002 | HiDPI 스케일링: HiDPI 가상 디스플레이 생성 후 실제 디스플레이를 가상 디스플레이의 미러로 구성. 해제 시 미러 해제와 가상 디스플레이 삭제 | PRD-VRT-002 | `Sources/TBDPlatform/VirtualDisplayService.swift` |
 | SRS-PRF-001 | `ProfileStore`: Application Support의 JSON 파일. 판 번호 필드 보유. 디스플레이 대응 규칙은 UUID, 제조사와 제품 코드와 일련번호 순 | PRD-PRF-001, PRD-PRF-003 | `Sources/TBDCore/Profile.swift` |
 | SRS-PRF-002 | 프로파일 적용 순서: 연결 활성, 미러, 모드, 색 모드, HDR, 회전, 배치, 밝기. 단계별 결과 수집 | PRD-PRF-002 | `Sources/TBDPlatform/ProfileApplier.swift` |
-| SRS-SAF-001 | `RevertGuard`: PRD 3절 상태 전이 구현. 시계와 적용기 주입으로 단위 테스트 가능 | PRD-SAF-001 | `Sources/TBDCore/RevertGuard.swift` |
-| SRS-SAF-002 | 복귀 정보 파일 기록과 삭제. 앱 실행 시 파일 존재하면 복귀 제안 | PRD-SAF-002 | `Sources/TBDPlatform/PendingRevertStore.swift` |
+| SRS-SAF-001 | `RevertStateMachine`: PRD 3절 상태 전이의 순수 구현. `RevertCoordinator`: 효과 실행기. 타이머와 적용, 확정, 복귀 동작 주입으로 단위 테스트 가능. 창 앱은 `ChangeController`, 명령행은 `performGuardedChange`가 구동 | PRD-SAF-001 | `Sources/TBDCore/RevertGuard.swift` |
+| SRS-SAF-002 | `PendingRevertStore`: 복귀 정보 파일 기록, 조회, 삭제. 손상 파일은 없음으로 처리. 앱 실행 시 파일이 있으면 복귀 제안, 명령행은 `revert-pending`. 복귀 동작 수행은 `PendingRevertApplier` | PRD-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` |
 | SRS-CLI-001 | `tbdctl`: 하위 명령 분기, `--json` 출력, PRD 5절 종료 코드. 인자 해석은 TBDCore의 `CommandLineParser` | PRD-CLI-001, PRD-CLI-002, PRD-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` |

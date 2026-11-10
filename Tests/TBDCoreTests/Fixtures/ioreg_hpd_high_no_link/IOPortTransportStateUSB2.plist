@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Active</key>
+		<true/>
+		<key>AuthenticationRequired</key>
+		<false/>
+		<key>AuthenticationStatus</key>
+		<integer>0</integer>
+		<key>AuthenticationStatusDescription</key>
+		<string>Idle</string>
+		<key>AuthorizationRequired</key>
+		<true/>
+		<key>AuthorizationStatus</key>
+		<integer>2</integer>
+		<key>AuthorizationStatusDescription</key>
+		<string>Policy Authorized</string>
+		<key>DataRate</key>
+		<integer>3</integer>
+		<key>DataRateDescription</key>
+		<string>480 Mbps (High Speed)</string>
+		<key>DataRole</key>
+		<integer>2</integer>
+		<key>DataRoleDescription</key>
+		<string>Host</string>
+		<key>Device Class</key>
+		<integer>9</integer>
+		<key>Device Protocol</key>
+		<integer>2</integer>
+		<key>Device Subclass</key>
+		<integer>0</integer>
+		<key>DriverStatus</key>
+		<integer>2</integer>
+		<key>DriverStatusDescription</key>
+		<string>Ready</string>
+		<key>Generation</key>
+		<integer>1</integer>
+		<key>GenerationDescription</key>
+		<string>USB 2.0</string>
+		<key>HashStatus</key>
+		<integer>3</integer>
+		<key>HashStatusDescription</key>
+		<string>Cached</string>
+		<key>IOGeneralInterest</key>
+		<string>IOCommand is not serializable</string>
+		<key>IOObjectClass</key>
+		<string>IOPortTransportStateUSB2</string>
+		<key>IOObjectRetainCount</key>
+		<integer>13</integer>
+		<key>IORegistryEntryID</key>
+		<integer>4295341161</integer>
+		<key>IORegistryEntryName</key>
+		<string>USB2</string>
+		<key>IOServiceBusyState</key>
+		<integer>0</integer>
+		<key>IOServiceBusyTime</key>
+		<integer>22324083</integer>
+		<key>IOServiceState</key>
+		<integer>30</integer>
+		<key>IOUserClientClass</key>
+		<string>IOPortTransportUserClient</string>
+		<key>Index</key>
+		<integer>0</integer>
+		<key>Manufacturer</key>
+		<string>Parade Technologies, Inc.</string>
+		<key>Metadata</key>
+		<dict>
+			<key>Device Class</key>
+			<integer>9</integer>
+			<key>Device Function</key>
+			<integer>3</integer>
+			<key>Device Protocol</key>
+			<integer>2</integer>
+			<key>Device Subclass</key>
+			<integer>0</integer>
+			<key>Manufacturer</key>
+			<string>Parade Technologies, Inc.</string>
+			<key>Product</key>
+			<string>USB2.0 Hub</string>
+			<key>Product ID</key>
+			<integer>36891</integer>
+			<key>Vendor ID</key>
+			<integer>7584</integer>
+		</dict>
+		<key>NominalSignalingFrequenciesHz</key>
+		<array>
+			<integer>240000000</integer>
+		</array>
+		<key>ParentBuiltInPortNumber</key>
+		<integer>4</integer>
+		<key>ParentBuiltInPortType</key>
+		<integer>2</integer>
+		<key>ParentBuiltInPortTypeDescription</key>
+		<string>USB-C</string>
+		<key>ParentPortBuiltIn</key>
+		<true/>
+		<key>ParentPortNumber</key>
+		<integer>4</integer>
+		<key>ParentPortType</key>
+		<integer>2</integer>
+		<key>ParentPortTypeDescription</key>
+		<string>USB-C</string>
+		<key>PortDataRole</key>
+		<integer>2</integer>
+		<key>PortDataRoleDescription</key>
+		<string>Host</string>
+		<key>Product</key>
+		<string>USB2.0 Hub</string>
+		<key>Product ID</key>
+		<integer>36891</integer>
+		<key>TRM_CacheMiss</key>
+		<false/>
+		<key>TRM_DeviceLocked</key>
+		<false/>
+		<key>TRM_GracePeriodReason</key>
+		<integer>4</integer>
+		<key>TRM_GracePeriodReasonDescription</key>
+		<string>Device Unlocked</string>
+		<key>TRM_IdentificationRestricted</key>
+		<false/>
+		<key>TRM_Profile</key>
+		<integer>2</integer>
+		<key>TRM_ProfileDescription</key>
+		<string>Ask for New Accessories</string>
+		<key>TRM_RelaxedPeriod</key>
+		<true/>
+		<key>TRM_State</key>
+		<integer>2</integer>
+		<key>TRM_StateDescription</key>
+		<string>Limited</string>
+		<key>TRM_TransportRestricted</key>
+		<false/>
+		<key>TRM_TransportSupervised</key>
+		<true/>
+		<key>TransportDescription</key>
+		<string>Port-USB-C@4/USB2</string>
+		<key>TransportType</key>
+		<integer>2</integer>
+		<key>TransportTypeDescription</key>
+		<string>USB2</string>
+		<key>Tunneled</key>
+		<false/>
+		<key>Vendor ID</key>
+		<integer>7584</integer>
+	</dict>
+</array>
+</plist>
