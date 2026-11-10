@@ -27,6 +27,13 @@ final class DisplayStore {
     private(set) var transportStates: [DPTransportState] = []
     /// 포트별 연결 경로.
     private(set) var connectionPaths: [ConnectionPath] = []
+    /// 진단 입력과 결과, 이벤트 기록.
+    private(set) var diagnosticSnapshot: DiagnosticSnapshot?
+    private(set) var diagnosis = DiagnosticResult(findings: [], portDiagnoses: [])
+    private(set) var eventLog = EventLog()
+    @ObservationIgnored private var lastEventState: EventState?
+    @ObservationIgnored private var lastInventory: PortInventory?
+    @ObservationIgnored private var portPollTimer: Timer?
 
     struct LinkDetails {
         var dpcd: DPCDInfo?
@@ -83,6 +90,7 @@ final class DisplayStore {
         dscAssessments = dscMap
         let inventory = PortService.inventory()
         transportStates = inventory.dpStates
+        lastInventory = inventory
         connectionPaths = ConnectionPathBuilder.build(inventory: inventory, displays: snapshot.displays)
         var reports: [UInt32: LinkReport] = [:]
         var details: [UInt32: LinkDetails] = [:]
@@ -93,6 +101,34 @@ final class DisplayStore {
         linkReports = reports
         linkDetails = details
         hdrStatuses = Dictionary(uniqueKeysWithValues: snapshot.displays.map { ($0.id, HDRService.status(for: $0, edid: edidRecords[$0.id]?.parsed)) })
+        let diagnostic = DiagnosticSnapshot(
+            capturedAt: snapshot.capturedAt,
+            system: SnapshotBuilder.systemInfo(displays: snapshot.displays),
+            displays: snapshot.displays.map { display in
+                DisplayDiagnostics(
+                    summary: display,
+                    edid: edidRecords[display.id]?.parsed,
+                    edidHex: edidRecords[display.id].map { $0.data.map { String(format: "%02x", $0) }.joined() },
+                    currentMode: current[display.id],
+                    modeCount: allModes[display.id]?.count ?? 0,
+                    signal: signalMap[display.id],
+                    dsc: dscMap[display.id],
+                    hdr: hdrStatuses[display.id],
+                    link: reports[display.id],
+                    dpcd: details[display.id]?.dpcd,
+                    linkTraining: details[display.id]?.training
+                )
+            },
+            inventory: inventory,
+            paths: connectionPaths,
+            attachedFramebuffers: SnapshotBuilder.attachedFramebuffers()
+        )
+        diagnosticSnapshot = diagnostic
+        diagnosis = DiagnosticEngine.evaluate(diagnostic)
+        // 이벤트 기록: 직전 상태와의 차이. 첫 조회는 기준 상태만 저장.
+        let state = EventState(diagnostic)
+        if let previous = lastEventState { eventLog.record(from: previous, to: state, at: diagnostic.capturedAt) }
+        lastEventState = state
         refreshCount += 1
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))
     }
@@ -109,6 +145,13 @@ final class DisplayStore {
     private func startMonitoring() {
         // 디스플레이 연결, 해제, 모드, 배치 변경 알림.
         CGDisplayRegisterReconfigurationCallback(displayReconfigured, Unmanaged.passUnretained(self).toOpaque())
+        // 온라인 목록에 들지 못한 연결(HPD만 감지 등)은 CoreGraphics 알림이 없으므로 포트 상태를 2초 주기로 대조.
+        portPollTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, PortService.inventory() != self.lastInventory else { return }
+                self.scheduleRefresh()
+            }
+        }
         observer = NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.scheduleRefresh() }
         }

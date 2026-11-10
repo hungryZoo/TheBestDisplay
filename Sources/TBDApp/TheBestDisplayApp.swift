@@ -25,6 +25,8 @@ struct TheBestDisplayApp: App {
             CommandGroup(after: .toolbar) {
                 Button("새로 고침") { store.refresh() }
                     .keyboardShortcut("r", modifiers: .command)
+                Button("진단 보고서 내보내기") { ReportSaver.save(store: store, redact: false, asText: false) }
+                    .keyboardShortcut("e", modifiers: .command)
             }
         }
     }

@@ -36,11 +36,11 @@
 | TC-LNK-004 | DPCD 해석과 실패 허용 확인 | PRD-LNK-005, SRS-LNK-004 | DPCD 픽스처 (내장 패널 실측) | 픽스처 해석. 읽기 실패 입력(nil) 처리 | DPCD 1.4, 최대 속도 HBR3, 최대 4레인 해석. nil 입력 시 해당 항목 없음으로 표시하고 충돌 없음 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-PRT-001 | 포트와 케이블 정보 조회 확인 | PRD-PRT-001, PRD-PRT-002, SRS-PRT-001 | 독 경유 외장 디스플레이 온라인 | `swift test`의 TC-PRT-001 묶음: 픽스처 해석과, 실제 조회 결과를 포트 컨트롤러 노드의 `PortDescription`과 비교. `tbdctl ports` | 픽스처: USB-C 3개, HDMI 1개, MagSafe 1개, 독 Parade Technologies PS9010, 케이블 USB4 Gen 4와 5 A와 EPR. 실제 조회: 포트 목록이 레지스트리와 일치, 외장 디스플레이마다 경로 1개 도달 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-PRT-002 | 연결 경로 조립 확인 | PRD-PRT-003, SRS-PRT-002 | 정상 상태와 사고 시점(T04)의 IORegistry 픽스처 | 연결 경로 조립 | 정상 픽스처: USB-C 4번 포트, 케이블, Parade Technologies PS9010, HBR3 x 4(터널링), LG TV SSCR2 순서의 경로 1개. 사고 시점 픽스처: 영상 링크 단계에서 끊김(HPD 감지, 링크 없음). 링크는 있으나 온라인 목록에 없는 경우 디스플레이 단계에서 끊김 | 단위 | macOS 26, Apple Silicon | 통과 | |
-| TC-DGN-001 | 미출력 진단 규칙 확인 | PRD-DGN-001, PRD-DGN-003, SRS-DGN-001 | 합성 스냅샷 6종 (연결 없음, HPD 없음, EDID 없음, 링크 없음, 프레임버퍼 미할당, 정상) | 진단 실행 | 스냅샷별 첫 실패 단계와 발견 코드가 기대값과 일치. 각 발견 항목에 조치 문구 존재 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DGN-002 | 모드 제한 진단 확인 | PRD-DGN-002, PRD-DGN-003, SRS-DGN-001 | 실측 스냅샷 픽스처 | 3840x2160 120 Hz에서 RGB 10 bpc 선택 불가 사유 조회 | 대역폭 초과 발견(필요 32.14 Gbps, 가용 25.92 Gbps)과 DSC 미지원 발견 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DGN-003 | 시스템 제약 점검 확인 | PRD-DGN-006, SRS-DGN-001 | 합성 스냅샷 (외장 디스플레이 수 한도 도달) | 진단 실행 | 한도 도달 발견 항목 생성 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DGN-004 | 이벤트 기록 확인 | PRD-DGN-004, SRS-DGN-002 | 스냅샷 2개 (모드 변경 전후, 연결 전후) | 스냅샷 차이로 이벤트 생성. 1,001건 추가 | 모드 변경, 연결, 해제 이벤트 생성. 보관 수 1,000건 유지 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DGN-005 | 진단 보고서 내보내기 확인 | PRD-DGN-005, SRS-DGN-003 | 스냅샷 픽스처 | JSON과 텍스트 직렬화. 일련번호 가림 옵션 적용. `tbdctl report <경로>` 실행 | JSON 재해석 가능. 가림 적용 시 일련번호 미포함. 파일 생성 | 단위 | macOS 26, Apple Silicon | 미실행 | |
+| TC-DGN-001 | 미출력 진단 규칙 확인 | PRD-DGN-001, PRD-DGN-003, SRS-DGN-001 | 합성 스냅샷 6종 (연결 없음, HPD 없음, EDID 없음, 링크 없음, 프레임버퍼 미할당, 정상) | 진단 실행 | 스냅샷별 첫 실패 단계와 발견 부호가 기대값과 일치. 각 발견 항목에 조치 문구 존재. T04 사고 시점 픽스처는 HPD 통과 뒤 단계에서 실패. 실제 구성(`swift test`의 TC-DGN-001 실측 묶음)은 외장 디스플레이 포트 전 단계 통과 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-DGN-002 | 모드 제한 진단 확인 | PRD-DGN-002, PRD-DGN-003, SRS-DGN-001 | 실측 스냅샷 픽스처 | 3840x2160 120 Hz에서 RGB 10 bpc 선택 불가 사유 조회 | 대역폭 초과 발견(필요 32.14 Gbps, 유효 25.92 Gbps, 원인에 DSC 미지원과 HBR3 4레인)과 크로마 서브샘플링 주의(HDR 끄기 제안) | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-DGN-003 | 시스템 제약 점검 확인 | PRD-DGN-006, SRS-DGN-001 | 합성 스냅샷 (외장 디스플레이 수 한도 도달) | 진단 실행 | 한도 도달 발견 항목 생성 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-DGN-004 | 이벤트 기록 확인 | PRD-DGN-004, SRS-DGN-002 | 스냅샷 2개 (모드 변경 전후, 연결 전후) | 스냅샷 차이로 이벤트 생성. 1,001건 추가 | 모드 변경, 연결, 해제 이벤트 생성. 보관 수 1,000건 유지 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-DGN-005 | 진단 보고서 내보내기 확인 | PRD-DGN-005, SRS-DGN-003 | 스냅샷 픽스처 | JSON과 텍스트 직렬화. 일련번호 가림 옵션 적용. `tbdctl report <경로>` 실행 | JSON 왕복 후 동일. 가림 적용 시 일련번호와 UUID 미포함, EDID 일련번호 바이트 0. 텍스트 보고서에 5개 구역 포함. 파일 생성 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-BRT-001 | 내장 디스플레이 밝기 제어 확인 | PRD-BRT-001, SRS-BRT-001 | 내장 디스플레이 온라인 | 밝기 조회, 0.1 낮춰 설정, 재조회, 원래 값 복원 | 재조회 값이 설정값과 0.02 이내 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
 | TC-BRT-002 | 전달 테이블 합성과 소프트웨어 디밍 확인 | PRD-BRT-003, PRD-CLR-002, SRS-CLR-001 | 없음 | 디밍 0.5, 색온도, 게인, 대비, 감마 조합으로 테이블 합성. 항등 설정 합성 | 항등 설정은 선형 테이블. 디밍 0.5는 최댓값 0.5. 단조 증가 유지. 값 범위 0-1 | 단위 | macOS 26, Apple Silicon | 미실행 | |
 | TC-BRT-003 | 자동 밝기 전환 확인 | PRD-BRT-004, SRS-BRT-001 | 내장 디스플레이 온라인 | 자동 밝기 상태 조회, 반전, 재조회, 복원 | 재조회 값이 반전값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
@@ -60,7 +60,7 @@
 | TC-PRF-002 | 프로파일 적용 확인 | PRD-PRF-002, SRS-PRF-002 | 디스플레이 2대 온라인, 저장 프로파일 1개 | 구성 변경 후 프로파일 적용 | 저장 시점 구성 복원. 항목별 결과 표시 | 통합 | macOS 26, Apple Silicon | 미실행 | |
 | TC-SAF-001 | 자동 복귀 상태 기계 확인 | PRD-SAF-001, SRS-SAF-001 | 없음 | 가짜 시계와 가짜 적용기로 PRD 3절 전이 9종 실행. 확인 대기 중 새 요청 | 전이 결과가 표와 일치. 타이머 만료 시 복귀 1회 호출. 새 요청 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-SAF-002 | 복귀 정보 파일 확인 | PRD-SAF-002, SRS-SAF-002 | 임시 폴더 | 기록, 조회, 삭제. 손상 파일 조회 | 기록 후 조회값 동일. 삭제 후 없음. 손상 파일은 없음으로 처리 | 단위 | macOS 26, Apple Silicon | 통과 | |
-| TC-CLI-001 | 조회 명령 확인 | PRD-CLI-001, SRS-CLI-001 | 디스플레이 온라인 | `list`, `info`, `modes`, `signal`, `link`, `ports`, `diagnose`를 `--json`으로 실행 | 전 명령 종료 코드 0. 출력이 유효한 JSON | 통합 | macOS 26, Apple Silicon | 미실행 | |
+| TC-CLI-001 | 조회 명령 확인 | PRD-CLI-001, SRS-CLI-001 | 디스플레이 온라인 | `swift test`의 TC-CLI-001 묶음: `list`, `capabilities`, `info`, `modes`, `signal`, `link`, `hdr`, `ports`, `diagnose`를 `--json`으로 실행, `report` 저장 | 전 명령 종료 코드 0. 출력이 유효한 JSON. 사용법 오류는 2, 대상 없음은 3 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | set-mode, set-color, hdr는 실측 완료. brightness 명령(T10) 추가 후 마감 |
 | TC-CLI-003 | 인자 해석과 종료 코드 확인 | PRD-CLI-003, SRS-CLI-001 | 없음 | 알 수 없는 명령, 인자 누락, 없는 디스플레이 지정, 정상 명령 해석 | 사용법 오류 2, 대상 없음 3, 정상 해석 결과 일치 | 단위 | macOS 26, Apple Silicon | 통과 | |
 

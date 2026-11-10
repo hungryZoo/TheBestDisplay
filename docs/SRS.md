@@ -105,7 +105,7 @@ public struct Finding: Codable, Hashable {
 }
 
 public enum DiagnosticEngine {
-    public static func evaluate(_ snapshot: SystemSnapshot) -> [Finding]
+    public static func evaluate(_ snapshot: DiagnosticSnapshot) -> DiagnosticResult
 }
 
 public enum BandwidthCalculator {
@@ -177,9 +177,9 @@ public protocol DisplayApplying {
 | SRS-LNK-004 | DPCD 읽기: `IODPDeviceReadDPCD`로 000h-00Fh, 060h-06Fh, 100h-107h, 160h, 200h-207h, 2200h-220Fh. 구간별 실패 허용, 수신기 능력을 읽지 못하면 nil. `DPCDDecoder`로 해석. `IODPDeviceGetLinkTrainingData`의 레인 수와 속도 부호는 `LinkTrainingData`로 해석 | PRD-LNK-005 | `Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/DPCDDecoder.swift` |
 | SRS-PRT-001 | `PortService`: 3.2절의 포트 컨트롤러 클래스와 `IOPortTransportState` 계열 노드 속성을 읽어 `PortInventory.decode`로 `PortInfo`, `CIOState`, `USBState`, `CableEMarker` 구성. 케이블 e-marker는 `IOPortTransportComponentCCUSBPDSOPp` 노드의 케이블 VDO 해석(속도, 전류, 전압, EPR). 부속 노드의 포트 연결은 부모 포트 종류와 번호 | PRD-PRT-001, PRD-PRT-002 | `Sources/TBDPlatform/PortService.swift`<br>`Sources/TBDCore/Ports.swift` |
 | SRS-PRT-002 | `ConnectionPathBuilder`: 포트마다 포트, 케이블, 독 또는 허브, 영상 링크, 디스플레이 단계 구성. 단계 상태는 정상, 정보 없음, 끊김. HPD는 감지되나 링크가 없는 경우와 링크는 있으나 온라인 목록에 없는 경우를 끊김으로 표시 | PRD-PRT-003 | `Sources/TBDCore/Ports.swift` |
-| SRS-DGN-001 | `DiagnosticEngine`: `SystemSnapshot`을 받아 `Finding` 목록을 반환하는 순수 함수. 규칙별 코드, 심각도, 근거 수치, 조치 문구 보유 | PRD-DGN-001, PRD-DGN-002, PRD-DGN-003, PRD-DGN-006 | `Sources/TBDCore/Diagnostics/` |
-| SRS-DGN-002 | `EventMonitor`: CoreGraphics 재구성 콜백과 IOKit 서비스 알림 수신, 스냅샷 차이로 이벤트 생성, 최근 1,000건 보관 | PRD-DGN-004 | `Sources/TBDPlatform/EventMonitor.swift` |
-| SRS-DGN-003 | `ReportExporter`: 스냅샷, 발견 항목, 이벤트를 JSON과 텍스트로 직렬화. 일련번호 가림 옵션 | PRD-DGN-005 | `Sources/TBDCore/ReportExporter.swift` |
+| SRS-DGN-001 | `DiagnosticEngine`: `DiagnosticSnapshot`을 받아 `DiagnosticResult`(발견 항목, 포트별 점검)를 반환하는 순수 함수. 포트 점검은 물리 연결, HPD, EDID, 링크, 프레임버퍼, 온라인 6단계이며 첫 실패 뒤는 생략 처리. 규칙별 부호, 심각도(정보, 주의, 문제), 근거 수치, 조치 문구 보유. 칩별 외장 디스플레이 한도는 추정값으로 표기. 스냅샷 수집은 `SnapshotBuilder` | PRD-DGN-001, PRD-DGN-002, PRD-DGN-003, PRD-DGN-006 | `Sources/TBDCore/Diagnostics/`<br>`Sources/TBDPlatform/SnapshotBuilder.swift` |
+| SRS-DGN-002 | `EventLog`: 직전 `EventState`와 현재 상태의 차이로 이벤트 생성(디스플레이 연결과 해제, 모드, 색 모드, HDR, 링크, HPD, 포트 연결), 최근 1,000건 보관. 변화 감지는 CoreGraphics 재구성 콜백과 포트 상태 2초 주기 대조 | PRD-DGN-004 | `Sources/TBDCore/Diagnostics/EventLog.swift`<br>`Sources/TBDApp/DisplayStore.swift` |
+| SRS-DGN-003 | `ReportExporter`: 스냅샷, 진단 결과, 이벤트를 JSON과 텍스트로 직렬화. 가림 옵션은 일련번호, UUID, EDID 일련번호 바이트 제거. 현재 타이밍 외의 색 모드 목록은 축약 | PRD-DGN-005 | `Sources/TBDCore/Diagnostics/ReportExporter.swift`<br>`Sources/TBDCore/Diagnostics/DiagnosticSnapshot.swift` |
 | SRS-BRT-001 | `BrightnessService`: 제어 방식 선택 순서는 DisplayServices, DDC, 소프트웨어 디밍. 자동 밝기는 DisplayServices의 주변광 보정 함수 | PRD-BRT-001, PRD-BRT-003, PRD-BRT-004 | `Sources/TBDPlatform/BrightnessService.swift` |
 | SRS-DDC-001 | `DDCService`: `IOAVServiceWriteI2C`와 `IOAVServiceReadI2C`(주소 0x37, 오프셋 0x51), 패킷 체크섬 계산, 재시도 3회, 직렬 큐. `DDCPacket`은 TBDCore에 배치 | PRD-DDC-001, PRD-DDC-002, PRD-DDC-003, PRD-BRT-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` |
 | SRS-CLR-001 | `GammaService`: 디밍, 색온도, 게인, 대비, 감마를 하나의 전달 테이블로 합성하여 `CGSetDisplayTransferByTable` 적용. 초기화는 `CGDisplayRestoreColorSyncSettings`. 테이블 합성은 TBDCore의 `GammaTable` | PRD-CLR-002, PRD-BRT-003 | `Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` |

@@ -126,6 +126,9 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T09 | 실제 구성 진단 결과: USB-C 4번 포트 6단계 전부 통과. 발견 항목 3건(YCbCr 4:2:2 출력 주의, 대역폭 한계로 선택 불가한 색 형식 10개, 링크 사용률 99.2%). 수집과 진단 1회 0.8초 이내(프로세스 시작 포함) |
+| T09 | 덮개 상태는 `IOPMrootDomain`의 `AppleClamshellState`, 칩 이름은 `machdep.cpu.brand_string`(Apple M5), 모델 식별자는 `hw.model`(Mac17,2) |
+| T09 | 창 앱 실행 중 주사율 전환과 자동 복귀 1회에 모드 변경 이벤트 2건 기록 확인 |
 | T08 | 포트 컨트롤러 노드: `AppleHPMInterfaceType10` 3개(USB-C 1, 2, 4번), `AppleHPMInterfaceType11` 1개(MagSafe 3), `AppleHDMIPortController` 1개(HDMI 3번). 전송 상태와 부속 노드는 `ParentPortTypeDescription`과 `ParentPortNumber`로 포트에 연결 |
 | T08 | 케이블 e-marker(`IOPortTransportComponentCCUSBPDSOPp`)의 `Metadata.VDOs` 4번째 값이 케이블 VDO. 실험 케이블 0x000A6644: 속도 부호 4(USB4 Gen 4), 전류 부호 2(5 A), 전압 부호 3(50 V), EPR 지원. 필드 위치는 USB Power Delivery 규격의 Passive Cable VDO 정의 기준 |
 | T08 | `IOPortTransportStateCIO`: 독 Parade Technologies PS9010, `Generation` 3, `CableGeneration` 2, `CableSpeed` 3, 터널 DisplayPort와 PCIe. `Generation`은 USB4 규격 명칭(Gen 3은 40 Gbps)으로 표시하며 `CableGeneration`과 `CableSpeed`의 값 체계는 근거 미확보로 미해석 |
