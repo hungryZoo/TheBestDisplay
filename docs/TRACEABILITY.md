@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 98 |
-| SRS 설계 요구사항 | 69 |
-| TC | 102 |
+| PRD 요구사항 | 99 |
+| SRS 설계 요구사항 | 70 |
+| TC | 104 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -87,12 +87,13 @@
 | PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
 | PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |
 | PRD-DDC-004 | P6 | 권장 | MRD-SCP-009 | SRS-DDC-002 | TC-DDC-004, TC-DDC-005 | `Sources/TBDCore/DDCCapabilities.swift`<br>`Sources/TBDPlatform/DDCService.swift` | 보류 1, 통과 1 |
-| PRD-CLR-001 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-002 | TC-CLR-001 | `Sources/TBDPlatform/ColorProfileService.swift` | 통과 1 |
+| PRD-CLR-001 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-002 | TC-CLR-001, TC-CLR-008 | `Sources/TBDPlatform/ColorProfileService.swift` | 통과 2 |
 | PRD-CLR-002 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 1 |
 | PRD-CLR-003 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002, TC-CLR-006 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 2 |
 | PRD-CLR-004 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
 | PRD-CLR-005 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-004 | TC-CLR-003, TC-CLR-004 | `Sources/TBDPlatform/PresetService.swift`<br>`Sources/TBDCore/DisplayPreset.swift` | 통과 2 |
 | PRD-CLR-006 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-005 | TC-CLR-005, TC-CLR-006 | `Sources/TBDCore/NightShiftEmulation.swift`<br>`Sources/TBDApp/NightShiftSyncController.swift` | 통과 2 |
+| PRD-CLR-007 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-006 | TC-CLR-007, TC-CLR-008 | `Sources/TBDCore/HDRProfile.swift`<br>`Sources/TBDPlatform/HDRProfileService.swift` | 통과 2 |
 | PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-002 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-002 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-003 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-003 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |

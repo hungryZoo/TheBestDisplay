@@ -27,12 +27,13 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "brightness", summary: "밝기 조회와 설정 (0-100)", positionals: ["디스플레이", "값"], optionalPositionals: 1),
     CommandSpec(name: "night-shift", summary: "시스템 Night Shift 조회와 전환", positionals: ["on|off"], optionalPositionals: 1),
     CommandSpec(name: "night-shift-sync", summary: "Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 (지정 시간 동안)", positionals: ["디스플레이"], valueOptions: ["--seconds"]),
+    CommandSpec(name: "hdr-profile", summary: "SDR과 HDR 상태별 색 프로파일 지정과 적용", positionals: ["디스플레이", "sdr|hdr|apply", "프로파일"], optionalPositionals: 2),
     CommandSpec(name: "preset", summary: "디스플레이 프리셋 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "번호 또는 이름"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "brightness-sync", summary: "원본 디스플레이의 밝기를 다른 디스플레이에 동기화 (지정 시간 동안)", positionals: ["원본 디스플레이"], valueOptions: ["--seconds"]),
     CommandSpec(name: "overlay-dim", summary: "오버레이 방식 디밍 (지정 시간 동안 유지)", positionals: ["디스플레이", "강도 %"], valueOptions: ["--seconds"]),
     CommandSpec(name: "xdr", summary: "XDR 밝기 업스케일 조회와 적용 (지정 시간 동안 유지)", positionals: ["디스플레이", "배율 %"], optionalPositionals: 1, valueOptions: ["--seconds"]),
     CommandSpec(name: "ddc", summary: "DDC 탐지와 VCP 읽기, 쓰기", positionals: ["디스플레이", "probe|caps|get|set", "코드", "값"], optionalPositionals: 2),
-    CommandSpec(name: "color", summary: "색 프로파일, Night Shift, True Tone 상태", positionals: ["디스플레이"], flags: ["--profiles"]),
+    CommandSpec(name: "color", summary: "색 프로파일 조회와 지정, Night Shift, True Tone 상태", positionals: ["디스플레이"], valueOptions: ["--set"], flags: ["--profiles"]),
     CommandSpec(name: "arrangement", summary: "배치, 회전, 미러 상태"),
     CommandSpec(name: "rotate", summary: "회전 (자동 복귀 적용)", positionals: ["디스플레이", "각도"], valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "mirror", summary: "미러 설정 또는 해제 (자동 복귀 적용)", positionals: ["디스플레이", "원본|off"], valueOptions: ["--timeout"], flags: ["--yes"]),
@@ -193,6 +194,9 @@ case "night-shift":
 
 case "night-shift-sync":
     runNightShiftSync(command)
+
+case "hdr-profile":
+    runHDRProfile(command)
 
 case "preset":
     runPreset(command, json: json)

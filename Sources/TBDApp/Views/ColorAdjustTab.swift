@@ -51,6 +51,8 @@ final class ColorAdjustViewModel {
 struct ColorAdjustTab: View {
     @Environment(ChangeController.self) private var changes
     @Environment(NightShiftSyncController.self) private var nightShiftSync
+    @Environment(HDRProfileController.self) private var hdrProfiles
+    @State private var hdrPreference = HDRProfilePreference()
     let display: DisplaySummary
     @State private var model = ColorAdjustViewModel()
 
@@ -96,6 +98,29 @@ struct ColorAdjustTab: View {
                 Text("지정한 프로파일은 시스템에 저장되어 앱을 종료해도 유지")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if HDRService.isSupported(display.id) {
+                    Picker("SDR 상태의 프로파일", selection: Binding(get: { hdrPreference.sdrProfilePath ?? "" }, set: { path in
+                        hdrPreference.sdrProfilePath = path.isEmpty ? nil : path
+                        try? HDRProfileStore.standard.save(hdrPreference, for: display.identity)
+                        hdrProfiles.evaluate()
+                        model.load(display)
+                    })) {
+                        Text("자동 전환 안 함").tag("")
+                        ForEach(model.profiles) { profile in Text(profile.name).tag(profile.path) }
+                    }
+                    Picker("HDR 상태의 프로파일", selection: Binding(get: { hdrPreference.hdrProfilePath ?? "" }, set: { path in
+                        hdrPreference.hdrProfilePath = path.isEmpty ? nil : path
+                        try? HDRProfileStore.standard.save(hdrPreference, for: display.identity)
+                        hdrProfiles.evaluate()
+                        model.load(display)
+                    })) {
+                        Text("자동 전환 안 함").tag("")
+                        ForEach(model.profiles) { profile in Text(profile.name).tag(profile.path) }
+                    }
+                    Text(hdrProfiles.lastMessage ?? "HDR이 켜지고 꺼질 때 지정한 프로파일로 자동 전환. 앱 실행 중에만 동작")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             Section {
                 slider("디밍", value: $model.adjustment.dimming, range: ColorAdjustment.dimmingRange, format: { "\(Int(($0 * 100).rounded()))%" })
@@ -152,7 +177,10 @@ struct ColorAdjustTab: View {
             }
         }
         .formStyle(.grouped)
-        .task(id: display.id) { model.load(display) }
+        .task(id: display.id) {
+            model.load(display)
+            hdrPreference = HDRProfileStore.standard.preference(for: display.identity)
+        }
     }
 
     private func slider(_ title: String, value: Binding<Double>, range: ClosedRange<Double>, format: @escaping (Double) -> String) -> some View {

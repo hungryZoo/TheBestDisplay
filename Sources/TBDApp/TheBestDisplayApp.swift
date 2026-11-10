@@ -12,6 +12,7 @@ struct TheBestDisplayApp: App {
     @State private var brightnessSync = BrightnessSyncController()
     @State private var autoDisconnect = AutoDisconnectController()
     @State private var nightShiftSync = NightShiftSyncController()
+    @State private var hdrProfiles = HDRProfileController()
 
     var body: some Scene {
         Window("TheBestDisplay", id: "main") {
@@ -22,8 +23,10 @@ struct TheBestDisplayApp: App {
                 .environment(brightnessSync)
                 .environment(autoDisconnect)
                 .environment(nightShiftSync)
+                .environment(hdrProfiles)
                 .onAppear {
                     autoDisconnect.start()
+                    hdrProfiles.start()
                     appDelegate.onTerminate = { [autoDisconnect] in autoDisconnect.shutdown() }
                     changes.onChanged = { [store] in store.scheduleRefresh() }
                     changes.onUserChange = { [protection] in protection.userChangedConfiguration() }

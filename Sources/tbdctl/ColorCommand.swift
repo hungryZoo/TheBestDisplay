@@ -13,8 +13,24 @@ struct ColorOutput: Encodable {
 /// `tbdctl color <디스플레이> [--profiles] [--json]` (PRD-CLR-001, PRD-CLR-003, PRD-CLR-004): 색 프로파일, Night Shift, True Tone 상태.
 func runColor(_ command: ParsedCommand, json: Bool) {
     let (display, _) = resolveDisplay(command.positionals[0])
-    let current = ColorProfileService.current(for: display.id)
     let available = ColorProfileService.available(for: display.id)
+    // `--set <이름 또는 경로>`: 색 프로파일 지정. (PRD-CLR-001)
+    if let text = command.options["--set"] {
+        let candidates = available + (ColorProfileService.current(for: display.id).map { [$0] } ?? [])
+        let profile = ColorProfileCatalog.resolve(text, in: candidates)
+            ?? (FileManager.default.fileExists(atPath: text) ? ColorProfileInfo(name: URL(fileURLWithPath: text).deletingPathExtension().lastPathComponent, path: text, isFactoryDefault: false) : nil)
+        guard let profile else {
+            writeError("오류: 일치하는 프로파일 없음 또는 여러 개와 일치: \(text)")
+            exit(.unsupported)
+        }
+        do {
+            try ColorProfileService.set(profile, for: display.id)
+        } catch {
+            writeError("오류: \(RevertCoordinator.describe(error))")
+            exit(.failure)
+        }
+    }
+    let current = ColorProfileService.current(for: display.id)
     let nightShift = NightShiftService.status()
     let trueTone = TrueToneService.status()
     if json {

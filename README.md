@@ -186,8 +186,9 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
 | `tbdctl night-shift [on\|off]` | 시스템 Night Shift 조회와 전환 |
 | `tbdctl night-shift-sync <디스플레이> [--seconds <초>]` | Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 |
+| `tbdctl hdr-profile <디스플레이> [sdr\|hdr <프로파일\|none> \| apply]` | SDR과 HDR 상태별 색 프로파일 지정과 적용 |
 | `tbdctl ddc <디스플레이> probe \| caps \| get <코드> \| set <코드> <값>` | DDC 탐지, capabilities 조회, VCP 읽기와 쓰기 |
-| `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 |
+| `tbdctl color <디스플레이> [--profiles] [--set <프로파일>]` | 색 프로파일 조회와 지정, Night Shift, True Tone 상태 |
 | `tbdctl arrangement` | 위치, 회전, 미러 상태 |
 | `tbdctl rotate <디스플레이> <각도> [--timeout <초>] [--yes]` | 회전 (0, 90, 180, 270) |
 | `tbdctl mirror <디스플레이> <원본\|off> [--timeout <초>] [--yes]` | 미러 설정과 해제 |
@@ -240,6 +241,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `protection.json` | 구성 보호 대상 프로파일과 보호 항목. 보호를 끄면 삭제 |
 | `mode-favorites.json` | 디스플레이별 즐겨찾기 모드 |
 | `auto-disconnect.json` | 내장 자동 연결 해제 설정과 해제해 둔 내장 디스플레이 ID |
+| `hdr-profiles.json` | 디스플레이별 SDR과 HDR 상태의 색 프로파일 지정 |
 
 - 사용자 정의 스케일 해상도는 `/Library/Displays/Contents/Resources/Overrides/` 아래 오버라이드 파일에 저장 (관리자 인증 필요)
 
@@ -258,8 +260,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 99건 중 통과 93건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 41행, 부분 14행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 104건 중 통과 98건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 43행, 부분 12행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 
