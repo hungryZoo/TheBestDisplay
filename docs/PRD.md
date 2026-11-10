@@ -98,6 +98,8 @@
 | `tbdctl brightness-sync <원본 디스플레이> [--seconds <초>]` | 원본의 밝기를 다른 디스플레이에 동기화 (기본 30초 동안) |
 | `tbdctl overlay-dim <디스플레이> <강도 %> [--seconds <초>]` | 오버레이 방식 디밍을 지정 시간(기본 10초) 동안 적용 |
 | `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
+| `tbdctl night-shift [on\|off]` | 시스템 Night Shift 조회와 전환 |
+| `tbdctl night-shift-sync <디스플레이> [--seconds <초>]` | Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 (기본 30초 동안) |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 조회 |
 | `tbdctl arrangement` | 디스플레이별 위치, 크기, 회전, 미러 상태 조회 |
@@ -240,6 +242,7 @@
 | PRD-CLR-003 | Night Shift 상태 표시, 전환, 강도 조절 | P4 | 권장 | MRD-SCP-010 |
 | PRD-CLR-004 | True Tone 상태 표시와 전환 | P4 | 권장 | MRD-SCP-010 |
 | PRD-CLR-005 | 디스플레이 프리셋(기준 모드) 목록 표시와 전환: 이름, 설명, 현재와 기본 표시. 전환에 자동 복귀 사용 | P6 | 권장 | MRD-SCP-010 |
+| PRD-CLR-006 | Night Shift 연동 색온도: 시스템 Night Shift가 적용되지 않는 디스플레이(TV 등)에 Night Shift가 켜져 있는 동안 강도에 맞춘 색온도를 소프트웨어로 적용. 앱 실행 중에만 동작 | P6 | 권장 | MRD-SCP-010 |
 
 ### 6.12 배치 (ARR)
 

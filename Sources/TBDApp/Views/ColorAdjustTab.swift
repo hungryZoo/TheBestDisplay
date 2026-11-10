@@ -50,6 +50,7 @@ final class ColorAdjustViewModel {
 /// 색 조정 탭: 디스플레이 프리셋, 색 프로파일, 소프트웨어 조정, Night Shift, True Tone. (PRD-CLR-001-005)
 struct ColorAdjustTab: View {
     @Environment(ChangeController.self) private var changes
+    @Environment(NightShiftSyncController.self) private var nightShiftSync
     let display: DisplaySummary
     @State private var model = ColorAdjustViewModel()
 
@@ -127,6 +128,13 @@ struct ColorAdjustTab: View {
                     }
                     LabeledContent("일정", value: status.scheduleName)
                     Text("Night Shift는 시스템 전체 설정이며 지원 디스플레이 전부에 적용").font(.caption).foregroundStyle(.secondary)
+                    Toggle("이 디스플레이에 Night Shift 연동 색온도 적용", isOn: Binding(get: { nightShiftSync.isEnabled(display.id) }, set: { value in
+                        nightShiftSync.setEnabled(value, for: display.id)
+                        model.load(display)
+                    }))
+                    Text("TV처럼 시스템 Night Shift가 적용되지 않는 디스플레이용. Night Shift가 켜져 있는 동안 강도에 맞춘 색온도를 전달 테이블로 적용. 앱 실행 중에만 동작")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 } else {
                     Text("이 기기에서 Night Shift를 사용할 수 없음").foregroundStyle(.secondary)
                 }

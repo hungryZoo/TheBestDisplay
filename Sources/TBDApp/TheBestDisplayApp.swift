@@ -11,6 +11,7 @@ struct TheBestDisplayApp: App {
     @State private var protection = ProtectionController()
     @State private var brightnessSync = BrightnessSyncController()
     @State private var autoDisconnect = AutoDisconnectController()
+    @State private var nightShiftSync = NightShiftSyncController()
 
     var body: some Scene {
         Window("TheBestDisplay", id: "main") {
@@ -20,6 +21,7 @@ struct TheBestDisplayApp: App {
                 .environment(protection)
                 .environment(brightnessSync)
                 .environment(autoDisconnect)
+                .environment(nightShiftSync)
                 .onAppear {
                     autoDisconnect.start()
                     appDelegate.onTerminate = { [autoDisconnect] in autoDisconnect.shutdown() }

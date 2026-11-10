@@ -20,7 +20,7 @@ public final class GammaService: @unchecked Sendable {
     }
 
     /// 현재 전달 테이블 읽기.
-    static func currentTable(_ display: CGDirectDisplayID) -> GammaTable? {
+    public static func currentTable(_ display: CGDirectDisplayID) -> GammaTable? {
         let capacity = UInt32(GammaTable.defaultSize)
         var red = [CGGammaValue](repeating: 0, count: Int(capacity))
         var green = red, blue = red

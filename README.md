@@ -184,6 +184,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl brightness-sync <원본 디스플레이> [--seconds <초>]` | 원본의 밝기를 다른 디스플레이에 동기화 |
 | `tbdctl overlay-dim <디스플레이> <강도 %> [--seconds <초>]` | 오버레이 방식 디밍 |
 | `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
+| `tbdctl night-shift [on\|off]` | 시스템 Night Shift 조회와 전환 |
+| `tbdctl night-shift-sync <디스플레이> [--seconds <초>]` | Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 |
 | `tbdctl ddc <디스플레이> probe \| caps \| get <코드> \| set <코드> <값>` | DDC 탐지, capabilities 조회, VCP 읽기와 쓰기 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 |
 | `tbdctl arrangement` | 위치, 회전, 미러 상태 |

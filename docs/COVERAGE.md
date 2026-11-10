@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 41행, 부분 14행, 미구현 3행
+- 집계: 구현 42행, 부분 13행, 미구현 3행
 
 ## 1. 대조표
 
@@ -36,7 +36,7 @@
 | 25 | 밝기 | 디스플레이 간 밝기 동기화 | 부분 | PRD-BRT-006 | 같은 비율로 동기화. nits 정규화 없음. DDC와 시스템 밝기 제어 대상은 미검증 |
 | 26 | 색 | 색 프로파일 선택과 SDR 및 HDR별 자동 전환 | 부분 | PRD-CLR-001 | 프로파일 선택 제공. SDR과 HDR별 자동 전환 없음 |
 | 27 | 색 | 색온도, 감마, gain, 대비, 채도 조정 | 부분 | PRD-CLR-002 | 채도는 채널별 전달 테이블로 표현 불가 |
-| 28 | 색 | Night Shift, True Tone 토글과 TV용 Night Shift | 부분 | PRD-CLR-003, PRD-CLR-004 | TV용 Night Shift 없음 |
+| 28 | 색 | Night Shift, True Tone 토글과 TV용 Night Shift | 구현 | PRD-CLR-003, PRD-CLR-004, PRD-CLR-006 | TV용은 Night Shift 상태에 맞춘 소프트웨어 색온도 |
 | 29 | 회전 | 0, 90, 180, 270도 회전 | 구현 | PRD-ARR-001 | LG TV에서 90도 회전 확인 (TC-ARR-001) |
 | 30 | 배치 | 드래그 배치와 스냅, 16방향 정렬, 좌표 지정 | 구현 | PRD-ARR-004, PRD-ARR-007 |  |
 | 31 | 배치 | 메인 디스플레이 지정 | 구현 | PRD-ARR-003 |  |

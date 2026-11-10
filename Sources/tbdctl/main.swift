@@ -25,6 +25,8 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "dither", summary: "GPU 디더링 조회와 전환", positionals: ["디스플레이", "on|off"], optionalPositionals: 1),
     CommandSpec(name: "hdr", summary: "HDR 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "brightness", summary: "밝기 조회와 설정 (0-100)", positionals: ["디스플레이", "값"], optionalPositionals: 1),
+    CommandSpec(name: "night-shift", summary: "시스템 Night Shift 조회와 전환", positionals: ["on|off"], optionalPositionals: 1),
+    CommandSpec(name: "night-shift-sync", summary: "Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 (지정 시간 동안)", positionals: ["디스플레이"], valueOptions: ["--seconds"]),
     CommandSpec(name: "preset", summary: "디스플레이 프리셋 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "번호 또는 이름"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "brightness-sync", summary: "원본 디스플레이의 밝기를 다른 디스플레이에 동기화 (지정 시간 동안)", positionals: ["원본 디스플레이"], valueOptions: ["--seconds"]),
     CommandSpec(name: "overlay-dim", summary: "오버레이 방식 디밍 (지정 시간 동안 유지)", positionals: ["디스플레이", "강도 %"], valueOptions: ["--seconds"]),
@@ -185,6 +187,12 @@ case "hdr":
 
 case "brightness":
     runBrightness(command, json: json)
+
+case "night-shift":
+    runNightShift(command)
+
+case "night-shift-sync":
+    runNightShiftSync(command)
 
 case "preset":
     runPreset(command, json: json)
