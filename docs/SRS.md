@@ -162,7 +162,7 @@ public protocol DisplayApplying {
 | SRS-UI-002 | 앱 델리게이트에서 마지막 창 닫기 시 종료. `NSStatusItem` 미사용 | PRD-APP-001 | `Sources/TBDApp/TheBestDisplayApp.swift` |
 | SRS-INF-001 | `DisplayCatalog`: `CGGetOnlineDisplayList`, CoreGraphics 속성, `CoreDisplay_DisplayCreateInfoDictionary`, 프레임버퍼 노드 대응으로 `DisplayIdentity`와 물리 정보 구성 | PRD-INF-001, PRD-PRF-003 | `Sources/TBDPlatform/DisplayCatalog.swift` |
 | SRS-INF-002 | `EDIDParser`: 기본 블록, CTA-861 확장(데이터 블록 전체 순회, HDMI VSDB, HF-VSDB, HDR 정적 메타데이터, 색 공간), DisplayID 확장 해석. 블록별 체크섬 검증. 손상 입력에서 충돌 없이 부분 결과 반환 | PRD-INF-002, PRD-INF-004 | `Sources/TBDCore/EDID/` |
-| SRS-INF-003 | EDID 원본 획득 순서: `IOAVServiceCopyEDID`, `IOPortTransportStateDisplayPort`의 `EDID` 키. 둘 다 실패 시 EDID 없음으로 표시 | PRD-INF-003 | `Sources/TBDPlatform/EDIDSource.swift` |
+| SRS-INF-003 | EDID 원본 획득 순서: `IOAVServiceCopyEDID`, `IOPortTransportStateDisplayPort`의 `EDID` 키. 둘 다 실패 시 EDID 없음으로 표시. 디스플레이 대응은 EDID 머리의 제조사, 제품 코드, 일련번호와 CoreGraphics 값 대조. 일련번호 불일치 시 같은 제품이 1대일 때만 제조사와 제품 코드로 대응. 내장 패널은 EDID 없음 | PRD-INF-003 | `Sources/TBDPlatform/EDIDSource.swift` |
 | SRS-MOD-001 | `ModeService` 열거: `SLSGetDisplayModeDescriptionOfLength`의 212바이트 구조체 해석. 심볼 미가용 시 `CGDisplayCopyAllDisplayModes` 대체 | PRD-MOD-001, PRD-MOD-004 | `Sources/TBDPlatform/ModeService.swift` |
 | SRS-MOD-002 | 모드 전환: `CGBeginDisplayConfiguration`, `SLSConfigureDisplayMode`, `CGCompleteDisplayConfiguration` 순서. 대체 경로는 `CGDisplaySetDisplayMode` | PRD-MOD-003, PRD-MOD-005 | `Sources/TBDPlatform/ModeService.swift` |
 | SRS-MOD-003 | `ModeCatalog`: 해상도별 묶음, HiDPI 판정(배율 2 이상), 필터, 시스템 기본 목록 포함 여부 판정(공개 API 기본 열거 결과와 대조) | PRD-MOD-002, PRD-MOD-006 | `Sources/TBDCore/ModeCatalog.swift` |

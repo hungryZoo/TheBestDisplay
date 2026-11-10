@@ -38,6 +38,7 @@ struct OverviewTab: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            EDIDSections(display: display, record: store.edidRecords[display.id])
             let unavailable = Capability.allCases.map(store.status).filter { !$0.isAvailable }
             if !unavailable.isEmpty {
                 Section("사용할 수 없는 기능") {

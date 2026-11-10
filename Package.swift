@@ -15,7 +15,7 @@ let package = Package(
         .target(name: "TBDPlatform", dependencies: ["TBDCore"], swiftSettings: [.swiftLanguageMode(.v5)]),
         .executableTarget(name: "TBDApp", dependencies: ["TBDCore", "TBDPlatform"], swiftSettings: [.swiftLanguageMode(.v5)]),
         .executableTarget(name: "tbdctl", dependencies: ["TBDCore", "TBDPlatform"], swiftSettings: [.swiftLanguageMode(.v5)]),
-        .testTarget(name: "TBDCoreTests", dependencies: ["TBDCore"], swiftSettings: [.swiftLanguageMode(.v5)]),
+        .testTarget(name: "TBDCoreTests", dependencies: ["TBDCore"], resources: [.copy("Fixtures")], swiftSettings: [.swiftLanguageMode(.v5)]),
         .testTarget(name: "TBDPlatformTests", dependencies: ["TBDPlatform"], swiftSettings: [.swiftLanguageMode(.v5)]),
     ]
 )

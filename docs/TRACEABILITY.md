@@ -28,9 +28,9 @@
 | PRD-APP-004 | P1 | 필수 | MRD-SCP-001 | SRS-ARC-004 | TC-APP-003 | `Sources/TBDApp/DisplayStore.swift` | 미실행 1 |
 | PRD-APP-005 | P1 | 필수 | MRD-RSK-001, MRD-RSK-003 | SRS-ARC-002 | TC-APP-004 | `Sources/TBDPlatform/PrivateSymbols.swift` | 통과 1 |
 | PRD-INF-001 | P1 | 필수 | MRD-SCP-002 | SRS-INF-001 | TC-INF-001 | `Sources/TBDPlatform/DisplayCatalog.swift` | 통과 1 |
-| PRD-INF-002 | P1 | 필수 | MRD-SCP-002 | SRS-INF-002 | TC-INF-002, TC-INF-003 | `Sources/TBDCore/EDID/` | 미실행 2 |
-| PRD-INF-003 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 | SRS-INF-003 | TC-INF-005 | `Sources/TBDPlatform/EDIDSource.swift` | 미실행 1 |
-| PRD-INF-004 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 | SRS-INF-002 | TC-INF-003 | `Sources/TBDCore/EDID/` | 미실행 1 |
+| PRD-INF-002 | P1 | 필수 | MRD-SCP-002 | SRS-INF-002 | TC-INF-002, TC-INF-003 | `Sources/TBDCore/EDID/` | 통과 2 |
+| PRD-INF-003 | P1 | 권장 | MRD-SCP-002, MRD-SCN-007 | SRS-INF-003 | TC-INF-005 | `Sources/TBDPlatform/EDIDSource.swift` | 통과 1 |
+| PRD-INF-004 | P1 | 필수 | MRD-SCP-002, MRD-PRB-002 | SRS-INF-002 | TC-INF-003 | `Sources/TBDCore/EDID/` | 통과 1 |
 | PRD-MOD-001 | P2 | 필수 | MRD-SCP-003, MRD-PRB-001 | SRS-MOD-001 | TC-MOD-001 | `Sources/TBDPlatform/ModeService.swift` | 미실행 1 |
 | PRD-MOD-002 | P2 | 권장 | MRD-SCP-003 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 미실행 1 |
 | PRD-MOD-003 | P2 | 필수 | MRD-SCP-003, MRD-KPI-001 | SRS-MOD-002 | TC-MOD-003 | `Sources/TBDPlatform/ModeService.swift` | 미실행 1 |

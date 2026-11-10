@@ -11,6 +11,8 @@ final class DisplayStore {
     private(set) var snapshot = SystemSnapshot(capturedAt: .now, displays: [])
     private(set) var capabilities: [Capability: CapabilityStatus] = [:]
     private(set) var refreshCount = 0
+    /// 디스플레이 ID별 EDID 원본과 해석 결과. 내장 패널은 없음.
+    private(set) var edidRecords: [UInt32: EDIDRecord] = [:]
 
     @ObservationIgnored private var pendingRefresh: Task<Void, Never>?
     @ObservationIgnored private var observer: NSObjectProtocol?
@@ -38,6 +40,7 @@ final class DisplayStore {
 
     func refresh() {
         snapshot = DisplayCatalog.snapshot()
+        edidRecords = Dictionary(EDIDSource.records(for: snapshot.displays).map { ($0.displayID, $0) }, uniquingKeysWith: { first, _ in first })
         refreshCount += 1
     }
 

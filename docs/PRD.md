@@ -66,7 +66,7 @@
 | --- | --- |
 | `tbdctl list` | 디스플레이 목록 |
 | `tbdctl capabilities` | 기능별 가용성과 누락 심볼 |
-| `tbdctl info <디스플레이>` | 제품 정보와 EDID 해석 |
+| `tbdctl info <디스플레이> [--edid-out <경로>] [--hex]` | 제품 정보, 싱크 능력, EDID 해석. EDID 원본 저장과 16진 표시 |
 | `tbdctl modes <디스플레이>` | 전체 모드 목록 |
 | `tbdctl signal <디스플레이>` | 현재 신호 형식과 색 모드 목록 |
 | `tbdctl link <디스플레이>` | 링크 정보와 대역폭 |
@@ -76,6 +76,7 @@
 | `tbdctl set-mode`, `set-color`, `hdr`, `brightness`, `ddc`, `rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
 
 - 공통 옵션: `--json`
+- 디스플레이 지정자: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
 - 종료 코드: 0 성공, 1 실행 실패, 2 사용법 오류, 3 미지원 기능 또는 대상 없음
 
 ## 6. 요구사항

@@ -121,3 +121,26 @@ struct DisplayCatalogSystemProfilerTests {
         }
     }
 }
+
+/// TC-INF-005: EDID 원본 획득. 외장 디스플레이가 없으면 검사 대상 없음.
+@Suite("TC-INF-005 EDID 원본 획득")
+struct EDIDSourceTests {
+    @Test func 외장_디스플레이의_EDID_획득과_식별_정보_일치() throws {
+        let displays = DisplayCatalog.displays()
+        let externals = displays.filter { !$0.identity.isBuiltin }
+        let records = EDIDSource.records(for: displays)
+        try #require(!externals.isEmpty, "외장 디스플레이 없음: 이 테스트는 외장 디스플레이 연결 상태에서 실행")
+        for display in externals {
+            let record = try #require(records.first { $0.displayID == display.id }, "EDID 없음: \(display.identity.name)")
+            #expect(record.data.count % 128 == 0)
+            #expect(Array(record.data.prefix(8)) == [0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00])
+            #expect(record.parsed.vendorNumber == display.identity.vendorID)
+            #expect(UInt32(record.parsed.productCode) == display.identity.productID)
+            #expect(record.source == "IOAVService" || record.source == "IORegistry")
+        }
+        // 내장 패널은 EDID 기록 없음.
+        for display in displays where display.identity.isBuiltin {
+            #expect(records.contains { $0.displayID == display.id } == false)
+        }
+    }
+}

@@ -7,6 +7,7 @@ import TBDPlatform
 let parser = CommandLineParser(specs: [
     CommandSpec(name: "list", summary: "디스플레이 목록"),
     CommandSpec(name: "capabilities", summary: "기능별 가용성"),
+    CommandSpec(name: "info", summary: "제품 정보와 EDID 해석", positionals: ["디스플레이"], valueOptions: ["--edid-out"], flags: ["--hex"]),
     CommandSpec(name: "help", summary: "사용법"),
 ])
 
@@ -27,6 +28,20 @@ func printJSON<T: Encodable>(_ value: T) {
         exit(.failure)
     }
     print(text)
+}
+
+/// 디스플레이 지정자를 해석. 대상이 없으면 종료 코드 3.
+func resolveDisplay(_ selector: String) -> (DisplaySummary, [DisplaySummary]) {
+    let displays = DisplayCatalog.displays()
+    do {
+        return (try DisplaySelector.resolve(selector, in: displays), displays)
+    } catch let error as DisplaySelector.SelectionError {
+        writeError("오류: \(error.message)")
+        exit(error.exitCode)
+    } catch {
+        writeError("오류: \(error)")
+        exit(.failure)
+    }
 }
 
 let arguments = Array(CommandLine.arguments.dropFirst())
@@ -79,6 +94,9 @@ case "capabilities":
             print("\(s.isAvailable ? "가용  " : "미가용") \(s.capability.title)" + (s.isAvailable ? "" : " — 누락: \(s.missingSymbols.joined(separator: ", "))"))
         }
     }
+
+case "info":
+    runInfo(command, json: json)
 
 default:
     writeError("오류: 미구현 명령 \(command.name)")
