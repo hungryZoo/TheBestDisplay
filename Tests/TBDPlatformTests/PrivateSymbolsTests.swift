@@ -420,6 +420,43 @@ struct BacklightLuminanceServiceTests {
     }
 }
 
+/// TC-BRT-013: 결합 밝기 적용. 내장 디스플레이에 낮은 값을 적용해 하드웨어 밝기와 전달 테이블을 확인한 뒤 복원.
+@Suite("TC-BRT-013 결합 밝기 적용", .serialized)
+struct CombinedBrightnessServiceTests {
+    @Test(.enabled(if: Hardware.hasBuiltinDisplay, "내장 디스플레이 필요"))
+    func 낮은_값은_하드웨어_하한과_디밍_적용() throws {
+        let builtin = try #require(DisplayCatalog.displays().first { $0.identity.isBuiltin })
+        let original = try #require(BrightnessService.nativeBrightness(builtin.id))
+        let gamma = GammaService()
+        defer {
+            gamma.resetAll()
+            try? BrightnessService.setNativeBrightness(original, on: builtin.id)
+            usleep(400_000)
+        }
+        // 결합 값 10%: 하드웨어는 하한(1/16), 디밍은 0.1 + 0.4 x 0.9 = 0.46.
+        let low = try BrightnessService.applyCombined(0.1, to: builtin, method: .native, gamma: gamma)
+        usleep(400_000)
+        #expect(low.hardware == CombinedBrightness.nativeHardwareFloor)
+        #expect(abs(low.dimming - 0.46) < 1e-9)
+        #expect(abs((BrightnessService.nativeBrightness(builtin.id) ?? -1) - 0.0625) < 0.02)
+        #expect(abs((GammaService.currentTableMaximum(builtin.id) ?? -1) - 0.46) < 0.02)
+
+        // 결합 값 70%: 디밍 해제, 하드웨어 0.625.
+        let high = try BrightnessService.applyCombined(0.7, to: builtin, method: .native, gamma: gamma)
+        usleep(400_000)
+        #expect(high.dimming == 1)
+        #expect(abs((BrightnessService.nativeBrightness(builtin.id) ?? -1) - 0.625) < 0.02)
+        #expect(abs((GammaService.currentTableMaximum(builtin.id) ?? -1) - 1) < 0.02)
+    }
+
+    @Test func 소프트웨어_방식은_대상_아님() throws {
+        guard let display = DisplayCatalog.displays().first else { return }
+        #expect(throws: DisplayChangeError.self) {
+            try BrightnessService.applyCombined(0.5, to: display, method: .software, gamma: GammaService())
+        }
+    }
+}
+
 /// TC-BRT-002 실측: 전달 테이블 적용과 복원. 화면이 잠깐 어두워짐.
 @Suite("TC-BRT-002 소프트웨어 디밍 실측", .serialized)
 struct GammaServiceTests {

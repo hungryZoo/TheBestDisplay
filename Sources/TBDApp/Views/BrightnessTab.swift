@@ -28,6 +28,9 @@ final class BrightnessViewModel {
     var overlayStrength = 0.0
     /// 내장 패널의 현재 휘도. (PRD-BRT-008)
     var luminance: BacklightLuminance?
+    /// 결합 밝기: 하드웨어 밝기와 전달 테이블 디밍을 한 값으로 조절. (PRD-BRT-009)
+    var combinedEnabled = false
+    var combined = 1.0
 
     @ObservationIgnored private var pendingWrite: Task<Void, Never>?
     /// 조회 순번. DDC 탐지를 기다리는 사이 다른 디스플레이로 넘어가면 늦게 끝난 탐지 결과를 버림. (T52 실측)
@@ -51,6 +54,7 @@ final class BrightnessViewModel {
             method = .native
             brightness = BrightnessService.nativeBrightness(display.id) ?? 1
             probe = DDCProbe(status: .notApplicable)
+            loadCombined(display)
             return
         }
         // DDC 탐지는 응답 대기가 있으므로 메인 스레드 밖에서 수행.
@@ -70,6 +74,61 @@ final class BrightnessViewModel {
         default:
             brightness = GammaService.shared.adjustment(for: display.id).dimming
         }
+        loadCombined(display)
+    }
+
+    private static func combinedKey(_ display: DisplaySummary) -> String {
+        "combinedBrightness.\(display.identity.uuid ?? String(display.id))"
+    }
+
+    private var hardwareFloor: Double { CombinedBrightness.hardwareFloor(for: method) }
+
+    /// 저장된 결합 밝기 사용 여부와 현재 값 반영. 소프트웨어 방식은 대상 아님.
+    private func loadCombined(_ display: DisplaySummary) {
+        combinedEnabled = method != .software && UserDefaults.standard.bool(forKey: Self.combinedKey(display))
+        combined = CombinedBrightness.combined(hardware: brightness, dimming: GammaService.shared.adjustment(for: display.id).dimming, hardwareFloor: hardwareFloor)
+    }
+
+    func setCombinedEnabled(_ enabled: Bool, display: DisplaySummary) {
+        combinedEnabled = enabled && method != .software
+        UserDefaults.standard.set(combinedEnabled, forKey: Self.combinedKey(display))
+        if combinedEnabled {
+            combined = CombinedBrightness.combined(hardware: brightness, dimming: GammaService.shared.adjustment(for: display.id).dimming, hardwareFloor: hardwareFloor)
+        } else {
+            // 끄면 디밍만 해제하고 하드웨어 밝기는 그대로 둠.
+            var adjustment = GammaService.shared.adjustment(for: display.id)
+            adjustment.dimming = 1
+            do { try GammaService.shared.apply(adjustment, to: display.id) } catch { message = RevertCoordinator.describe(error) }
+        }
+    }
+
+    func setCombined(_ value: Double, display: DisplaySummary) {
+        combined = value
+        let levels = CombinedBrightness.levels(for: value, hardwareFloor: hardwareFloor)
+        brightness = levels.hardware
+        do {
+            switch method {
+            case .native:
+                try BrightnessService.applyCombined(value, to: display, method: .native)
+            case .ddc:
+                // 디밍은 바로, DDC 쓰기는 모아서 적용.
+                var adjustment = GammaService.shared.adjustment(for: display.id)
+                adjustment.dimming = levels.dimming
+                try GammaService.shared.apply(adjustment, to: display.id)
+                let maximum = UInt16(ddcValues[VCPCode.brightness.rawValue]?.maximum ?? 100)
+                scheduleDDC { try? BrightnessService.setDDCBrightness(levels.hardware, for: display, maximum: maximum) }
+            case .software:
+                break
+            }
+            message = nil
+        } catch {
+            message = RevertCoordinator.describe(error)
+        }
+    }
+
+    /// 결합 밝기의 현재 분해 결과 표기.
+    var combinedDescription: String {
+        CombinedBrightness.describe(CombinedBrightness.levels(for: combined, hardwareFloor: hardwareFloor))
     }
 
     func setBrightness(_ value: Double, display: DisplaySummary) {
@@ -172,16 +231,28 @@ struct BrightnessTab: View {
                 LabeledContent("제어 방식", value: model.isProbing ? "확인 중" : model.method.title)
                 HStack(spacing: 10) {
                     Image(systemName: "sun.min")
-                    Slider(value: Binding(get: { model.brightness }, set: { model.setBrightness($0, display: display) }), in: sliderRange)
-                        .disabled(model.isProbing || changes.isBusy)
+                    if model.combinedEnabled {
+                        Slider(value: Binding(get: { model.combined }, set: { model.setCombined($0, display: display) }), in: 0...1)
+                            .disabled(model.isProbing || changes.isBusy)
+                    } else {
+                        Slider(value: Binding(get: { model.brightness }, set: { model.setBrightness($0, display: display) }), in: sliderRange)
+                            .disabled(model.isProbing || changes.isBusy)
+                    }
                     Image(systemName: "sun.max")
-                    Text("\(Int((model.brightness * 100).rounded()))%")
+                    Text("\(Int(((model.combinedEnabled ? model.combined : model.brightness) * 100).rounded()))%")
                         .monospacedDigit()
                         .frame(width: 44, alignment: .trailing)
                 }
                 if let luminance = model.luminance {
                     LabeledContent("휘도", value: luminance.summary)
                         .help("백라이트 드라이버가 보고하는 현재 휘도. 자동 밝기와 HDR 표시 상태에 따라 변함")
+                }
+                if model.method != .software, !model.isProbing {
+                    Toggle("결합 밝기 (하드웨어 최저 아래는 소프트웨어 디밍)", isOn: Binding(get: { model.combinedEnabled }, set: { model.setCombinedEnabled($0, display: display) }))
+                        .help("조절 범위의 아래쪽 25%는 하드웨어 밝기를 최저에 둔 채 전달 테이블로 더 어둡게 함. 디밍은 앱 실행 중에만 유지")
+                    if model.combinedEnabled {
+                        LabeledContent("현재 구성", value: model.combinedDescription)
+                    }
                 }
                 if model.method == .software, !model.isProbing {
                     Text("하드웨어 밝기 제어를 쓸 수 없어 전달 테이블로 화면 출력값을 낮춤. 백라이트는 그대로이며 앱을 종료하면 원래 밝기로 복귀")

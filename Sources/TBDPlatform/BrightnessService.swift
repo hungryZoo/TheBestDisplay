@@ -60,6 +60,23 @@ public enum BrightnessService {
 
     // MARK: - 자동 밝기 (PRD-BRT-004)
 
+    /// 결합 밝기 적용: 하드웨어 밝기를 지정하고 전달 테이블 디밍을 맞춤. 소프트웨어 방식 디스플레이는 대상 아님. (SRS-BRT-006)
+    /// 디밍은 `GammaService`의 다른 조정값(색온도 등)을 유지한 채 디밍 값만 바꿈.
+    @discardableResult
+    public static func applyCombined(_ value: Double, to display: DisplaySummary, method: BrightnessMethod, ddcMaximum: UInt16 = 100, gamma: GammaService = .shared) throws -> CombinedBrightness.Levels {
+        guard method != .software else { throw DisplayChangeError.unavailable("하드웨어 밝기 제어가 없는 디스플레이는 결합 밝기 대상 아님") }
+        let levels = CombinedBrightness.levels(for: value, hardwareFloor: CombinedBrightness.hardwareFloor(for: method))
+        switch method {
+        case .native: try setNativeBrightness(levels.hardware, on: display.id)
+        case .ddc: try setDDCBrightness(levels.hardware, for: display, maximum: ddcMaximum)
+        case .software: break
+        }
+        var adjustment = gamma.adjustment(for: display.id)
+        adjustment.dimming = levels.dimming
+        try gamma.apply(adjustment, to: display.id)
+        return levels
+    }
+
     /// 내장 패널의 현재 휘도. 내장 디스플레이가 아니거나 프레임버퍼 노드에 값이 없으면 nil. (SRS-BRT-005)
     /// 외장 디스플레이의 같은 속성은 백라이트와 무관한 고정값(200 cd/m²)이라 제외 (T52 실측).
     public static func backlightLuminance(for display: DisplaySummary) -> BacklightLuminance? {
