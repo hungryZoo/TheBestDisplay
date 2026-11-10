@@ -77,6 +77,7 @@
 | `tbdctl diagnose` | 포트별 점검 단계와 진단 발견 항목(근거, 조치) |
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장. 기본 JSON, `--text`는 텍스트, `--redact`는 일련번호 가림 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 상태와 정보 조회, 켜기와 끄기 |
+| `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 상태와 전환 가능 여부 조회, 켜기와 끄기 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 시스템 밝기 제어 또는 DDC. 소프트웨어 디밍은 창 앱 전용 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 조회 |
@@ -133,6 +134,7 @@
 | PRD-COL-003 | 선택한 색 모드로 전환 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 |
 | PRD-COL-004 | DSC 정보 표시와 간접 제어: 소스와 싱크의 DSC 지원, 현재 DSC 활성 여부, 모드별 DSC 필요 여부, DSC 사용 모드와 미사용 모드 필터 | P2 | 필수 | MRD-SCP-004 |
 | PRD-COL-005 | 싱크 타이밍 목록 표시: 해상도, 주사율, 픽셀 클록, 블랭킹, 타이밍별 색 모드 수 | P2 | 권장 | MRD-SCP-004 |
+| PRD-COL-006 | DSC 켜기와 끄기: 현재 타이밍과 전달 함수를 유지하고 DSC 사용 색 모드와 미사용 색 모드 사이를 전환. 전환할 색 모드가 없으면 사유 표시 (싱크 미지원, 현재 타이밍에 후보 없음, HDR 상태 변경 필요) | P6 | 필수 | MRD-SCP-004 |
 
 ### 6.5 HDR (HDR)
 

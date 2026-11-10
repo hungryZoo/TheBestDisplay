@@ -38,7 +38,7 @@ struct ColorModeTab: View {
             Form {
                 if let hdr = store.hdrStatuses[display.id] { hdrSection(hdr) }
                 currentSignal(info)
-                if let dsc = store.dscAssessments[display.id] { dscSection(dsc) }
+                if let dsc = store.dscAssessments[display.id] { dscSection(dsc, info: info) }
                 colorModes(info)
                 timings(info)
             }
@@ -103,16 +103,52 @@ struct ColorModeTab: View {
         }
     }
 
-    private func dscSection(_ dsc: DSCAssessment) -> some View {
-        Section("DSC 압축") {
-            LabeledContent("현재 상태", value: dsc.summary)
+    /// DSC 정보와 켜기, 끄기. (PRD-COL-004, PRD-COL-006)
+    private func dscSection(_ dsc: DSCAssessment, info: SignalInfo) -> some View {
+        let enablePlan = DSCControl.plan(signal: info, enable: true)
+        let disablePlan = DSCControl.plan(signal: info, enable: false)
+        return Section("DSC 압축") {
+            LabeledContent("현재 상태") {
+                HStack(spacing: 10) {
+                    Text(dsc.summary)
+                    Button("DSC 켜기") { applyDSC(enablePlan, info: info) }
+                        .disabled(changes.isBusy || !Self.isPossible(enablePlan))
+                        .help(Self.planHelp(enablePlan))
+                    Button("DSC 끄기") { applyDSC(disablePlan, info: info) }
+                        .disabled(changes.isBusy || !Self.isPossible(disablePlan))
+                        .help(Self.planHelp(disablePlan))
+                }
+            }
             LabeledContent("소스 (Mac)", value: Self.support(dsc.sourceSupportsDSC))
             LabeledContent("싱크 (디스플레이)", value: Self.support(dsc.sinkSupportsDSC))
             LabeledContent("현재 타이밍의 색 모드", value: "DSC 필요 \(dsc.dscRequiredModeCount)개, 불필요 \(dsc.dscFreeModeCount)개")
-            Text("DSC 강제 켜기와 끄기는 제공하지 않음. DSC 사용 여부는 아래 색 모드 선택으로 결정")
+            if dsc.isActive != true, case .failure(let error) = enablePlan, case .noCandidate = error {
+                Text("켜기 불가: \(error.localizedDescription)").font(.caption).foregroundStyle(.secondary)
+            }
+            if dsc.isActive == true, case .failure(let error) = disablePlan, case .noCandidate = error {
+                Text("끄기 불가: \(error.localizedDescription)").font(.caption).foregroundStyle(.secondary)
+            }
+            Text("DSC 전환은 현재 타이밍을 유지하고 DSC 사용 색 모드와 미사용 색 모드 사이를 바꾸는 방식. 시스템이 제공하지 않는 조합의 강제는 불가")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private static func isPossible(_ plan: Result<ColorElement, DSCControl.Unavailable>) -> Bool {
+        if case .success = plan { return true }
+        return false
+    }
+
+    private static func planHelp(_ plan: Result<ColorElement, DSCControl.Unavailable>) -> String {
+        switch plan {
+        case .success(let element): "색 모드 \(element.label)로 전환"
+        case .failure(let error): error.localizedDescription
+        }
+    }
+
+    private func applyDSC(_ plan: Result<ColorElement, DSCControl.Unavailable>, info: SignalInfo) {
+        guard case .success(let element) = plan, let timingID = info.currentTimingID, let current = info.currentColor else { return }
+        changes.request(DisplayChanges.colorChange(display: display, timingID: timingID, from: current, to: element), targetDisplayID: display.id)
     }
 
     @ViewBuilder

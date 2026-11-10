@@ -63,7 +63,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 디스플레이 정보 | 제품 정보, 물리 크기, EDID 해석(기본 블록, CTA-861, DisplayID), 싱크 능력 요약, EDID 원본 저장 |
 | 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시 |
 | 색 모드 | 현재 송출 신호(픽셀 인코딩, 비트 심도, 레인지, EOTF, 색 공간) 표시, 현재 타이밍에서 선택 가능한 색 모드 전환 |
-| DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. 색 모드 선택을 통한 간접 제어 |
+| DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
 | HDR | 지원 여부, 켜기와 끄기, 지원 EOTF, EDR 헤드룸 |
 | 링크 | 링크 속도, 레인 수, 터널링, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD, 링크 훈련 결과 |
 | 포트와 케이블 | 포트별 지원 전송, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로 |
@@ -160,6 +160,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 조회와 전환 |
+| `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 조회와 전환 |
 | `tbdctl link <디스플레이>` | 링크 정보, 대역폭, DPCD |
 | `tbdctl ports` | 포트, 케이블, 독, 연결 경로 |
 | `tbdctl diagnose` | 포트 점검과 발견 항목 |
@@ -185,7 +186,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 
 ### 자동 복귀 안전장치
 
-- 대상: 모드, 색 모드, HDR, 회전, 미러, 연결 해제, HiDPI 스케일링, 프로파일 적용
+- 대상: 모드, 색 모드, DSC, HDR, 회전, 미러, 연결 해제, HiDPI 스케일링, 프로파일 적용
 - 창 앱: 확인 대화상자에서 15초 안에 유지를 누르지 않으면 이전 설정으로 복귀
 - 명령행: Return을 입력하면 확정, 제한 시간(`--timeout`, 기본 15초) 안에 입력이 없으면 복귀. `--yes`는 확인 없이 확정
 - 확인 전에 앱이 종료되면 다음 실행 시 복귀 제안 표시. 명령행은 `tbdctl revert-pending`
@@ -232,7 +233,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | Intel Mac | 미지원 |
 | Mac App Store 배포 | 불가 (비공개 API 사용, 샌드박스 미적용) |
-| DSC 강제 켜기와 끄기 | 미제공. 색 모드 선택으로만 간접 제어 |
+| DSC 강제 | 시스템이 색 모드로 제공하는 범위 안에서만 켜기와 끄기 가능. DSC 미지원 싱크에서 켜기 같은 강제는 불가 |
 | EDID 오버라이드, 사용자 정의 타이밍 | 미제공 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
 | 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드 (장비 없음) |

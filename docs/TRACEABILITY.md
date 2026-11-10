@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 53 |
-| PRD 요구사항 | 66 |
-| SRS 설계 요구사항 | 42 |
-| TC | 53 |
+| PRD 요구사항 | 67 |
+| SRS 설계 요구사항 | 43 |
+| TC | 55 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -42,6 +42,7 @@
 | PRD-COL-003 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-003 | TC-COL-004 | `Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
 | PRD-COL-004 | P2 | 필수 | MRD-SCP-004 | SRS-COL-004 | TC-COL-005 | `Sources/TBDCore/DSCAssessment.swift` | 통과 1 |
 | PRD-COL-005 | P2 | 권장 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/Signal.swift` | 통과 1 |
+| PRD-COL-006 | P6 | 필수 | MRD-SCP-004 | SRS-COL-006 | TC-COL-006, TC-COL-007 | `Sources/TBDCore/DSCControl.swift` | 보류 1, 통과 1 |
 | PRD-HDR-001 | P2 | 필수 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-001 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
 | PRD-HDR-002 | P2 | 필수 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-002 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
 | PRD-HDR-003 | P2 | 권장 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-001 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
@@ -86,5 +87,5 @@
 | PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-CLI-001 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-001 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
-| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
+| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-COL-007, TC-CLI-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 보류 1, 통과 1 |
 | PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |

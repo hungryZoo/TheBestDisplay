@@ -166,3 +166,4 @@
 | T05 | 3840x2160 120 Hz 타이밍(ID 96)의 선택 가능 색 모드 15개: RGB는 8 bpc SDR(Full, Limited)만, HDR(PQ, HLG)은 YCbCr 4:2:2 10 bpc와 12 bpc만 제공. 가상 형식 2개(ID 1, 2)는 프레임버퍼용이라 선택 목록에서 제외 |
 | T05 | 내장 패널의 정밀 주사율은 120.0005 Hz (`PreciseSyncRate` 7864351) |
 | T04 | MonitorPanel 경로 실측: 주사율 전환 3회, 해상도 전환 2회(2560x1440 HiDPI, 시스템 설정 목록 밖 1344x756 HiDPI), 창 앱 전환 1회 모두 디스플레이 온라인 유지와 자동 복귀 정상 |
+| T16 | DSC 제어 심볼 조사 (`dyld_info -exports`): IOKit에 DSC 계산용 `IOAVDSCCapabilitiesGetMaxSlicesPerLine`, `IOAVDSCModeForPixelEncoding`, `IOAVVideoColorMinimumBitsPerPixelDSC`만 있고 DSC 설정 함수 없음. IOMobileFramebuffer, SkyLight, CoreDisplay, MonitorPanel, DisplayServices에는 DSC 이름의 심볼 없음. 관련 설정 계열로 `IOAVServiceSetVirtualEDIDMode`, `IODPPortSetVirtualEDID`, `IODPPortSetVirtualDPCD`, `IODPControllerSetMaxLinkRate`, `IODPControllerSetMaxLaneCount`, `IODPServiceRetrainLink`, `IOAVServiceSetFRLMaxRate` 존재 확인 (호출 가능 여부는 T17, T20에서 실측) |

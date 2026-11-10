@@ -100,7 +100,7 @@
 | MRD-EXC-003 | 화면 스트리밍, PIP, 원격 디스플레이 | 디스플레이 옵션 설정 범위 밖 |
 | MRD-EXC-004 | Intel Mac 지원 | 프레임버퍼 구조와 API 상이 |
 | MRD-EXC-005 | 키보드 밝기 키 가로채기와 OSD | 메뉴 막대 상주 프로세스 필요 |
-| MRD-EXC-006 | DSC 강제 활성과 강제 비활성의 직접 제어 | 공개 근거가 있는 비권한 API 부재. 색 모드 선택을 통한 간접 제어만 제공 |
+| MRD-EXC-006 | 시스템이 색 모드로 제공하지 않는 DSC 조합의 강제 (예: DSC 미지원 싱크에서 DSC 켜기) | DSC 설정 전용 API 부재 (IOKit, IOMobileFramebuffer, SkyLight 심볼 조사). DSC 켜기와 끄기는 DSC 사용 색 모드와 미사용 색 모드 간 전환으로 제공 (PRD-COL-006) |
 
 ## 10. 성공 기준
 
