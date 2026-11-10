@@ -32,6 +32,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "brightness-sync", summary: "원본 디스플레이의 밝기를 다른 디스플레이에 동기화 (지정 시간 동안)", positionals: ["원본 디스플레이"], valueOptions: ["--seconds"], flags: ["--nits"]),
     CommandSpec(name: "luminance-reference", summary: "디스플레이의 최대 휘도 기준값 조회, 지정, 해제", positionals: ["디스플레이", "cd/m² 또는 reset"], optionalPositionals: 1),
     CommandSpec(name: "combined-brightness", summary: "결합 밝기: 하드웨어 밝기와 소프트웨어 디밍을 한 값으로 적용 (지정 시간 동안 유지)", positionals: ["디스플레이", "0-100"], valueOptions: ["--seconds"]),
+    CommandSpec(name: "saturation", summary: "채도 조회와 조정 (색 프로파일의 색 좌표 변경), reset으로 해제", positionals: ["디스플레이", "50-150 또는 reset"], optionalPositionals: 1),
     CommandSpec(name: "overlay-dim", summary: "오버레이 방식 디밍 (지정 시간 동안 유지)", positionals: ["디스플레이", "강도 %"], valueOptions: ["--seconds"]),
     CommandSpec(name: "xdr", summary: "XDR 밝기 업스케일 조회와 적용 (지정 시간 동안 유지)", positionals: ["디스플레이", "배율 %"], optionalPositionals: 1, valueOptions: ["--seconds"]),
     CommandSpec(name: "ddc", summary: "DDC 탐지, capabilities와 제어 구성, VCP 읽기와 쓰기", positionals: ["디스플레이", "probe|caps|plan|get|set", "코드", "값"], optionalPositionals: 2, valueOptions: ["--caps"]),
@@ -212,6 +213,9 @@ case "brightness-sync":
 
 case "combined-brightness":
     MainActor.assumeIsolated { runCombinedBrightness(command) }
+
+case "saturation":
+    runSaturation(command, json: json)
 
 case "overlay-dim":
     MainActor.assumeIsolated { runOverlayDim(command) }

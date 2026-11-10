@@ -70,7 +70,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 포트와 케이블 | 포트별 지원 전송, 플러그 방향, PHY 레인, 케이블 e-marker(속도, 전류, 전압, 제조사, USB-IF 인증 ID, 신뢰 신호), 독, 연결 경로, 전원 어댑터, 충전 제한 요소 판정 |
 | 진단 | 포트별 화면 출력 점검 6단계, 발견 항목(근거와 조치), 이벤트 기록, 진단 보고서 내보내기 |
 | 밝기와 DDC | 시스템 밝기, 내장 패널 휘도(cd/m²) 표시, DDC 밝기, 소프트웨어 디밍, 결합 밝기, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
-| 색 조정 | 디스플레이 프리셋(기준 모드), 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
+| 색 조정 | 디스플레이 프리셋(기준 모드), 색 프로파일, 채도, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
 | 배치 | 회전, 미러, 메인 지정, 위치 편집, 16방향 정렬, 논리적 연결 해제와 재연결, 외장 연결 시 내장 자동 해제, 언더스캔 |
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
 | 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
@@ -141,7 +141,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | 색 모드 | HDR 전환, 현재 송출 신호, DSC 상태, 색 모드 목록과 적용, 싱크 타이밍 |
 | 링크 | 링크 속도와 레인, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD |
 | 밝기 | 밝기, 내장 패널 휘도, 결합 밝기, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 기능 |
-| 색 조정 | 디스플레이 프리셋, 색 프로파일, 소프트웨어 조정, Night Shift, True Tone |
+| 색 조정 | 디스플레이 프리셋, 색 프로파일, 채도, 소프트웨어 조정, Night Shift, True Tone |
 | 배치 | 위치 편집, 회전, 메인 지정, 미러, 연결 해제 |
 | 연결 진단 | 발견 항목, 포트와 연결 경로, 이벤트 기록, 보고서 내보내기 |
 | 가상 디스플레이 | 가상 디스플레이 추가, 켜기와 끄기, 삭제 |
@@ -191,6 +191,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl hdr-profile <디스플레이> [sdr\|hdr <프로파일\|none> \| apply]` | SDR과 HDR 상태별 색 프로파일 지정과 적용 |
 | `tbdctl ddc <디스플레이> probe \| caps \| plan [--caps <문자열>] \| get <코드> \| set <코드> <값>` | DDC 탐지, capabilities 조회, capabilities 기반 제어 구성, VCP 읽기와 쓰기 |
 | `tbdctl color <디스플레이> [--profiles] [--set <프로파일>]` | 색 프로파일 조회와 지정, Night Shift, True Tone 상태 |
+| `tbdctl saturation <디스플레이> [<50-150> \| reset]` | 채도 조회와 조정 (색 프로파일의 색 좌표 변경), 해제 |
 | `tbdctl arrangement` | 위치, 회전, 미러 상태 |
 | `tbdctl rotate <디스플레이> <각도> [--timeout <초>] [--yes]` | 회전 (0, 90, 180, 270) |
 | `tbdctl mirror <디스플레이> <원본\|off> [--timeout <초>] [--yes]` | 미러 설정과 해제 |
@@ -263,8 +264,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 118건 중 통과 113건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 49행, 부분 6행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 120건 중 통과 115건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 50행, 부분 5행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

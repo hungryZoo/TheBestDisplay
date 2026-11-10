@@ -14,6 +14,10 @@ final class ColorAdjustViewModel {
     var message: String?
     /// 디스플레이 프리셋 (사용 가능한 것만). (PRD-CLR-005)
     var presets: [DisplayPreset] = []
+    /// 채도 조정 (색 프로파일의 색 좌표 변경). (PRD-CLR-008)
+    var saturation = 1.0
+    var saturationBase = ""
+    var saturationUnavailable: String?
 
     func load(_ display: DisplaySummary) {
         presets = PresetService.presets(for: display.id).filter(\.isValid)
@@ -25,6 +29,10 @@ final class ColorAdjustViewModel {
         adjustment = GammaService.shared.adjustment(for: display.id)
         nightShift = NightShiftService.status()
         trueTone = TrueToneService.status()
+        let status = SaturationService.status(for: display)
+        saturation = status.saturation
+        saturationBase = status.baseName
+        saturationUnavailable = status.unavailableReason
     }
 
     func perform(_ display: DisplaySummary, _ action: () throws -> Void) {
@@ -121,6 +129,32 @@ struct ColorAdjustTab: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+            Section {
+                if let reason = model.saturationUnavailable {
+                    Text(reason).font(.callout).foregroundStyle(.secondary)
+                } else {
+                    HStack(spacing: 10) {
+                        Text("채도").frame(width: 60, alignment: .leading)
+                        // 값을 바꿀 때마다 프로파일 파일을 새로 만들므로 조절을 마친 시점에만 적용.
+                        Slider(value: $model.saturation, in: SaturationAdjustment.range, step: 0.05) { editing in
+                            guard !editing else { return }
+                            let value = model.saturation
+                            model.perform(display) { try SaturationService.apply(value, to: display) }
+                        }
+                        Text("\(Int((model.saturation * 100).rounded()))%").monospacedDigit().frame(width: 60, alignment: .trailing)
+                    }
+                    LabeledContent("기준 프로파일", value: model.saturationBase)
+                    Button("초기화") {
+                        model.perform(display) { try SaturationService.reset(display) }
+                    }
+                    .disabled(abs(model.saturation - 1) < 0.005)
+                }
+            } header: {
+                Text("채도")
+            } footer: {
+                Text("현재 색 프로파일의 색 좌표를 바꾼 프로파일을 만들어 지정. 시스템에 저장되어 앱을 종료해도 유지되며 초기화하면 기준 프로파일로 복귀. 색 관리를 거치는 내용에 적용")
+                    .font(.caption)
             }
             Section {
                 slider("디밍", value: $model.adjustment.dimming, range: ColorAdjustment.dimmingRange, format: { "\(Int(($0 * 100).rounded()))%" })

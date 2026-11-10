@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 107 |
-| SRS 설계 요구사항 | 78 |
-| TC | 118 |
+| PRD 요구사항 | 108 |
+| SRS 설계 요구사항 | 79 |
+| TC | 120 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -100,6 +100,7 @@
 | PRD-CLR-005 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-004 | TC-CLR-003, TC-CLR-004 | `Sources/TBDPlatform/PresetService.swift`<br>`Sources/TBDCore/DisplayPreset.swift` | 통과 2 |
 | PRD-CLR-006 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-005 | TC-CLR-005, TC-CLR-006 | `Sources/TBDCore/NightShiftEmulation.swift`<br>`Sources/TBDApp/NightShiftSyncController.swift` | 통과 2 |
 | PRD-CLR-007 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-006 | TC-CLR-007, TC-CLR-008 | `Sources/TBDCore/HDRProfile.swift`<br>`Sources/TBDPlatform/HDRProfileService.swift` | 통과 2 |
+| PRD-CLR-008 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-007 | TC-CLR-009, TC-CLR-010 | `Sources/TBDCore/ICCProfile.swift`<br>`Sources/TBDCore/SaturationProfile.swift`<br>`Sources/TBDPlatform/SaturationService.swift` | 통과 2 |
 | PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-002 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-002 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-003 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-003 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
