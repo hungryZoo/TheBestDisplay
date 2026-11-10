@@ -28,8 +28,8 @@
 | TC-COL-003 | 링크 데이터 구조체 해석 확인 | SRS-COL-002 | 링크 데이터 픽스처 (0x110바이트) | 픽스처 해석 | 12 bpc, YCbCr 4:2:2, Limited, PQ, 3840x2160, 총 3968x2250, 120 Hz, 픽셀 클록 1,071,360,000 Hz | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-COL-004 | 색 모드 전환과 자동 복귀 확인 | PRD-COL-003, PRD-SAF-001, SRS-COL-003 | 외장 디스플레이 온라인, 색 모드 2개 이상. 사용자에게 사전 알림 | `tbdctl set-color external ycbcr422:12:pq --timeout 6`을 표준 입력 없이 실행 | 전환 직후 현재 색 ID와 링크 데이터의 비트 심도 변경. 제한 시간 뒤 원래 색 모드 복귀와 복귀 정보 파일 삭제. 디스플레이 온라인 유지 | 통합 | macOS 26, Apple Silicon | 통과 | 창 앱의 적용 버튼은 같은 변경 묶음을 쓰며 화면 표시만 확인 |
 | TC-COL-005 | DSC 판정 확인 | PRD-COL-004, PRD-LNK-003, SRS-COL-004 | 합성 픽스처 (DSC 지원 색 요소, DSC 필수 목록 포함)와 실측 픽스처 | DSC 판정 실행 | 합성 픽스처는 DSC 필요 모드 식별. 실측 픽스처는 싱크 DSC 미지원 판정 | 단위 | macOS 26, Apple Silicon | 통과 | |
-| TC-HDR-001 | HDR 상태와 정보 조회 확인 | PRD-HDR-001, PRD-HDR-003, SRS-HDR-001 | HDR 지원 외장 디스플레이 온라인 | `tbdctl signal <외장> --json`의 HDR 항목 확인 | 지원 여부와 활성 상태가 시스템 설정과 일치. 지원 EOTF 표시 | 통합 | macOS 26, Apple Silicon | 미실행 | |
-| TC-HDR-002 | HDR 전환과 자동 복귀 확인 | PRD-HDR-002, PRD-SAF-001, SRS-HDR-001 | HDR 지원 외장 디스플레이 온라인 | HDR 상태 반전 후 확인 없이 대기 | 전환 직후 상태 변경. 제한 시간 뒤 원래 상태 복귀 | 통합 | macOS 26, Apple Silicon | 미실행 | |
+| TC-HDR-001 | HDR 상태와 정보 조회 확인 | PRD-HDR-001, PRD-HDR-003, SRS-HDR-001 | HDR 지원 외장 디스플레이 온라인 | `swift test`의 TC-HDR-001 묶음: `HDRService` 결과를 `MPDisplay`의 `hasHDRModes`, `preferHDRModes`, 링크 데이터의 EOTF와 비교. `tbdctl hdr external` | 지원 여부와 활성 상태가 시스템 설정 판정과 일치. 지원 EOTF 표시. 링크 데이터의 EOTF가 HDR 상태와 일치 | 통합 | macOS 26, Apple Silicon | 통과 | |
+| TC-HDR-002 | HDR 전환과 자동 복귀 확인 | PRD-HDR-002, PRD-SAF-001, SRS-HDR-001 | HDR 지원 외장 디스플레이 온라인. 사용자에게 사전 알림 | `tbdctl hdr external off --timeout 6`을 표준 입력 없이 실행. `--yes`로 끄기, 색 모드 전환 시험, `--yes`로 켜기 | 전환 직후 HDR 상태와 링크 데이터의 EOTF 변경. 제한 시간 뒤 원래 상태 복귀와 복귀 정보 파일 삭제. 디스플레이 온라인 유지 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-LNK-001 | 링크 정보 조회 확인 | PRD-LNK-001, SRS-LNK-001 | 외장 디스플레이 온라인 | `tbdctl link <외장> --json` 결과를 `ioreg -r -c IOPortTransportStateDisplayPort`와 비교 | 링크 속도, 레인 수, 터널링, HPD 값 일치 | 통합 | macOS 26, Apple Silicon | 미실행 | |
 | TC-LNK-002 | 대역폭 계산 확인 | PRD-LNK-002, SRS-LNK-002 | 없음 | 픽셀 클록 1,071.36 MHz에 대해 YCbCr 4:2:2 12 bpc, RGB 10 bpc, RGB 8 bpc 계산. HBR3 4레인, UHBR10 4레인, FRL 48 Gbps 가용 대역폭 계산 | 25.71, 32.14, 25.71 Gbps. 가용 25.92, 38.79, 42.67 Gbps (소수 둘째 자리 반올림) | 단위 | macOS 26, Apple Silicon | 미실행 | |
 | TC-LNK-003 | HDMI 링크 정보 확인 | PRD-LNK-004, SRS-LNK-003 | HDMI 직결 디스플레이 | `tbdctl link <외장> --json` | 전송 방식 HDMI, TMDS 또는 FRL 속도 표시 | 통합 | macOS 26, Apple Silicon | 미실행 | |
@@ -61,7 +61,7 @@
 | TC-SAF-001 | 자동 복귀 상태 기계 확인 | PRD-SAF-001, SRS-SAF-001 | 없음 | 가짜 시계와 가짜 적용기로 PRD 3절 전이 9종 실행. 확인 대기 중 새 요청 | 전이 결과가 표와 일치. 타이머 만료 시 복귀 1회 호출. 새 요청 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-SAF-002 | 복귀 정보 파일 확인 | PRD-SAF-002, SRS-SAF-002 | 임시 폴더 | 기록, 조회, 삭제. 손상 파일 조회 | 기록 후 조회값 동일. 삭제 후 없음. 손상 파일은 없음으로 처리 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-CLI-001 | 조회 명령 확인 | PRD-CLI-001, SRS-CLI-001 | 디스플레이 온라인 | `list`, `info`, `modes`, `signal`, `link`, `ports`, `diagnose`를 `--json`으로 실행 | 전 명령 종료 코드 0. 출력이 유효한 JSON | 통합 | macOS 26, Apple Silicon | 미실행 | |
-| TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
+| TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | set-mode, set-color, hdr는 실측 완료. brightness 명령(T10) 추가 후 마감 |
 | TC-CLI-003 | 인자 해석과 종료 코드 확인 | PRD-CLI-003, SRS-CLI-001 | 없음 | 알 수 없는 명령, 인자 누락, 없는 디스플레이 지정, 정상 명령 해석 | 사용법 오류 2, 대상 없음 3, 정상 해석 결과 일치 | 단위 | macOS 26, Apple Silicon | 통과 | |
 
 ## 2. 선행 검증 대응 표

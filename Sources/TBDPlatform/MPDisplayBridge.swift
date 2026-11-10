@@ -53,6 +53,16 @@ final class MPDisplayBridge {
         return unsafeBitCast(object.method(for: selector), to: Fn.self)(object, selector, number)
     }
 
+    /// 시스템 설정과 같은 경로의 HDR 전환. 형식 부호 `v20@0:8B16` (반환 없음, BOOL 인자) 실측.
+    /// 메서드가 없으면 거짓.
+    func setPreferHDRModes(_ enabled: Bool) -> Bool {
+        let selector = NSSelectorFromString("setPreferHDRModes:")
+        guard object.responds(to: selector) else { return false }
+        typealias Fn = @convention(c) (NSObject, Selector, Bool) -> Void
+        unsafeBitCast(object.method(for: selector), to: Fn.self)(object, selector, enabled)
+        return true
+    }
+
     func bool(_ key: String) -> Bool? {
         guard object.responds(to: NSSelectorFromString(key)) else { return nil }
         return object.value(forKey: key) as? Bool

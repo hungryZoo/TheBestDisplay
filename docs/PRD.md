@@ -76,7 +76,8 @@
 | `tbdctl ports` | 포트와 연결 경로 |
 | `tbdctl diagnose` | 진단 발견 항목 |
 | `tbdctl report <경로>` | 진단 보고서 저장 |
-| `tbdctl hdr`, `brightness`, `ddc`, `rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
+| `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 상태와 정보 조회, 켜기와 끄기 |
+| `tbdctl brightness`, `ddc`, `rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정자: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
@@ -130,7 +131,7 @@
 | --- | --- | --- | --- | --- |
 | PRD-HDR-001 | HDR 지원 여부와 현재 상태 표시 | P2 | 필수 | MRD-SCP-005 |
 | PRD-HDR-002 | HDR 켜기와 끄기 | P2 | 필수 | MRD-SCP-005 |
-| PRD-HDR-003 | HDR 정보 표시: 지원 EOTF, 최대 휘도, 현재와 최대 EDR 헤드룸 | P2 | 권장 | MRD-SCP-005 |
+| PRD-HDR-003 | HDR 정보 표시: 지원 EOTF, 최대 휘도, 현재와 최대 EDR 헤드룸. 색 모드 목록에서 HDR 상태와 전달 함수가 어긋나는 형식에 경고 표시 | P2 | 권장 | MRD-SCP-005 |
 
 ### 6.6 링크 (LNK)
 

@@ -58,4 +58,21 @@ public enum DisplayChanges {
             }
         )
     }
+
+    /// HDR 켜기와 끄기. 복귀는 이전 상태 재적용.
+    public static func hdrChange(display: DisplaySummary, enable: Bool, method: HDRService.Method? = nil, onApplied: @escaping (HDRService.Method) -> Void = { _ in }) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        let displayID = display.id
+        return RevertCoordinator.Change(
+            summary: "\(name): HDR \(enable ? "켜기" : "끄기")",
+            pending: PendingRevert(
+                createdAt: Date(),
+                summary: "\(name) HDR을 \(enable ? "꺼짐" : "켜짐")(으)로 복귀",
+                actions: [.hdr(target: DisplayRef(display.identity), enabled: !enable)]
+            ),
+            apply: { onApplied(try HDRService.setEnabled(enable, on: displayID, method: method)) },
+            commit: { guard ModeService.isOnline(displayID) else { throw DisplayChangeError.displayNotFound } },
+            restore: { try HDRService.setEnabled(!enable, on: displayID, method: method) }
+        )
+    }
 }

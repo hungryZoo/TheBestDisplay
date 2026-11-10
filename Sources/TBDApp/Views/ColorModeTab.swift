@@ -36,6 +36,7 @@ struct ColorModeTab: View {
     var body: some View {
         if let info = store.signals[display.id] {
             Form {
+                if let hdr = store.hdrStatuses[display.id] { hdrSection(hdr) }
                 currentSignal(info)
                 if let dsc = store.dscAssessments[display.id] { dscSection(dsc) }
                 colorModes(info)
@@ -74,6 +75,31 @@ struct ColorModeTab: View {
                 Text("현재 색 모드를 확인할 수 없음").foregroundStyle(.secondary)
             }
             LabeledContent("전송 방식", value: info.transport ?? "미확인")
+        }
+    }
+
+    /// HDR 상태, 전환, 정보. (PRD-HDR-001-003)
+    private func hdrSection(_ hdr: HDRStatus) -> some View {
+        Section("HDR") {
+            LabeledContent("상태") {
+                HStack(spacing: 10) {
+                    Text(hdr.stateLabel)
+                    if hdr.isSupported {
+                        Button(hdr.isEnabled ? "HDR 끄기" : "HDR 켜기") {
+                            changes.request(DisplayChanges.hdrChange(display: display, enable: !hdr.isEnabled), targetDisplayID: display.id)
+                        }
+                        .disabled(changes.isBusy)
+                    }
+                }
+            }
+            LabeledContent("지원 EOTF", value: hdr.supportedEOTFs.isEmpty ? "EDID 미보고" : hdr.supportedEOTFs.joined(separator: ", "))
+            LabeledContent("최대 휘도", value: hdr.maxLuminance.map { String(format: "%.0f cd/m²", $0) } ?? "EDID 미보고")
+            LabeledContent("EDR 헤드룸", value: "현재 \(hdr.currentEDRHeadroom.map { String(format: "%.2f", $0) } ?? "미확인")배, 최대 \(hdr.maxEDRHeadroom.map { String(format: "%.2f", $0) } ?? "미확인")배")
+            if hdr.isSupported {
+                Text("HDR을 켜거나 끄면 시스템이 색 모드를 다시 선택. 높은 주사율에서 대역폭이 부족하면 HDR 상태의 형식은 YCbCr 4:2:2로 제한될 수 있음")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
@@ -133,6 +159,7 @@ struct ColorModeTab: View {
                     isCurrent: element.id == info.currentColorID,
                     needsDSC: timing?.requiresDSC(element.id) ?? false,
                     isUnsafe: timing?.unsafeColorElementIDs.contains(element.id) ?? false,
+                    isMismatched: store.hdrStatuses[display.id]?.isMismatched(with: element.eotf) ?? false,
                     isDisabled: changes.isBusy || !store.status(.signalWrite).isAvailable
                 ) {
                     apply(element, info: info)
@@ -144,6 +171,7 @@ struct ColorModeTab: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("목록은 현재 해상도와 주사율에서 연결이 제공하는 형식. 주사율을 낮추면 선택 가능한 형식이 늘어날 수 있음")
                 Text("해상도나 주사율 변경, 재연결 뒤에는 시스템이 색 모드를 선호값으로 되돌릴 수 있음")
+                Text("HDR 불일치 표시가 있는 형식은 현재 HDR 상태와 전달 함수가 달라 화면 이상 가능. HDR 전환을 먼저 권장")
                 if let reason = store.status(.signalWrite).unavailableReason { Text(reason) }
             }
             .font(.caption)
@@ -196,6 +224,7 @@ private struct ColorModeRow: View {
     let isCurrent: Bool
     let needsDSC: Bool
     let isUnsafe: Bool
+    let isMismatched: Bool
     let isDisabled: Bool
     let select: () -> Void
 
@@ -209,6 +238,7 @@ private struct ColorModeRow: View {
                     Badge(text: element.eotf.name, color: element.eotf.isHDR ? .purple : .gray)
                     if needsDSC { Badge(text: "DSC", color: .orange) }
                     if isUnsafe { Badge(text: "안전하지 않음", color: .red) }
+                    if isMismatched { Badge(text: "HDR 불일치", color: .red) }
                     if isCurrent { Badge(text: "현재", color: .accentColor) }
                 }
                 Text("색 공간 \(Colorimetry.name(element.colorimetry)), 픽셀당 \(ColorModeTab.trim(element.bitsPerPixel))비트, 색 모드 번호 \(element.id)")

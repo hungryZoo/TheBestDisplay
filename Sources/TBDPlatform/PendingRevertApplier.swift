@@ -12,6 +12,9 @@ public enum PendingRevertApplier {
             case .colorMode(let target, let color):
                 guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
                 try SignalService.setColorMode(matching: color, for: display)
+            case .hdr(let target, let enabled):
+                guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
+                try HDRService.setEnabled(enabled, on: display.id)
             }
         }
     }

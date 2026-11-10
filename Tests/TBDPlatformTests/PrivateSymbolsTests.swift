@@ -207,3 +207,33 @@ struct SignalServiceTests {
         }
     }
 }
+
+/// TC-HDR-001: HDR 상태 조회. 읽기 전용.
+@Suite("TC-HDR-001 HDR 상태 조회")
+struct HDRServiceTests {
+    @Test func 윈도우_서버와_시스템_설정_판정이_일치() throws {
+        let displays = DisplayCatalog.displays()
+        try #require(!displays.isEmpty)
+        let records = EDIDSource.records(for: displays)
+        for display in displays {
+            let edid = records.first { $0.displayID == display.id }?.parsed
+            let status = HDRService.status(for: display, edid: edid)
+            let bridge = try #require(MPDisplayBridge(display: display.id))
+            // 시스템 설정(MPDisplay)의 판정과 대조.
+            #expect(status.isSupported == bridge.bool("hasHDRModes"))
+            if status.isSupported {
+                #expect(status.isEnabled == bridge.bool("preferHDRModes"))
+                // HDR 지원 디스플레이는 EDID에 HDR 전달 함수 선언.
+                if edid != nil { #expect(!status.supportedEOTFs.isEmpty) }
+            } else {
+                #expect(!status.isEnabled)
+            }
+            let maxEDR = try #require(status.maxEDRHeadroom)
+            #expect(maxEDR >= 1)
+            // 신호의 전달 함수와 HDR 상태 일치 (외장 디스플레이).
+            if status.isSupported, let link = SignalService.linkData(for: display) {
+                #expect(link.eotf.isHDR == status.isEnabled)
+            }
+        }
+    }
+}

@@ -216,3 +216,32 @@ struct DSCAssessmentTests {
         #expect(DSCAssessment.assess(signal: empty, edidSupportsDSC: true, sourceSupportsDSC: nil).sinkSupportsDSC == true)
     }
 }
+
+@Suite("TC-HDR-001 HDR 상태 모델")
+struct HDRStatusTests {
+    func status(supported: Bool, enabled: Bool, maxEDR: Double? = 10) -> HDRStatus {
+        HDRStatus(displayID: 2, isSupported: supported, isEnabled: enabled, currentEDRHeadroom: 1, maxEDRHeadroom: maxEDR, supportedEOTFs: ["PQ (HDR10)"], maxLuminance: nil)
+    }
+
+    @Test func 상태_문구() {
+        #expect(status(supported: true, enabled: true).stateLabel == "켜짐")
+        #expect(status(supported: true, enabled: false).stateLabel == "꺼짐")
+        #expect(status(supported: false, enabled: false, maxEDR: 16).stateLabel == "전환 항목 없음 (EDR 상시 지원)")
+        #expect(status(supported: false, enabled: false, maxEDR: 1).stateLabel == "미지원")
+        #expect(status(supported: false, enabled: false, maxEDR: nil).stateLabel == "미지원")
+    }
+
+    @Test func 전달_함수와_HDR_상태_불일치_판정() {
+        #expect(status(supported: true, enabled: true).isMismatched(with: .sdr))
+        #expect(!status(supported: true, enabled: true).isMismatched(with: .pq))
+        #expect(status(supported: true, enabled: false).isMismatched(with: .hlg))
+        #expect(!status(supported: true, enabled: false).isMismatched(with: .sdr))
+        #expect(!status(supported: false, enabled: false).isMismatched(with: .sdr))
+    }
+
+    @Test func 켜기_끄기_값_해석() {
+        for text in ["on", "ON", "1", "true", "yes"] { #expect(Toggle.parse(text) == true) }
+        for text in ["off", "Off", "0", "false", "no"] { #expect(Toggle.parse(text) == false) }
+        #expect(Toggle.parse("toggle") == nil)
+    }
+}

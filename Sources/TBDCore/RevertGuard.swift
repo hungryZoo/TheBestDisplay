@@ -111,6 +111,7 @@ public struct DisplayRef: Codable, Hashable, Sendable {
 public enum RevertAction: Codable, Hashable, Sendable {
     case displayMode(target: DisplayRef, mode: ModeDescriptor)
     case colorMode(target: DisplayRef, color: ColorDescriptor)
+    case hdr(target: DisplayRef, enabled: Bool)
 }
 
 public struct PendingRevert: Codable, Hashable, Sendable {

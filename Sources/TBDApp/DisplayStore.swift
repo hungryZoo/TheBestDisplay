@@ -19,6 +19,7 @@ final class DisplayStore {
     /// 디스플레이 ID별 신호 상태와 DSC 판정.
     private(set) var signals: [UInt32: SignalInfo] = [:]
     private(set) var dscAssessments: [UInt32: DSCAssessment] = [:]
+    private(set) var hdrStatuses: [UInt32: HDRStatus] = [:]
     /// 온라인 목록이 바뀔 때 호출.
     @ObservationIgnored var onDisplaysChanged: (Set<UInt32>) -> Void = { _ in }
 
@@ -68,6 +69,7 @@ final class DisplayStore {
         }
         signals = signalMap
         dscAssessments = dscMap
+        hdrStatuses = Dictionary(uniqueKeysWithValues: snapshot.displays.map { ($0.id, HDRService.status(for: $0, edid: edidRecords[$0.id]?.parsed)) })
         refreshCount += 1
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))
     }

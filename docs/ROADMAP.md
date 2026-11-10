@@ -23,8 +23,8 @@
 | T02 | P1 | 패키지 골격, 비공개 심볼 로더, 디스플레이 목록, 창 앱 골격(사이드바, 탭), CLI 골격(`list`), 앱 번들 스크립트 | PRD-APP-001-005, PRD-INF-001, PRD-CLI-001, PRD-CLI-003 | TC-APP-001-004, TC-INF-001, TC-CLI-003 | 완료 |
 | T03 | P1 | EDID 파서, EDID 원본 획득, 개요 탭, `info` 명령 | PRD-INF-002-004 | TC-INF-002-005 | 완료 |
 | T04 | P2 | 자동 복귀 안전장치, 모드 열거와 전환, 해상도 탭, `modes`와 `set-mode` 명령 | PRD-MOD-001-006, PRD-SAF-001-002 | TC-MOD-001-004, TC-SAF-001-002, TC-APP-003 | 완료 |
-| T05 | P2 | 타이밍과 색 요소 해석, 현재 신호 조회, 색 모드 전환, DSC 판정, 색 모드 탭, `signal`과 `set-color` 명령 | PRD-COL-001-005 | TC-COL-001-005 | 완료 (SDR RGB 전환 실측은 HDR 전환과 함께 T06에서 수행) |
-| T06 | P2 | HDR 상태, 전환, 정보, `hdr` 명령 | PRD-HDR-001-003, PRD-CLI-002 | TC-HDR-001-002, TC-CLI-002 | 예정 |
+| T05 | P2 | 타이밍과 색 요소 해석, 현재 신호 조회, 색 모드 전환, DSC 판정, 색 모드 탭, `signal`과 `set-color` 명령 | PRD-COL-001-005 | TC-COL-001-005 | 완료 |
+| T06 | P2 | HDR 상태, 전환, 정보, `hdr` 명령 | PRD-HDR-001-003, PRD-CLI-002 | TC-HDR-001-002, TC-CLI-002 | 완료 (TC-CLI-002는 밝기 명령 추가 후 T10에서 마감) |
 | T07 | P3 | 링크 정보, 대역폭 계산, DPCD, HDMI 링크, 링크 탭, `link` 명령 | PRD-LNK-001-005 | TC-LNK-001-004 | 예정 |
 | T08 | P3 | 포트와 케이블 정보, 연결 경로, 연결 진단 화면, `ports` 명령 | PRD-PRT-001-003 | TC-PRT-001-002 | 예정 |
 | T09 | P3 | 진단 규칙 엔진, 이벤트 기록, 보고서 내보내기, `diagnose`와 `report` 명령 | PRD-DGN-001-006 | TC-DGN-001-005, TC-CLI-001 | 예정 |
