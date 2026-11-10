@@ -243,7 +243,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 53건 중 통과 47건, 미실행 4건, 보류 2건 (`docs/TC.md`) |
+| 검증 결과 | TC 70건 중 통과 60건, 미실행 7건, 보류 3건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 23행, 부분 22행, 미구현 13행 (`docs/COVERAGE.md`) |
 
 ### 제약
 
@@ -255,7 +256,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | EDID 오버라이드 | 외장 디스플레이 한정. 재시동하면 원본 EDID로 복귀. 디스플레이 저장 장치 쓰기는 미제공. 실제 디스플레이 대상 적용은 미검증 |
 | 사용자 정의 타이밍 | 가상 EDID에 상세 타이밍을 추가하는 방식. 시스템과 디스플레이의 수용 여부는 구성에 따라 다름. 실제 디스플레이 대상 적용은 미검증 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
-| 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드 (장비 없음) |
+| 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드와 DSC 전환 (장비 없음). 가상 EDID 적용, 사용자 정의 타이밍 적용, 사용자 정의 스케일 해상도 반영 (외장 디스플레이 재연결 필요) |
 | 모드 전환 경로 | SkyLight 직접 호출 경로는 독 경유 TV에서 미출력을 유발한 사례가 있어 기본 경로에서 제외 (`docs/adr/0005-mode-switch-path.md`) |
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
@@ -273,7 +274,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `Tests` | 단위 테스트와 통합 테스트, IORegistry와 EDID 픽스처 |
 | `docs` | 명세(MRD, PRD, SRS, TC), ADR, 조사 문서, 로드맵 |
 | `scripts` | 앱 번들 조립, 테스트 실행, 추적성 검사 |
-| `spikes` | Phase 0 선행 실험 코드 |
+| `spikes` | 선행 실험 코드 |
 
 ### 테스트
 
@@ -294,6 +295,7 @@ uv run scripts/trace_check.py
 - 요구사항 추적: MRD → PRD → SRS → TC. 검사 스크립트가 `docs/TRACEABILITY.md`를 다시 생성하고 누락이 있으면 실패
 - 결정 기록: `docs/adr/`, 작업 순서와 사용자 결정: `docs/ROADMAP.md`
 - 실측 기록: `docs/research/spikes.md`
+- 참고 제품 기능 대조표: `docs/COVERAGE.md`
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 
@@ -305,8 +307,10 @@ uv run scripts/trace_check.py
 - [x] P3 링크, 포트, 진단, 이벤트, 보고서
 - [x] P4 밝기, DDC, 색 조정, 배치
 - [x] P5 가상 디스플레이, HiDPI 스케일링, 프로파일
-- [ ] 외장 디스플레이 재연결 후 실측: 회전, 언더스캔, HiDPI 스케일링, DDC 미응답 탐지
-- [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드
+- [x] P6 DSC 전환, EDID 오버라이드, 사용자 정의 타이밍, 사용자 정의 스케일 해상도, XDR 밝기 업스케일, 주사율 측정, 구성 보호
+- [ ] 외장 디스플레이 재연결 후 실측: 회전, 언더스캔, HiDPI 스케일링, DDC 미응답 탐지, 가상 EDID 적용, 사용자 정의 타이밍 적용, 사용자 정의 스케일 해상도 반영
+- [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환
+- [ ] 미구현 기능 13행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 
