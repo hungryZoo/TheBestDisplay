@@ -67,7 +67,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
 | HDR | 지원 여부, 켜기와 끄기, 지원 EOTF, EDR 헤드룸 |
 | 링크 | 링크 속도, 레인 수, 터널링, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD, 링크 훈련 결과 |
-| 포트와 케이블 | 포트별 지원 전송, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로 |
+| 포트와 케이블 | 포트별 지원 전송, 플러그 방향, PHY 레인, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로, 전원 어댑터 |
 | 진단 | 포트별 화면 출력 점검 6단계, 발견 항목(근거와 조치), 이벤트 기록, 진단 보고서 내보내기 |
 | 밝기와 DDC | 시스템 밝기, DDC 밝기, 소프트웨어 디밍, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
 | 색 조정 | 디스플레이 프리셋(기준 모드), 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
@@ -172,7 +172,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 |
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl link <디스플레이>` | 링크 정보, 대역폭, DPCD |
-| `tbdctl ports` | 포트, 케이블, 독, 연결 경로 |
+| `tbdctl ports` | 포트, PHY 레인, 케이블, 독, 연결 경로, 전원 어댑터 |
 | `tbdctl diagnose` | 포트 점검과 발견 항목 |
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정 |

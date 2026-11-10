@@ -43,6 +43,8 @@ public struct PortInfo: Codable, Hashable, Sendable, Identifiable {
     public var plugEventCount: Int?
     public var connectionCount: Int?
     public var overcurrentCount: Int?
+    /// 플러그 방향 원시 값. 연결이 없으면 0, 연결 시 1 또는 2 (실측: 연결된 포트에서 2). 없는 포트 종류는 nil. (PRD-PRT-004)
+    public var plugOrientation: Int?
 
     public var id: String { portDescription }
     public var supportsDisplay: Bool { transportsSupported.contains("DisplayPort") }
@@ -63,7 +65,8 @@ public struct PortInfo: Codable, Hashable, Sendable, Identifiable {
             partnerManufacturer: manufacturer?.isEmpty == false ? manufacturer : nil,
             plugEventCount: intValue(node, "Plug Event Count"),
             connectionCount: intValue(node, "ConnectionCount"),
-            overcurrentCount: intValue(node, "Overcurrent Count")
+            overcurrentCount: intValue(node, "Overcurrent Count"),
+            plugOrientation: intValue(node, "PlugOrientation")
         )
     }
 }
@@ -207,13 +210,17 @@ public struct PortInventory: Codable, Hashable, Sendable {
     public var cioStates: [CIOState]
     public var usbStates: [USBState]
     public var cables: [CableEMarker]
+    public var phys: [PhyInfo]
+    public var powerAdapter: PowerAdapterInfo?
 
-    public init(ports: [PortInfo], dpStates: [DPTransportState], cioStates: [CIOState], usbStates: [USBState], cables: [CableEMarker]) {
+    public init(ports: [PortInfo], dpStates: [DPTransportState], cioStates: [CIOState], usbStates: [USBState], cables: [CableEMarker], phys: [PhyInfo] = [], powerAdapter: PowerAdapterInfo? = nil) {
         self.ports = ports
         self.dpStates = dpStates
         self.cioStates = cioStates
         self.usbStates = usbStates
         self.cables = cables
+        self.phys = phys
+        self.powerAdapter = powerAdapter
     }
 
     /// 클래스 이름별 노드 속성 사전에서 구성. 포트 컨트롤러 클래스는 칩 세대에 따라 다르므로 `PortTypeDescription`이 있는 노드를 전부 포트로 취급.
@@ -231,9 +238,17 @@ public struct PortInventory: Codable, Hashable, Sendable {
             dpStates: (nodesByClass["IOPortTransportStateDisplayPort"] ?? []).compactMap(DPTransportState.decode),
             cioStates: (nodesByClass["IOPortTransportStateCIO"] ?? []).compactMap(CIOState.decode),
             usbStates: ((nodesByClass["IOPortTransportStateUSB2"] ?? []) + (nodesByClass["IOPortTransportStateUSB3"] ?? [])).compactMap(USBState.decode),
-            cables: (nodesByClass["IOPortTransportComponentCCUSBPDSOPp"] ?? []).compactMap(CableEMarker.decode)
+            cables: (nodesByClass["IOPortTransportComponentCCUSBPDSOPp"] ?? []).compactMap(CableEMarker.decode),
+            // PHY 노드의 클래스 이름은 칩마다 달라 접미사로 판별.
+            phys: nodesByClass.filter { $0.key.hasSuffix(Self.phyClassSuffix) }.flatMap(\.value).compactMap(PhyInfo.decode).sorted { $0.id < $1.id },
+            powerAdapter: nodesByClass[Self.batteryClass]?.first.map(PowerAdapterInfo.decode)
         )
     }
+
+    public static let phyClassSuffix = "TypeCPhy"
+    /// PHY 노드를 찾는 속성 이름.
+    public static let phyPropertyKey = "AppleTypeCPhyID"
+    public static let batteryClass = "AppleSmartBattery"
 
     public static let relevantClasses = [
         "AppleHPMInterfaceType10", "AppleHPMInterfaceType11", "AppleHPMInterfaceType12", "AppleHPMInterfaceType18",
@@ -243,9 +258,127 @@ public struct PortInventory: Codable, Hashable, Sendable {
     ]
 }
 
+/// USB-C 포트의 PHY 상태: 고속 레인별 전송 방식, USB2 선, DisplayPort 터널과 픽셀 클록 링크 속도. (PRD-PRT-004)
+/// 노드 클래스는 칩에 따라 다름 (예: `AppleT8132TypeCPhy`). 속성 `AppleTypeCPhyID`가 있는 노드를 대상으로 함.
+public struct PhyInfo: Codable, Hashable, Sendable, Identifiable {
+    public struct Lane: Codable, Hashable, Sendable {
+        public var name: String
+        public var transport: String?
+        public var client: String?
+        public var powerLevel: String?
+    }
+
+    public struct Link: Codable, Hashable, Sendable {
+        public var name: String
+        public var linkRate: String?
+        public var clients: [String]
+    }
+
+    public var id: Int
+    public var lanes: [Lane]
+    public var usb2: Lane?
+    public var dpTunnels: [Link]
+    public var dpPixelClocks: [Link]
+
+    /// 대응하는 USB-C 포트 번호. PHY 번호 + 1 (실측: PHY 3이 USB-C 4번 포트).
+    public var portNumber: Int { id + 1 }
+    public var isActive: Bool { lanes.contains { $0.transport != nil } || usb2?.transport != nil || !dpTunnels.isEmpty }
+
+    static func lane(_ name: String, _ value: Any?) -> Lane? {
+        guard let dict = value as? [String: Any] else { return nil }
+        return Lane(name: name, transport: dict["Transport"] as? String, client: dict["Client"] as? String, powerLevel: dict["Power Level"] as? String)
+    }
+
+    static func links(_ value: Any?) -> [Link] {
+        guard let dict = value as? [String: Any] else { return [] }
+        return dict.keys.sorted().compactMap { key in
+            guard let entry = dict[key] as? [String: Any] else { return nil }
+            let clients = (entry["Clients"] as? [String]) ?? (entry["Client"] as? String).map { [$0] } ?? []
+            return Link(name: key, linkRate: entry["Link Rate"] as? String, clients: clients)
+        }
+    }
+
+    public static func decode(_ node: [String: Any]) -> PhyInfo? {
+        guard let id = intValue(node, "AppleTypeCPhyID") else { return nil }
+        let laneDict = node["AppleTypeCPhyLane"] as? [String: Any] ?? [:]
+        return PhyInfo(
+            id: id,
+            lanes: laneDict.keys.sorted().compactMap { lane($0, laneDict[$0]) },
+            usb2: lane("USB2", node["AppleTypeCPhyUSB2"]).flatMap { $0.transport == nil && $0.client == nil ? nil : $0 },
+            dpTunnels: links(node["AppleTypeCPhyDisplayPortTunnel"]),
+            dpPixelClocks: links(node["AppleTypeCPhyDisplayPortPclk"])
+        )
+    }
+
+    /// 예: "레인 0 CIO, 레인 1 CIO, USB2 사용, DP 터널 8.10Gbps/lane (HBR3)"
+    public var summary: String {
+        var parts = lanes.map { "\($0.name.replacingOccurrences(of: "Lane", with: "레인")) \($0.transport ?? "미사용")" }
+        if usb2?.transport != nil { parts.append("USB2 사용") }
+        for tunnel in dpTunnels { parts.append("DP 터널 \(tunnel.linkRate ?? "속도 미확인")") }
+        if dpTunnels.isEmpty { for clock in dpPixelClocks { parts.append("DP \(clock.linkRate ?? "속도 미확인")") } }
+        return parts.joined(separator: ", ")
+    }
+}
+
+/// 전원 어댑터 정보. `AppleSmartBattery` 노드의 `AdapterDetails`에서 구성. (PRD-PRT-005)
+public struct PowerAdapterInfo: Codable, Hashable, Sendable {
+    public struct Option: Codable, Hashable, Sendable {
+        public var voltage: Double
+        public var current: Double
+        public var watts: Double { voltage * current }
+    }
+
+    public var isConnected: Bool
+    public var watts: Int?
+    /// 협상 전압 (V)과 전류 (A).
+    public var voltage: Double?
+    public var current: Double?
+    public var name: String?
+    public var manufacturer: String?
+    public var isWireless: Bool
+    /// 어댑터가 제시한 전압과 전류 조합 (USB-PD 전원 옵션).
+    public var options: [Option]
+
+    /// `node`는 `AppleSmartBattery` 노드의 속성 사전. 전압은 mV, 전류는 mA 단위.
+    public static func decode(_ node: [String: Any]) -> PowerAdapterInfo {
+        let details = node["AdapterDetails"] as? [String: Any] ?? [:]
+        let menu = details["UsbHvcMenu"] as? [[String: Any]] ?? []
+        let options = menu.compactMap { item -> Option? in
+            guard let v = intValue(item, "MaxVoltage"), let a = intValue(item, "MaxCurrent"), v > 0 else { return nil }
+            return Option(voltage: Double(v) / 1000, current: Double(a) / 1000)
+        }
+        let watts = intValue(details, "Watts")
+        return PowerAdapterInfo(
+            isConnected: boolValue(node, "ExternalConnected") ?? (watts != nil),
+            watts: watts,
+            voltage: intValue(details, "AdapterVoltage").map { Double($0) / 1000 },
+            current: intValue(details, "Current").map { Double($0) / 1000 },
+            name: (details["Name"] as? String) ?? (details["Description"] as? String),
+            manufacturer: details["Manufacturer"] as? String,
+            isWireless: boolValue(details, "IsWireless") ?? false,
+            options: options
+        )
+    }
+
+    /// 예: "96 W (20.0 V, 4.80 A), 96W USB-C Power Adapter, 전원 옵션 5 V 3 A, 9 V 3 A"
+    public var summary: String {
+        guard isConnected else { return "연결 없음" }
+        var parts: [String] = []
+        if let watts { parts.append("\(watts) W") }
+        if let voltage, let current, voltage > 0 { parts.append(String(format: "협상 %.1f V, %.2f A", voltage, current)) }
+        if let name, !name.isEmpty { parts.append(name) }
+        if let manufacturer, !manufacturer.isEmpty { parts.append(manufacturer) }
+        if isWireless { parts.append("무선") }
+        if !options.isEmpty {
+            parts.append("전원 옵션 " + options.map { String(format: "%g V %g A", $0.voltage, $0.current) }.joined(separator: ", "))
+        }
+        return parts.isEmpty ? "연결됨 (세부 정보 없음)" : parts.joined(separator: ", ")
+    }
+}
+
 /// 연결 경로의 한 단계. (PRD-PRT-003)
 public struct PathStep: Codable, Hashable, Sendable, Identifiable {
-    public enum Kind: String, Codable, Sendable { case port, cable, dock, link, display }
+    public enum Kind: String, Codable, Sendable { case port, phy, cable, dock, link, display }
     public enum Status: String, Codable, Sendable {
         /// 정상.
         case ok
@@ -282,7 +415,7 @@ public struct ConnectionPath: Codable, Hashable, Sendable, Identifiable {
 
     /// 한 줄 요약. 예: "USB-C 4번 → Parade Technologies PS9010 → HBR3 x 4 → LG TV SSCR2"
     public var summary: String {
-        steps.filter { $0.status != .unknown || $0.kind == .port }.map(\.title).joined(separator: " → ")
+        steps.filter { ($0.status != .unknown || $0.kind == .port) && $0.kind != .phy }.map(\.title).joined(separator: " → ")
     }
 }
 
@@ -304,12 +437,12 @@ public enum ConnectionPathBuilder {
             return ConnectionPath(
                 port: port, cable: cable, cio: cio, usb: usb, dp: dp,
                 displayID: display?.id, displayName: display?.identity.name,
-                steps: steps(port: port, cable: cable, cio: cio, usb: usb, dp: dp, display: display)
+                steps: steps(port: port, cable: cable, cio: cio, usb: usb, dp: dp, display: display, phy: port.key.type == "USB-C" ? inventory.phys.first { $0.portNumber == port.key.number } : nil)
             )
         }
     }
 
-    static func steps(port: PortInfo, cable: CableEMarker?, cio: CIOState?, usb: [USBState], dp: DPTransportState?, display: DisplaySummary?) -> [PathStep] {
+    static func steps(port: PortInfo, cable: CableEMarker?, cio: CIOState?, usb: [USBState], dp: DPTransportState?, display: DisplaySummary?, phy: PhyInfo? = nil) -> [PathStep] {
         var result: [PathStep] = []
         let connected = port.connectionActive || port.hpdAsserted == true || dp?.hpdAsserted == true
 
@@ -317,8 +450,14 @@ public enum ConnectionPathBuilder {
         var portDetail = connected ? "연결 감지" : "연결 없음"
         if !port.transportsActive.isEmpty { portDetail += ", 활성 전송: \(port.transportsActive.joined(separator: ", "))" }
         if !port.supportsDisplay { portDetail += ", 영상 출력 미지원 포트" }
+        if let orientation = port.plugOrientation, orientation != 0 { portDetail += ", 플러그 방향 \(orientation)" }
         result.append(.init(kind: .port, title: port.key.label, detail: portDetail, status: connected ? .ok : .unknown))
         guard connected else { return result }
+
+        // PHY: 고속 레인의 전송 방식.
+        if let phy, phy.isActive {
+            result.append(.init(kind: .phy, title: "PHY \(phy.id)", detail: phy.summary, status: .ok))
+        }
 
         // (2) 케이블
         if let cable {

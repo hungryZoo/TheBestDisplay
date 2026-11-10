@@ -16,6 +16,19 @@ public enum IORegistry {
     }
 
     /// 서비스마다 본문을 실행하고 서비스 해제.
+    /// 지정한 속성이 있는 서비스 전체. 클래스 이름이 기기마다 다른 노드를 찾을 때 사용.
+    public static func services(havingProperty key: String) -> [io_service_t] {
+        var iterator: io_iterator_t = 0
+        let matching = ["IOPropertyExistsMatch": key] as CFDictionary
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return [] }
+        defer { IOObjectRelease(iterator) }
+        var result: [io_service_t] = []
+        while case let service = IOIteratorNext(iterator), service != 0 {
+            result.append(service)
+        }
+        return result
+    }
+
     public static func forEachService<T>(matching className: String, _ body: (io_service_t) -> T?) -> [T] {
         let list = services(matching: className)
         defer { list.forEach { IOObjectRelease($0) } }

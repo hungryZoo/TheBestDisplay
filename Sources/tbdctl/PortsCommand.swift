@@ -34,4 +34,5 @@ func runPorts(_ command: ParsedCommand, json: Bool) {
         }
         if path.isConnected { print("  경로: \(path.summary)") }
     }
+    if let adapter = inventory.powerAdapter { print("전원 어댑터: \(adapter.summary)") }
 }

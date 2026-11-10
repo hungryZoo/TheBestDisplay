@@ -55,6 +55,11 @@ struct DiagnosticsView: View {
             ForEach(store.connectionPaths) { path in
                 PortPathCard(path: path, diagnosis: store.diagnosis.portDiagnoses.first { $0.port == path.port.key })
             }
+            if let adapter = store.powerAdapter {
+                Label("전원 어댑터: \(adapter.summary)", systemImage: "powerplug")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
@@ -229,6 +234,7 @@ private struct PortPathCard: View {
     static func kindName(_ kind: PathStep.Kind) -> String {
         switch kind {
         case .port: "포트"
+        case .phy: "PHY 레인"
         case .cable: "케이블"
         case .dock: "독, 허브"
         case .link: "영상 링크"

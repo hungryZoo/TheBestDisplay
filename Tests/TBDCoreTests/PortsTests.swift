@@ -5,7 +5,8 @@ import Testing
 extension RegistryFixture {
     static func inventory(_ folder: String) throws -> PortInventory {
         var nodes: [String: [[String: Any]]] = [:]
-        for className in PortInventory.relevantClasses {
+        // PHY 노드는 칩별 클래스 이름으로 저장한 픽스처 사용.
+        for className in PortInventory.relevantClasses + ["AppleT8132TypeCPhy"] {
             // 픽스처에 없는 클래스(이 기기에 없는 노드)는 건너뜀.
             guard let url = Bundle.module.url(forResource: "\(folder)/\(className).plist", withExtension: nil, subdirectory: "Fixtures") else { continue }
             let data = try Data(contentsOf: url)
@@ -109,10 +110,13 @@ struct ConnectionPathTests {
         let path = try #require(reaching.first)
         #expect(path.port.key == PortKey(type: "USB-C", number: 4))
         #expect(path.displayID == 2)
-        #expect(path.steps.map(\.kind) == [.port, .cable, .dock, .link, .display])
+        #expect(path.steps.map(\.kind) == [.port, .phy, .cable, .dock, .link, .display])
         #expect(path.steps.allSatisfy { $0.status == .ok })
+        #expect(path.steps[0].detail.contains("플러그 방향 2"))
+        #expect(path.steps[1].title == "PHY 3")
+        #expect(path.steps[1].detail == "레인 0 CIO, 레인 1 CIO, USB2 사용, DP 터널 8.10Gbps/lane (HBR3)")
         #expect(path.summary == "USB-C 4번 → 케이블 → Parade Technologies PS9010 → HBR3 x 4 → LG TV SSCR2")
-        #expect(path.steps[3].detail.contains("터널링"))
+        #expect(path.steps[4].detail.contains("터널링"))
 
         // 빈 포트는 포트 단계만.
         let empty = try #require(paths.first { $0.port.key == PortKey(type: "USB-C", number: 1) })
@@ -130,7 +134,7 @@ struct ConnectionPathTests {
         let path = try #require(paths.first { $0.port.key == PortKey(type: "USB-C", number: 4) })
         #expect(path.isConnected)
         #expect(!path.reachesDisplay)
-        #expect(path.steps.map(\.kind) == [.port, .cable, .dock, .link])
+        #expect(path.steps.map(\.kind) == [.port, .phy, .cable, .dock, .link])
         let link = try #require(path.steps.last)
         #expect(link.status == .broken)
         #expect(link.title == "링크 없음")
