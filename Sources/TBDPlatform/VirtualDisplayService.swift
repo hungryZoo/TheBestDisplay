@@ -108,10 +108,20 @@ public final class VirtualDisplayService: @unchecked Sendable {
                 if config.hiDPI { selectHiDPIMode(config, displayID: displayID) }
                 return displayID
             }
-            usleep(100_000)
+            Self.pause(0.1)
         }
         destroy(config.id)
         throw DisplayChangeError.system(operation: "가상 디스플레이 온라인 대기", code: -1)
+    }
+
+    /// 대기. 창 앱의 메인 스레드에서는 런 루프를 돌려야 새 디스플레이가 프로세스의 온라인 목록에 반영됨
+    /// (T39 실측: 메인 스레드를 막고 기다리면 다른 프로세스에는 보이는 가상 디스플레이가 앱 안에서는 온라인으로 잡히지 않음).
+    static func pause(_ seconds: TimeInterval) {
+        if Thread.isMainThread {
+            RunLoop.current.run(until: Date().addingTimeInterval(seconds))
+        } else {
+            usleep(useconds_t(seconds * 1_000_000))
+        }
     }
 
     /// 생성 직후의 가상 디스플레이를 HiDPI 모드로 맞춤. 판정은 윈도우 서버의 현재 모드 기준.
@@ -123,7 +133,7 @@ public final class VirtualDisplayService: @unchecked Sendable {
                 if ModeService.currentModeNumber(for: displayID) == target.modeNumber { return }
                 _ = try? ModeService.setMode(target, on: displayID, permanently: true)
             }
-            usleep(100_000)
+            Self.pause(0.1)
         }
     }
 

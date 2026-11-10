@@ -240,6 +240,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 
 - 가상 디스플레이, HiDPI 스케일링, 소프트웨어 디밍, 소프트웨어 색 조정, XDR 밝기 업스케일은 앱 실행 중에만 유지
 - 가상 EDID는 재시동 전까지 유지
+- HiDPI 스케일링 중에는 대상 디스플레이의 HDR이 꺼짐 (LG TV 실측: RGB 8 bpc SDR 송출)
 - 모드, 색 프로파일, HDR, 회전, 배치는 시스템이 저장하므로 앱을 종료해도 유지
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
@@ -252,7 +253,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 91건 중 통과 84건, 미실행 2건, 보류 5건 (`docs/TC.md`) |
+| 검증 결과 | TC 91건 중 통과 85건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
 | 참고 제품 기능 대조 | 58행 중 구현 33행, 부분 20행, 미구현 5행 (`docs/COVERAGE.md`) |
 
 ### 제약
@@ -265,7 +266,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | EDID 오버라이드 | 외장 디스플레이 한정. 재시동하면 원본 EDID로 복귀. 디스플레이 저장 장치 쓰기는 미제공. 독 경유 LG TV에서 적용과 복귀 확인 |
 | 사용자 정의 타이밍 | 가상 EDID에 상세 타이밍을 추가하는 방식. 시스템과 디스플레이의 수용 여부는 구성에 따라 다름. 독 경유 LG TV에서 2560x1440 100 Hz 추가 확인 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
-| 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드와 DSC 전환, 언더스캔 변경 (장비 없음). 실제 외장 디스플레이 대상 HiDPI 스케일링, 사용자 정의 스케일 해상도 반영 (사용자 조작 필요) |
+| 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드와 DSC 전환, 언더스캔 변경 (장비 없음). 사용자 정의 스케일 해상도 반영 (관리자 인증 필요) |
 | 모드 전환 경로 | SkyLight 직접 호출 경로는 독 경유 TV에서 미출력을 유발한 사례가 있어 기본 경로에서 제외 (`docs/adr/0005-mode-switch-path.md`) |
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
@@ -318,7 +319,8 @@ uv run scripts/trace_check.py
 - [x] P5 가상 디스플레이, HiDPI 스케일링, 프로파일
 - [x] P6 DSC 전환, EDID 오버라이드, 사용자 정의 타이밍, 사용자 정의 스케일 해상도, XDR 밝기 업스케일, 주사율 측정, 구성 보호, 디스플레이 프리셋, 즐겨찾기와 슬라이더, 밝기 동기화, 포트 부가 정보, 타이밍 직접 선택, HDCP 능력 표시, 16방향 정렬, DDC capabilities 해석, notch 모드 전환
 - [x] 외장 디스플레이 실측: 회전, DDC 미응답 탐지, 가상 EDID 적용, 사용자 정의 타이밍 적용, 타이밍 직접 선택
-- [ ] 사용자 조작이 필요한 실측: 실제 외장 디스플레이 대상 HiDPI 스케일링, 사용자 정의 스케일 해상도 반영(관리자 인증)
+- [x] 실제 외장 디스플레이 대상 HiDPI 스케일링 실측
+- [ ] 사용자 조작이 필요한 실측: 사용자 정의 스케일 해상도 반영(관리자 인증)
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
 - [ ] 미구현 기능 5행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
 

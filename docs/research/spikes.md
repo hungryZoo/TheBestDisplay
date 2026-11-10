@@ -179,3 +179,5 @@
 | T37 | `IOMobileFramebufferSetDigitalOutMode`에 다른 타이밍 ID(60, 3840x2160 59.94 Hz)를 주면 링크가 그 타이밍으로 전환 (링크 데이터 59.94 Hz, 593.41 MHz). 디스플레이 온라인 유지. 윈도우 서버의 현재 모드 표기는 120 Hz로 남음 |
 | T37 | `MPDisplay setOrientation:`으로 LG TV 90도 회전과 복귀 확인. LG TV의 `supportsUnderscan`은 거짓 |
 | T38 | LG TV(독 경유)에서 `IOAVServiceReadI2C` 칩 주소 0x50으로 EDID 384바이트 전체 읽기 성공 (오프셋 256의 셋째 블록 포함). 시스템 제공 EDID(`IOAVServiceCopyEDID`)와 전 바이트 일치, 일련번호 바이트 포함. DDC/CI(칩 주소 0x37)는 같은 경로에서 응답 없음 |
+| T39 | 창 앱의 메인 스레드에서 `usleep`으로 기다리면 새 가상 디스플레이가 다른 프로세스에는 온라인으로 보여도 앱 안의 온라인 목록에는 나타나지 않음. 메인 스레드에서는 런 루프를 돌리며 기다리도록 수정 뒤 정상 |
+| T39 | LG TV 대상 HiDPI 스케일링 2560x1440: 가상 디스플레이(백킹 5120x2880)가 메인, TV가 미러 대상. 스케일링 중 TV 송출은 3840x2160 120 Hz, RGB 4:4:4 8 bpc SDR로 바뀌며 HDR은 꺼짐. 해제 뒤 YCbCr 4:2:2 12 bpc PQ와 HDR 켜짐으로 복귀 |
