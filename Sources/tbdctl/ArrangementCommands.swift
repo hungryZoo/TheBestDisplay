@@ -151,3 +151,26 @@ func runReconnect(_ command: ParsedCommand) {
     }
     if failed { exit(.failure) }
 }
+
+/// `tbdctl align <디스플레이> <기준 디스플레이> <위치>` (PRD-ARR-007)
+/// 위치: left|right|top|bottom에 -top|-center|-bottom 또는 -left|-center|-right, 모서리는 corner-top-left 등.
+func runAlign(_ command: ParsedCommand) {
+    let (display, displays) = resolveDisplay(command.positionals[0])
+    let (reference, _) = resolveDisplay(command.positionals[1])
+    guard let position = AlignmentPosition.parse(command.positionals[2]) else {
+        writeError("오류: 위치는 \(AlignmentPosition.allCases.map(\.rawValue).joined(separator: ", ")) 중 하나 (left, right, top, bottom은 가운데 맞춤)")
+        exit(.usage)
+    }
+    guard display.id != reference.id else {
+        writeError("오류: 대상과 기준이 같은 디스플레이")
+        exit(.unsupported)
+    }
+    let origin = ArrangementPlanner.alignedOrigin(target: DisplayFrame(display), reference: DisplayFrame(reference), position: position)
+    do {
+        let applied = try ArrangementService.move(display.id, toX: origin.x, y: origin.y, displays: displays)
+        print("정렬: \(display.identity.name)을(를) \(reference.identity.name)의 \(position.title) 위치로 이동 (\(applied.x), \(applied.y))" + (applied.x != origin.x || applied.y != origin.y ? " (계산값 (\(origin.x), \(origin.y))에서 보정)" : ""))
+    } catch {
+        writeError("오류: \(RevertCoordinatorDescribe(error))")
+        exit(.failure)
+    }
+}

@@ -14,6 +14,8 @@ struct ArrangementTab: View {
     @State private var dragOffset: CGSize = .zero
     @State private var underscan: ArrangementService.Underscan?
     @State private var canRotate = false
+    @State private var alignReference: UInt32?
+    @State private var alignPosition: AlignmentPosition = .rightCenter
 
     var body: some View {
         Form {
@@ -28,6 +30,26 @@ struct ArrangementTab: View {
                 .disabled(!canRotate || changes.isBusy)
                 if !canRotate {
                     Text(display.identity.isBuiltin ? "내장 디스플레이는 회전 대상에서 제외" : "이 디스플레이는 회전을 지원하지 않음").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            if store.displays.count > 1 {
+                Section("기준 디스플레이 대비 정렬") {
+                    let others = store.displays.filter { $0.id != display.id && $0.mirrorsDisplayID == nil }
+                    HStack {
+                        Picker("기준", selection: $alignReference) {
+                            Text("선택").tag(UInt32?.none)
+                            ForEach(others) { Text($0.identity.name).tag(UInt32?.some($0.id)) }
+                        }
+                        Picker("위치", selection: $alignPosition) {
+                            ForEach(AlignmentPosition.allCases, id: \.self) { Text($0.title).tag($0) }
+                        }
+                        Button("정렬") {
+                            guard let reference = others.first(where: { $0.id == alignReference }) else { return }
+                            let origin = ArrangementPlanner.alignedOrigin(target: DisplayFrame(display), reference: DisplayFrame(reference), position: alignPosition)
+                            perform { try ArrangementService.move(display.id, toX: origin.x, y: origin.y, displays: store.displays) }
+                        }
+                        .disabled(alignReference == nil || display.mirrorsDisplayID != nil)
+                    }
                 }
             }
             Section("메인 디스플레이와 미러") {
