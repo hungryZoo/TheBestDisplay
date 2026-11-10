@@ -32,6 +32,8 @@ struct ColorModeTab: View {
 
     @State private var rangeFilter: RangeFilter = .all
     @State private var dscFilter: DSCFilter = .all
+    @State private var dither: Bool?
+    @State private var ditherMessage: String?
 
     var body: some View {
         if let info = store.signals[display.id] {
@@ -43,6 +45,7 @@ struct ColorModeTab: View {
                 timings(info)
             }
             .formStyle(.grouped)
+            .task(id: display.id) { dither = DitherService.isEnabled(for: display) }
         } else {
             ContentUnavailableView("신호 정보를 읽을 수 없음", systemImage: "waveform.slash", description: Text("이 디스플레이의 프레임버퍼 노드를 찾지 못함"))
         }
@@ -75,6 +78,20 @@ struct ColorModeTab: View {
                 Text("현재 색 모드를 확인할 수 없음").foregroundStyle(.secondary)
             }
             LabeledContent("전송 방식", value: info.transport ?? "미확인")
+            if let dither {
+                Toggle("GPU 디더링", isOn: Binding(get: { dither }, set: { value in
+                    do {
+                        try DitherService.setEnabled(value, for: display)
+                        ditherMessage = nil
+                    } catch {
+                        ditherMessage = RevertCoordinator.describe(error)
+                    }
+                    self.dither = DitherService.isEnabled(for: display)
+                }))
+                Text(ditherMessage ?? "출력 비트 심도보다 높은 계조를 시간 축으로 섞어 표현하는 처리. 끄면 깜박임에 민감한 경우 도움이 되며 계조 띠가 보일 수 있음. 재시동 또는 재연결 시 기본값으로 복귀")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 

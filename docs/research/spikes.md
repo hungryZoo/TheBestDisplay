@@ -181,3 +181,5 @@
 | T38 | LG TV(독 경유)에서 `IOAVServiceReadI2C` 칩 주소 0x50으로 EDID 384바이트 전체 읽기 성공 (오프셋 256의 셋째 블록 포함). 시스템 제공 EDID(`IOAVServiceCopyEDID`)와 전 바이트 일치, 일련번호 바이트 포함. DDC/CI(칩 주소 0x37)는 같은 경로에서 응답 없음 |
 | T39 | 창 앱의 메인 스레드에서 `usleep`으로 기다리면 새 가상 디스플레이가 다른 프로세스에는 온라인으로 보여도 앱 안의 온라인 목록에는 나타나지 않음. 메인 스레드에서는 런 루프를 돌리며 기다리도록 수정 뒤 정상 |
 | T39 | LG TV 대상 HiDPI 스케일링 2560x1440: 가상 디스플레이(백킹 5120x2880)가 메인, TV가 미러 대상. 스케일링 중 TV 송출은 3840x2160 120 Hz, RGB 4:4:4 8 bpc SDR로 바뀌며 HDR은 꺼짐. 해제 뒤 YCbCr 4:2:2 12 bpc PQ와 HDR 켜짐으로 복귀 |
+| T41 | 프레임버퍼 노드(`IOMobileFramebufferShim`)의 `enableDither` 속성: 내장 Yes, 12 bpc 송출 중인 LG TV No, 빈 노드 Yes. 비권한 프로세스의 `IORegistryEntrySetCFProperty`로 내장 노드 값을 No로 바꾼 뒤 다시 Yes로 복원 확인. `IOMobileFramebufferEnableDisableDithering`은 내부 함수 표로 바로 분기해 인자 구성을 확정하지 못해 사용하지 않음 |
+| T40 | `SLSConfigureDisplayEnabled`로 LG TV가 온라인인 상태에서 내장 디스플레이 해제와 재연결 확인 (재연결은 7초 안) |

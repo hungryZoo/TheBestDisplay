@@ -22,6 +22,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "set-color", summary: "색 모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "색 모드"], valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "dsc", summary: "DSC 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "set-timing", summary: "연결 수준 타이밍 직접 선택 (자동 복귀 적용)", positionals: ["디스플레이", "타이밍"], valueOptions: ["--timeout"], flags: ["--yes"]),
+    CommandSpec(name: "dither", summary: "GPU 디더링 조회와 전환", positionals: ["디스플레이", "on|off"], optionalPositionals: 1),
     CommandSpec(name: "hdr", summary: "HDR 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "brightness", summary: "밝기 조회와 설정 (0-100)", positionals: ["디스플레이", "값"], optionalPositionals: 1),
     CommandSpec(name: "preset", summary: "디스플레이 프리셋 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "번호 또는 이름"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
@@ -175,6 +176,9 @@ case "dsc":
 
 case "set-timing":
     runSetTiming(command)
+
+case "dither":
+    runDither(command, json: json)
 
 case "hdr":
     runHDR(command, json: json)

@@ -165,6 +165,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환 |
 | `tbdctl set-timing <디스플레이> <타이밍> [--timeout <초>] [--yes]` | 연결 수준 타이밍 직접 선택 (`id:<번호>` 또는 `<폭>x<높이>@<주사율>`) |
+| `tbdctl dither <디스플레이> [on\|off]` | GPU 디더링 조회와 전환 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 조회와 전환 |
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 조회와 전환 |
 | `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약 |
@@ -255,8 +256,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 93건 중 통과 87건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 34행, 부분 20행, 미구현 4행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 94건 중 통과 88건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 35행, 부분 20행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 
@@ -324,7 +325,7 @@ uv run scripts/trace_check.py
 - [x] 실제 외장 디스플레이 대상 HiDPI 스케일링 실측
 - [ ] 사용자 조작이 필요한 실측: 사용자 정의 스케일 해상도 반영(관리자 인증)
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
-- [ ] 미구현 기능 4행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
+- [ ] 미구현 기능 3행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 

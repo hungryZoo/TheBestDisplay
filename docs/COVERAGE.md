@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 34행, 부분 20행, 미구현 4행
+- 집계: 구현 35행, 부분 20행, 미구현 3행
 
 ## 1. 대조표
 
@@ -27,7 +27,7 @@
 | 16 | 색 모드 | RGB 또는 YCbCr, chroma, range, 비트 심도, EOTF 조합 목록과 선택 | 구현 | PRD-COL-002, PRD-COL-003 |  |
 | 17 | 색 모드 | 선호 모드와 현재 모드 구분 표시, 심도 불일치 안내 | 부분 | PRD-COL-001, PRD-HDR-003 | 현재 모드와 선호 타이밍 표시, HDR 상태와 전달 함수 불일치 경고. 프레임버퍼 심도 비교 없음 |
 | 18 | 색 모드 | 색 모드 유지(변경 감지 후 복원) | 구현 | PRD-PRF-004 | 프로파일 단위 구성 보호. 색 모드 복원 실측 없음 |
-| 19 | 색 모드 | GPU 디더링 토글 | 미구현 |  | `IOMobileFramebufferEnableDisableDithering` 심볼은 있으나 시그니처 미확인 |
+| 19 | 색 모드 | GPU 디더링 토글 | 구현 | PRD-COL-008 | 프레임버퍼 노드의 `enableDither` 속성 사용. 화면의 계조 변화는 측정하지 않음 |
 | 20 | DDC | 밝기, 대비, 볼륨, 음소거, RGB gain, 입력 전환, 전원 | 구현 | PRD-BRT-002, PRD-DDC-002, PRD-DDC-003 | RGB gain은 임의 VCP로 지정. DDC 지원 모니터 미보유로 보류 (TC-DDC-003) |
 | 21 | DDC | capabilities 탐지와 자동 구성, 임의 VCP 읽기 및 쓰기 | 부분 | PRD-DDC-001, PRD-DDC-003, PRD-DDC-004 | 응답 탐지, capabilities 해석, 임의 VCP 제공. capabilities 기반 화면 자동 구성 없음. 실제 모니터 조회는 보류 (TC-DDC-005) |
 | 22 | DDC | 내장 HDMI 포트 DDC | 미구현 |  | 내장 HDMI 경로의 칩 주소 실측 필요 (HDMI 직결 구성 없음) |
@@ -83,5 +83,5 @@
 | 조건 | 대상 번호 |
 | --- | --- |
 | 추가 장비 (HDMI 직결 구성) | 22 |
-| API 근거 확보 (E-11) | 5, 19 |
+| API 근거 확보 (E-11) | 5 |
 | 제외 결정 (디스플레이 저장 장치 손상 위험, E-10) | 44 |
