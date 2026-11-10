@@ -50,9 +50,9 @@
 | PRD-LNK-003 | P3 | 필수 | MRD-SCP-006 | SRS-COL-004, SRS-LNK-001 | TC-COL-005 | `Sources/TBDCore/DSCAssessment.swift`<br>`Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/Link.swift` | 통과 1 |
 | PRD-LNK-004 | P3 | 권장 | MRD-SCP-006 | SRS-LNK-003 | TC-LNK-003 | `Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/Link.swift` | 보류 1 |
 | PRD-LNK-005 | P3 | 권장 | MRD-SCP-006, MRD-RSK-005 | SRS-LNK-004 | TC-LNK-004 | `Sources/TBDPlatform/LinkService.swift`<br>`Sources/TBDCore/DPCDDecoder.swift` | 통과 1 |
-| PRD-PRT-001 | P3 | 필수 | MRD-SCP-007 | SRS-PRT-001 | TC-PRT-001 | `Sources/TBDPlatform/PortService.swift` | 미실행 1 |
-| PRD-PRT-002 | P3 | 필수 | MRD-SCP-007 | SRS-PRT-001 | TC-PRT-001 | `Sources/TBDPlatform/PortService.swift` | 미실행 1 |
-| PRD-PRT-003 | P3 | 필수 | MRD-SCP-007, MRD-DIF-003 | SRS-PRT-002 | TC-PRT-002 | `Sources/TBDCore/ConnectionPath.swift` | 미실행 1 |
+| PRD-PRT-001 | P3 | 필수 | MRD-SCP-007 | SRS-PRT-001 | TC-PRT-001 | `Sources/TBDPlatform/PortService.swift`<br>`Sources/TBDCore/Ports.swift` | 통과 1 |
+| PRD-PRT-002 | P3 | 필수 | MRD-SCP-007 | SRS-PRT-001 | TC-PRT-001 | `Sources/TBDPlatform/PortService.swift`<br>`Sources/TBDCore/Ports.swift` | 통과 1 |
+| PRD-PRT-003 | P3 | 필수 | MRD-SCP-007, MRD-DIF-003 | SRS-PRT-002 | TC-PRT-002 | `Sources/TBDCore/Ports.swift` | 통과 1 |
 | PRD-DGN-001 | P3 | 필수 | MRD-SCP-008, MRD-PRB-004, MRD-SCN-002 | SRS-DGN-001 | TC-DGN-001 | `Sources/TBDCore/Diagnostics/` | 미실행 1 |
 | PRD-DGN-002 | P3 | 필수 | MRD-SCP-008, MRD-DIF-002, MRD-KPI-003 | SRS-LNK-002, SRS-DGN-001 | TC-DGN-002 | `Sources/TBDCore/Diagnostics/`<br>`Sources/TBDCore/Link.swift` | 미실행 1 |
 | PRD-DGN-003 | P3 | 필수 | MRD-SCP-008 | SRS-DGN-001 | TC-DGN-001, TC-DGN-002 | `Sources/TBDCore/Diagnostics/` | 미실행 2 |

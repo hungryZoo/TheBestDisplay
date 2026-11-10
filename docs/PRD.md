@@ -73,7 +73,7 @@
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정. `--timings`는 싱크 타이밍 전체 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환. 형식은 `id:<번호>` 또는 `<rgb\|ycbcr444\|ycbcr422\|ycbcr420>[:<bpc>][:<full\|limited>][:<sdr\|pq\|hlg>]`. 생략 항목은 현재 값 우선 |
 | `tbdctl link <디스플레이>` | 링크 속도, 레인, 대역폭 사용률, 색 형식별 필요 대역폭과 선택 불가 사유, DPCD, 링크 훈련 결과 |
-| `tbdctl ports` | 포트와 연결 경로 |
+| `tbdctl ports` | 포트별 지원 전송, 케이블 e-marker, 독, 영상 링크, 디스플레이까지의 연결 경로와 단계별 상태 |
 | `tbdctl diagnose` | 진단 발견 항목 |
 | `tbdctl report <경로>` | 진단 보고서 저장 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 상태와 정보 조회, 켜기와 끄기 |

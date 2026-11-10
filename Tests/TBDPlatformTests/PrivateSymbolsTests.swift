@@ -285,3 +285,38 @@ struct LinkServiceTests {
         }
     }
 }
+
+/// TC-PRT-001: 포트와 케이블 정보 조회. 읽기 전용.
+@Suite("TC-PRT-001 포트 정보 조회")
+struct PortServiceTests {
+    @Test func 포트_목록과_연결_경로가_레지스트리와_일치() throws {
+        let inventory = PortService.inventory()
+        try #require(!inventory.ports.isEmpty, "포트 컨트롤러 노드 없음")
+        // 포트 설명 문자열이 레지스트리의 포트 컨트롤러 노드와 1대1 대응.
+        var registryPorts = Set<String>()
+        for className in PortInventory.relevantClasses where className.hasPrefix("AppleHPM") || className.hasPrefix("AppleTC") || className == "AppleHDMIPortController" {
+            let names: [String] = IORegistry.forEachService(matching: className) { IORegistry.property($0, "PortDescription") as? String }
+            registryPorts.formUnion(names)
+        }
+        #expect(Set(inventory.ports.map(\.portDescription)) == registryPorts)
+        for port in inventory.ports {
+            #expect(port.transportsActive.allSatisfy { port.transportsSupported.contains($0) || port.transportsProvisioned.contains($0) })
+        }
+
+        let displays = DisplayCatalog.displays()
+        let paths = ConnectionPathBuilder.build(inventory: inventory, displays: displays)
+        #expect(paths.count == inventory.ports.count)
+        // 외장 디스플레이마다 경로 1개가 도달.
+        for display in displays where !display.identity.isBuiltin {
+            let reaching = paths.filter { $0.displayID == display.id }
+            #expect(reaching.count == 1, "\(display.identity.name)")
+            if let path = reaching.first {
+                #expect(path.steps.last?.kind == .display)
+                #expect(path.steps.allSatisfy { $0.status != .broken })
+                #expect(path.dp?.isActive == true)
+            }
+        }
+        // 디스플레이에 도달한 경로 수는 외장 디스플레이 수 이하.
+        #expect(paths.filter(\.reachesDisplay).count <= displays.filter { !$0.identity.isBuiltin }.count)
+    }
+}

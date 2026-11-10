@@ -72,7 +72,7 @@ struct ContentView: View {
                 ContentUnavailableView("디스플레이 연결 해제됨", systemImage: "display.trianglebadge.exclamationmark")
             }
         case .diagnostics:
-            PendingFeatureView(title: "연결 진단", systemImage: "cable.connector", stage: "P3")
+            DiagnosticsView()
         case .profiles:
             PendingFeatureView(title: "프로파일", systemImage: "square.stack.3d.up", stage: "P5")
         case nil:

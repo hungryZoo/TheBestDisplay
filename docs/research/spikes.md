@@ -126,6 +126,10 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T08 | 포트 컨트롤러 노드: `AppleHPMInterfaceType10` 3개(USB-C 1, 2, 4번), `AppleHPMInterfaceType11` 1개(MagSafe 3), `AppleHDMIPortController` 1개(HDMI 3번). 전송 상태와 부속 노드는 `ParentPortTypeDescription`과 `ParentPortNumber`로 포트에 연결 |
+| T08 | 케이블 e-marker(`IOPortTransportComponentCCUSBPDSOPp`)의 `Metadata.VDOs` 4번째 값이 케이블 VDO. 실험 케이블 0x000A6644: 속도 부호 4(USB4 Gen 4), 전류 부호 2(5 A), 전압 부호 3(50 V), EPR 지원. 필드 위치는 USB Power Delivery 규격의 Passive Cable VDO 정의 기준 |
+| T08 | `IOPortTransportStateCIO`: 독 Parade Technologies PS9010, `Generation` 3, `CableGeneration` 2, `CableSpeed` 3, 터널 DisplayPort와 PCIe. `Generation`은 USB4 규격 명칭(Gen 3은 40 Gbps)으로 표시하며 `CableGeneration`과 `CableSpeed`의 값 체계는 근거 미확보로 미해석 |
+| T08 | 구성 해석: 케이블은 80 Gbps 등급이나 독의 링크는 USB4 Gen 3이고 터널 안의 DP 링크는 HBR3 4레인(유효 25.92 Gbps). DPCD 기준 DP 수신 측은 128b/132b와 DSC 미지원 |
 | T07 | 재연결 후에는 외장(독 터널링) 경로에서도 `IODPDeviceReadDPCD` 성공: DPCD 1.4, HBR3 x 4레인, 8b/10b만 지원, DSC 미지원, 4레인 훈련 완료. Phase 0의 0xe00002ca 실패는 일시 상태였으며 실패 허용 설계 유지 |
 | T07 | 내장 패널의 링크 훈련 속도 부호는 0x17(6.21 Gbps/레인, 비표준). 4레인 유효 대역폭 19.87 Gbps, 현재 모드 필요 19.31 Gbps |
 | T07 | LG TV 3840x2160 120 Hz: 유효 25.92 Gbps, 현재 모드(YCbCr 4:2:2 12 bpc) 25.71 Gbps, 사용률 99.2%. RGB 10 bpc는 32.14 Gbps로 초과. 시스템이 제공하는 색 모드 15개는 전부 유효 대역폭 이내이고 싱크 선언 형식 중 미제공 형식은 전부 초과 (계산과 시스템 목록 일치) |

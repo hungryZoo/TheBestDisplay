@@ -25,6 +25,8 @@ final class DisplayStore {
     private(set) var linkDetails: [UInt32: LinkDetails] = [:]
     /// 전 포트의 DisplayPort 전송 상태.
     private(set) var transportStates: [DPTransportState] = []
+    /// 포트별 연결 경로.
+    private(set) var connectionPaths: [ConnectionPath] = []
 
     struct LinkDetails {
         var dpcd: DPCDInfo?
@@ -79,7 +81,9 @@ final class DisplayStore {
         }
         signals = signalMap
         dscAssessments = dscMap
-        transportStates = LinkService.transportStates()
+        let inventory = PortService.inventory()
+        transportStates = inventory.dpStates
+        connectionPaths = ConnectionPathBuilder.build(inventory: inventory, displays: snapshot.displays)
         var reports: [UInt32: LinkReport] = [:]
         var details: [UInt32: LinkDetails] = [:]
         for display in snapshot.displays {

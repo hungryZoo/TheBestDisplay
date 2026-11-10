@@ -12,6 +12,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "set-mode", summary: "모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "모드"], valueOptions: ["--timeout", "--method"], flags: ["--yes"]),
     CommandSpec(name: "signal", summary: "현재 신호 형식과 색 모드 목록", positionals: ["디스플레이"], flags: ["--timings"]),
     CommandSpec(name: "link", summary: "링크 정보와 대역폭", positionals: ["디스플레이"]),
+    CommandSpec(name: "ports", summary: "포트, 케이블, 독, 연결 경로"),
     CommandSpec(name: "set-color", summary: "색 모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "색 모드"], valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "hdr", summary: "HDR 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
@@ -116,6 +117,9 @@ case "signal":
 
 case "link":
     runLink(command, json: json)
+
+case "ports":
+    runPorts(command, json: json)
 
 case "set-color":
     runSetColor(command)
