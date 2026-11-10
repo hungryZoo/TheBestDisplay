@@ -71,6 +71,7 @@
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환. 모드 형식은 `<폭>x<높이>[@<주사율>][:hidpi\|:lodpi]` 또는 `mode:<번호>`. Return 입력 시 확정, 제한 시간 내 입력이 없으면 복귀. `--yes`는 즉시 확정 |
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도(HiDPI 논리 해상도) 조회, 추가, 삭제. 쓰기 권한이 없으면 관리자 권한으로 실행할 명령 출력 |
 | `tbdctl align <디스플레이> <기준 디스플레이> <위치>` | 기준 디스플레이 대비 16방향 정렬. 위치는 `left-top`, `right-center`, `bottom-right`, `corner-top-left` 등 |
+| `tbdctl auto-disconnect [on\|off]` | 내장 자동 연결 해제 설정 조회와 변경. 해제와 재연결은 창 앱이 수행 |
 | `tbdctl favorites <디스플레이> [list \| add [<모드>] \| remove [<모드>]]` | 즐겨찾기 모드 조회, 추가, 삭제. 모드를 생략하면 현재 모드 |
 | `tbdctl notch <디스플레이> [show\|hide] [--timeout <초>] [--yes]` | notch 영역 사용 여부 조회와 전환 |
 | `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 (기본 2초) |
@@ -244,6 +245,7 @@
 | PRD-ARR-005 | 디스플레이의 논리적 연결 해제와 재연결 | P4 | 필수 | MRD-SCP-011 |
 | PRD-ARR-006 | 언더스캔 조정 | P4 | 권장 | MRD-SCP-011 |
 | PRD-ARR-007 | 기준 디스플레이 대비 16방향 정렬: 변 4개의 시작, 가운데, 끝 맞춤과 모서리 4곳 | P6 | 권장 | MRD-SCP-011 |
+| PRD-ARR-008 | 외장 디스플레이 연결 시 내장 디스플레이 자동 연결 해제 (기본 꺼짐). 실제 외장 디스플레이가 온라인일 때만 해제하고, 외장이 모두 사라지거나 설정을 끄거나 앱을 종료하면 재연결. 앱 실행 중에만 동작 | P6 | 권장 | MRD-SCP-011 |
 
 ### 6.13 가상 디스플레이 (VRT)
 

@@ -10,6 +10,7 @@ struct TheBestDisplayApp: App {
     @State private var changes = ChangeController()
     @State private var protection = ProtectionController()
     @State private var brightnessSync = BrightnessSyncController()
+    @State private var autoDisconnect = AutoDisconnectController()
 
     var body: some Scene {
         Window("TheBestDisplay", id: "main") {
@@ -18,7 +19,10 @@ struct TheBestDisplayApp: App {
                 .environment(changes)
                 .environment(protection)
                 .environment(brightnessSync)
+                .environment(autoDisconnect)
                 .onAppear {
+                    autoDisconnect.start()
+                    appDelegate.onTerminate = { [autoDisconnect] in autoDisconnect.shutdown() }
                     changes.onChanged = { [store] in store.scheduleRefresh() }
                     changes.onUserChange = { [protection] in protection.userChangedConfiguration() }
                     store.onDisplaysChanged = { [changes, protection] ids in
@@ -53,7 +57,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// 프로세스 수명에 종속된 화면 조정(전달 테이블)을 종료 시 원래대로 복원. (ADR-0004)
+    /// 종료 직전에 수행할 추가 정리 (내장 자동 해제의 재연결).
+    var onTerminate: () -> Void = {}
+
     func applicationWillTerminate(_ notification: Notification) {
+        onTerminate()
         XDRBoostService.shared.resetAll()
         OverlayDimService.shared.resetAll()
         GammaService.shared.resetAll()

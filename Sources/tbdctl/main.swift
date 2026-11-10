@@ -36,6 +36,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "main", summary: "메인 디스플레이 지정", positionals: ["디스플레이"]),
     CommandSpec(name: "move", summary: "디스플레이 위치 지정", positionals: ["디스플레이", "x", "y"]),
     CommandSpec(name: "align", summary: "기준 디스플레이에 대한 16방향 정렬", positionals: ["디스플레이", "기준 디스플레이", "위치"]),
+    CommandSpec(name: "auto-disconnect", summary: "외장 연결 시 내장 자동 연결 해제 설정 (창 앱 실행 중 동작)", positionals: ["on|off"], optionalPositionals: 1),
     CommandSpec(name: "disconnect", summary: "논리적 연결 해제 (자동 복귀 적용)", positionals: ["디스플레이"], valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "reconnect", summary: "연결 해제한 디스플레이 재연결", positionals: ["디스플레이 ID"], optionalPositionals: 1),
     CommandSpec(name: "virtual", summary: "가상 디스플레이를 만들고 지정 시간 동안 유지", positionals: ["해상도"], valueOptions: ["--name", "--seconds"], flags: ["--hidpi"]),
@@ -216,6 +217,9 @@ case "move":
 
 case "align":
     runAlign(command)
+
+case "auto-disconnect":
+    runAutoDisconnect(command)
 
 case "disconnect":
     runDisconnect(command)

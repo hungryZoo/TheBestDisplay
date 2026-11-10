@@ -6,6 +6,7 @@ import TBDPlatform
 struct ArrangementTab: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
+    @Environment(AutoDisconnectController.self) private var autoDisconnect
     let display: DisplaySummary
 
     @State private var xText = ""
@@ -88,6 +89,13 @@ struct ArrangementTab: View {
                 }
             }
             Section("연결") {
+                Toggle("외장 디스플레이 연결 시 내장 디스플레이 자동 연결 해제", isOn: Binding(get: { autoDisconnect.isEnabled }, set: { autoDisconnect.setEnabled($0) }))
+                Text("실제 외장 디스플레이가 온라인일 때 내장 디스플레이를 연결 해제하고, 외장이 모두 사라지거나 앱을 종료하면 다시 연결. 앱 실행 중에만 동작. 재연결이 되지 않으면 `tbdctl reconnect` 또는 재시동으로 복구")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if let message = autoDisconnect.message {
+                    Text(message).font(.caption).foregroundStyle(.secondary)
+                }
                 let refusal = ArrangementPlanner.disconnectRefusal(display.id, online: store.displays.map(\.id))
                 LabeledContent("논리적 연결 해제") {
                     Button("연결 해제") {

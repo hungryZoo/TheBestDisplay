@@ -71,7 +71,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 진단 | 포트별 화면 출력 점검 6단계, 발견 항목(근거와 조치), 이벤트 기록, 진단 보고서 내보내기 |
 | 밝기와 DDC | 시스템 밝기, DDC 밝기, 소프트웨어 디밍, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
 | 색 조정 | 디스플레이 프리셋(기준 모드), 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
-| 배치 | 회전, 미러, 메인 지정, 위치 편집, 16방향 정렬, 논리적 연결 해제와 재연결, 언더스캔 |
+| 배치 | 회전, 미러, 메인 지정, 위치 편집, 16방향 정렬, 논리적 연결 해제와 재연결, 외장 연결 시 내장 자동 해제, 언더스캔 |
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
 | 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
 
@@ -190,6 +190,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl mirror <디스플레이> <원본\|off> [--timeout <초>] [--yes]` | 미러 설정과 해제 |
 | `tbdctl main <디스플레이>`, `move <디스플레이> <x> <y>` | 메인 지정, 위치 지정 |
 | `tbdctl align <디스플레이> <기준 디스플레이> <위치>` | 기준 디스플레이 대비 16방향 정렬 |
+| `tbdctl auto-disconnect [on\|off]` | 외장 연결 시 내장 자동 연결 해제 설정 |
 | `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]` | 논리적 연결 해제 |
 | `tbdctl reconnect [<디스플레이 ID>]` | 연결 해제한 디스플레이 재연결 |
 | `tbdctl virtual <폭>x<높이> [--hidpi] [--name <이름>] [--seconds <초>]` | 가상 디스플레이 생성과 유지 |
@@ -235,6 +236,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `pending-revert.json` | 확인 대기 중인 변경의 복귀 정보. 확정하거나 복귀하면 삭제 |
 | `protection.json` | 구성 보호 대상 프로파일과 보호 항목. 보호를 끄면 삭제 |
 | `mode-favorites.json` | 디스플레이별 즐겨찾기 모드 |
+| `auto-disconnect.json` | 내장 자동 연결 해제 설정과 해제해 둔 내장 디스플레이 ID |
 
 - 사용자 정의 스케일 해상도는 `/Library/Displays/Contents/Resources/Overrides/` 아래 오버라이드 파일에 저장 (관리자 인증 필요)
 
@@ -253,8 +255,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 91건 중 통과 85건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 33행, 부분 20행, 미구현 5행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 93건 중 통과 87건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 34행, 부분 20행, 미구현 4행 (`docs/COVERAGE.md`) |
 
 ### 제약
 
@@ -322,7 +324,7 @@ uv run scripts/trace_check.py
 - [x] 실제 외장 디스플레이 대상 HiDPI 스케일링 실측
 - [ ] 사용자 조작이 필요한 실측: 사용자 정의 스케일 해상도 반영(관리자 인증)
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
-- [ ] 미구현 기능 5행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
+- [ ] 미구현 기능 4행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 

@@ -174,3 +174,23 @@ func runAlign(_ command: ParsedCommand) {
         exit(.failure)
     }
 }
+
+/// `tbdctl auto-disconnect [on|off]` (PRD-ARR-008): 설정 조회와 변경. 해제와 재연결은 창 앱이 수행.
+func runAutoDisconnect(_ command: ParsedCommand) {
+    let store = AutoDisconnectStore.standard
+    var state = store.load()
+    if let text = command.positionals.first {
+        guard let enabled = Toggle.parse(text) else {
+            writeError("오류: 인자는 on 또는 off")
+            exit(.usage)
+        }
+        state.enabled = enabled
+        do {
+            try store.save(state)
+        } catch {
+            writeError("오류: \(RevertCoordinatorDescribe(error))")
+            exit(.failure)
+        }
+    }
+    print("내장 자동 연결 해제: \(state.enabled ? "켜짐" : "꺼짐")" + (state.disconnectedBuiltin.map { ", 해제해 둔 내장 디스플레이 id:\($0)" } ?? ""))
+}
