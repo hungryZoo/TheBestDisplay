@@ -156,7 +156,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl list` | 디스플레이 목록 |
 | `tbdctl capabilities` | 기능별 가용성과 누락 심볼 |
 | `tbdctl info <디스플레이> [--edid-out <경로>] [--hex]` | 제품 정보, 싱크 능력, EDID 해석 |
-| `tbdctl modes <디스플레이> [--hidpi] [--outside-default]` | 전체 모드 목록 |
+| `tbdctl modes <디스플레이> [--hidpi] [--outside-default]` | 전체 모드 목록, 렌더링 한계 (모드 목록 기준과 프레임버퍼 보고) |
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환 |
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이> \| ladder [<단계 수>]]` | 사용자 정의 스케일 해상도 조회, 추가, 삭제, 다단계 일괄 등록 |
 | `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 |
@@ -264,8 +264,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 120건 중 통과 115건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 50행, 부분 5행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 122건 중 통과 117건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 51행, 부분 4행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

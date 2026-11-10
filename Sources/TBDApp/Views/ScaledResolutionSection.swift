@@ -89,7 +89,9 @@ struct ScaledResolutionSection: View {
             message = RevertCoordinator.describe(error)
             return
         }
-        save(edited, done: "\(w) x \(h) HiDPI 등록 완료. 디스플레이 재연결 또는 재시동 후 반영")
+        // 백킹 크기(논리 해상도의 2배)가 프레임버퍼 소스 한도를 넘으면 안내를 덧붙임. (PRD-MOD-014)
+        let notice = ModeService.framebufferLimits(for: display)?.excessNotice(pixelWidth: w * 2, pixelHeight: h * 2)
+        save(edited, done: "\(w) x \(h) HiDPI 등록 완료. 디스플레이 재연결 또는 재시동 후 반영" + (notice.map { ". 주의: \($0)" } ?? ""))
     }
 
     /// 다단계 스케일 해상도 일괄 등록. (PRD-MOD-013)

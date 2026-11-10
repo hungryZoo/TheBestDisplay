@@ -183,3 +183,32 @@ struct LuminanceReferenceCommandTests {
         #expect(try CLI.run(["luminance-reference", "main", "abc"]).status == 2)
     }
 }
+
+/// TC-MOD-016: 프레임버퍼 한도 조회. 읽기 전용.
+@Suite("TC-MOD-016 프레임버퍼 한도 조회")
+struct FramebufferLimitsServiceTests {
+    @Test func 모드_목록의_최대_백킹은_프레임버퍼_한도_안() throws {
+        for display in DisplayCatalog.displays() {
+            // 가상 디스플레이처럼 프레임버퍼 노드가 없는 디스플레이는 대상 아님.
+            guard let limits = ModeService.framebufferLimits(for: display) else { continue }
+            let width = try #require(limits.primarySourceWidth)
+            let height = try #require(limits.primarySourceHeight)
+            #expect(width >= display.pixelWidth && height >= display.pixelHeight)
+            let hiDPI = ModeService.modes(for: display.id).filter(\.isHiDPI)
+            for mode in hiDPI {
+                #expect(limits.allows(pixelWidth: mode.pixelWidth, pixelHeight: mode.pixelHeight) == true, "\(mode.label)")
+            }
+            #expect(!limits.summary.isEmpty)
+        }
+    }
+
+    @Test func 모드_명령_출력에_프레임버퍼_한도_포함() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let display = try #require(DisplayCatalog.displays().first { ModeService.framebufferLimits(for: $0) != nil }, "프레임버퍼 한도를 보고하는 디스플레이 필요")
+        let result = try CLI.run(["modes", "id:\(display.id)", "--json"])
+        #expect(result.status == 0)
+        let root = try #require(JSONSerialization.jsonObject(with: result.stdout) as? [String: Any])
+        let limits = try #require(root["framebufferLimits"] as? [String: Any])
+        #expect((limits["maxSourceWidths"] as? [Int])?.isEmpty == false)
+    }
+}

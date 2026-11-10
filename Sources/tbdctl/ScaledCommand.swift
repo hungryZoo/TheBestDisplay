@@ -84,6 +84,10 @@ func runScaled(_ command: ParsedCommand, json: Bool) {
         do {
             if action == "add" {
                 try file.add(logicalWidth: size.width, logicalHeight: size.height)
+                // 백킹 크기(논리 해상도의 2배)가 프레임버퍼 소스 한도를 넘으면 안내. (PRD-MOD-014)
+                if let notice = ModeService.framebufferLimits(for: display)?.excessNotice(pixelWidth: size.width * 2, pixelHeight: size.height * 2) {
+                    writeError("주의: \(notice)")
+                }
             } else {
                 try file.remove(logicalWidth: size.width, logicalHeight: size.height)
             }

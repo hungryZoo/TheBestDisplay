@@ -167,7 +167,7 @@ struct ResolutionTab: View {
                 }
             }
             if let limits = ModeCatalog.renderingLimits(modes) {
-                Text("렌더링 한계 (모드 목록 기준): \(limits.summary)")
+Text("렌더링 한계 (모드 목록 기준): \(limits.summary)" + (ModeService.framebufferLimits(for: display).map { "\n렌더링 한계 (프레임버퍼 보고): \($0.summary)" } ?? ""))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

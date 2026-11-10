@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 50행, 부분 5행, 미구현 3행
+- 집계: 구현 51행, 부분 4행, 미구현 3행
 
 ## 1. 대조표
 
@@ -16,7 +16,7 @@
 | 5 | 해상도 | 네이티브 및 기본 해상도 override, 디스플레이 역할 변경 | 미구현 |  | 오버라이드 파일의 해당 키 동작 근거 미확보 |
 | 6 | HiDPI | HiDPI와 LoDPI 토글, notch 모드 토글 | 구현 | PRD-MOD-001, PRD-MOD-011 | HiDPI와 LoDPI는 모드 목록의 배율 필터와 선택으로 전환 |
 | 7 | HiDPI | Flexible scaling(다단계 HiDPI 스케일) | 구현 | PRD-VRT-002, PRD-MOD-007, PRD-MOD-013 | 단일 항목의 설치와 반영은 실측 (TC-MOD-007). 다단계 일괄 등록의 실제 설치는 미실행 |
-| 8 | HiDPI | 렌더링 한계 표시 | 부분 | PRD-MOD-009 | 모드 목록에서 관찰한 최대 백킹 크기 표시. 시스템 한도 값의 직접 조회 없음 |
+| 8 | HiDPI | 렌더링 한계 표시 | 구현 | PRD-MOD-009, PRD-MOD-014 | 모드 목록에서 관찰한 최대 백킹 크기와 프레임버퍼가 보고한 소스, 버퍼, 스케일 한도 표시. 파이프별 값의 의미는 공개 근거 없음 |
 | 9 | HiDPI | HiDPI 개념 설명 | 구현 | PRD-MOD-001, PRD-MOD-012 | 해상도 탭의 용어 설명 팝오버 |
 | 10 | 주사율 | 현재 모드 기준 주사율 목록, VRR 표기 | 구현 | PRD-MOD-005 |  |
 | 11 | 주사율 | 연결 수준 비노출 주사율 선택 | 구현 | PRD-COL-007 | LG TV에서 59.94 Hz 전환 확인 (TC-COL-009) |
@@ -48,7 +48,7 @@
 | 37 | 연결 관리 | 디스플레이 재초기화, 재감지 | 구현 | PRD-EDO-004, PRD-ARR-009 |  |
 | 38 | 연결 관리 | 구성 보호 | 구현 | PRD-PRF-004 | 프로파일 주사율은 모드 단계에 포함 |
 | 39 | 가상 디스플레이 | 가상 스크린 생성(프리셋, 커스텀 종횡비, HiDPI) | 구현 | PRD-VRT-001 |  |
-| 40 | 가상 디스플레이 | HDR, 고주사율, 8K 초과 가상 스크린 | 부분 | PRD-VRT-001, PRD-VRT-004, PRD-VRT-005 | HDR과 주사율 지정 제공. 8K 초과는 시스템이 거부하거나 WindowServer를 중단시켜 제외 (E-12) |
+| 40 | 가상 디스플레이 | HDR, 고주사율, 8K 초과 가상 스크린 | 부분 | PRD-VRT-001, PRD-VRT-004, PRD-VRT-005 | HDR과 주사율 지정 제공. 8K 초과는 시스템이 거부하거나 WindowServer를 중단시켜 제외 (E-12). 프레임버퍼가 보고한 최대 소스 크기도 7680 x 4320 |
 | 41 | EDID | EDID 조회(OS 제공, I2C 직접), 해석, 내보내기 | 구현 | PRD-INF-002, PRD-INF-003, PRD-INF-005 |  |
 | 42 | EDID | EDID 리포트(CTA, DisplayID, tiled display 디코딩) | 구현 | PRD-INF-002, PRD-INF-006 | 타일 배치는 합성 자료로만 확인 |
 | 43 | EDID | 커스텀 EDID 적용과 원복 | 구현 | PRD-EDO-001-003 | LG TV에서 적용과 복귀 확인 (TC-EDO-003) |

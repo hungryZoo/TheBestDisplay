@@ -29,6 +29,15 @@ public enum ModeService {
     typealias ConfigureModeFn = @convention(c) (CGDisplayConfigRef?, CGDirectDisplayID, Int32) -> Int32
 
     /// 숨은 모드를 포함한 전체 모드. 비공개 열거를 쓸 수 없으면 공개 API로 대체.
+    /// 프레임버퍼가 보고하는 소스 크기와 스케일 한도. 대응하는 노드나 속성이 없으면 nil (가상 디스플레이 등). (SRS-MOD-009)
+    public static func framebufferLimits(for display: DisplaySummary) -> FramebufferLimits? {
+        guard let node = SignalService.framebufferNode(for: display) else { return nil }
+        defer { IOObjectRelease(node.service) }
+        var properties: [String: Any] = [:]
+        for key in ["IOMFBMaxSrcPixels", "IOMFBScalingLimits"] { properties[key] = IORegistry.property(node.service, key) }
+        return FramebufferLimits(properties: properties)
+    }
+
     public static func modes(for display: CGDirectDisplayID, symbols: PrivateSymbols = .shared) -> [DisplayMode] {
         let defaults = systemDefaultKeys(for: display)
         guard let getCount = symbols.function("SLSGetNumberOfDisplayModes", in: .skyLight, as: GetCountFn.self),
