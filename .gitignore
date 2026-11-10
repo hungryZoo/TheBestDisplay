@@ -5,3 +5,4 @@ logs/
 .swiftpm/
 .DS_Store
 DerivedData/
+dist/

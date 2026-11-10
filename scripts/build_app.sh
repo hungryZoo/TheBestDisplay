@@ -18,6 +18,8 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/TheBestDisplay" "$APP/Contents/MacOS/TheBestDisplay"
 cp "$BIN/tbdctl" "$APP/Contents/MacOS/tbdctl"
+# 앱 아이콘 (scripts/make_icon.swift로 생성한 파일).
+cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
 # LSUIElement 미설정: Dock과 앱 전환기에 표시되는 일반 창 앱.
 cat > "$APP/Contents/Info.plist" <<EOF
@@ -30,6 +32,7 @@ cat > "$APP/Contents/Info.plist" <<EOF
     <key>CFBundleIdentifier</key><string>dev.thebestdisplay.app</string>
     <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
     <key>CFBundleName</key><string>TheBestDisplay</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundleDisplayName</key><string>TheBestDisplay</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>${VERSION}</string>

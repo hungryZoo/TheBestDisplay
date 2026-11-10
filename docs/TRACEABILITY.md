@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 55 |
-| PRD 요구사항 | 113 |
-| SRS 설계 요구사항 | 82 |
-| TC | 124 |
+| PRD 요구사항 | 114 |
+| SRS 설계 요구사항 | 83 |
+| TC | 125 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -135,3 +135,4 @@
 | PRD-UPD-002 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-002 | TC-UPD-002 | `Sources/TBDApp/UpdateController.swift`<br>`Sources/TBDApp/Views/UpdateView.swift`<br>`Sources/TBDCore/Update/InstallMethod.swift` | 통과 1 |
 | PRD-UPD-003 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-002 | TC-UPD-002 | `Sources/TBDApp/UpdateController.swift`<br>`Sources/TBDApp/Views/UpdateView.swift`<br>`Sources/TBDCore/Update/InstallMethod.swift` | 통과 1 |
 | PRD-UPD-004 | P7 | 권장 | MRD-SCP-017, MRD-SCP-015 | SRS-UPD-001 | TC-UPD-001 | `Sources/TBDCore/Update/`<br>`scripts/build_app.sh`<br>`Sources/tbdctl/UpdateCommand.swift` | 통과 1 |
+| PRD-UPD-005 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-003 | TC-UPD-003 | `scripts/build_dmg.sh`<br>`scripts/make_icon.swift`<br>`scripts/build_app.sh`<br>`.github/release-notes/` | 통과 1 |
