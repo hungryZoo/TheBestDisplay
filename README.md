@@ -181,7 +181,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 내장 패널은 현재 휘도(cd/m²)도 출력 |
 | `tbdctl xdr <디스플레이> [<배율 %>] [--seconds <초>]` | XDR 밝기 업스케일 조회, 지정 시간 동안 적용 |
-| `tbdctl brightness-sync <원본 디스플레이> [--seconds <초>]` | 원본의 밝기를 다른 디스플레이에 동기화 |
+| `tbdctl brightness-sync <원본 디스플레이> [--seconds <초>] [--nits]` | 원본의 밝기를 다른 디스플레이에 동기화. `--nits`는 휘도 기준 |
+| `tbdctl luminance-reference <디스플레이> [<cd/m²> \| reset]` | 최대 휘도 기준값 조회, 지정, 해제 |
 | `tbdctl combined-brightness <디스플레이> <0-100> [--seconds <초>]` | 결합 밝기 적용 (하드웨어 밝기와 소프트웨어 디밍), 지정 시간 뒤 복원 |
 | `tbdctl overlay-dim <디스플레이> <강도 %> [--seconds <초>]` | 오버레이 방식 디밍 |
 | `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
@@ -262,8 +263,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 116건 중 통과 111건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 47행, 부분 8행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 118건 중 통과 113건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 49행, 부분 6행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

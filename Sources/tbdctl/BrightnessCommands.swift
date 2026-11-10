@@ -42,6 +42,10 @@ func runBrightness(_ command: ParsedCommand, json: Bool) {
         }
         if let luminance = BrightnessService.backlightLuminance(for: display) {
             print("  휘도: \(luminance.summary)")
+        } else if let reference = LuminanceReferenceStore.standard.reference(for: display.identity, edidMaximum: BrightnessSyncService.edidMaximum(display)) {
+            // 휘도를 직접 읽을 수 없는 디스플레이: 밝기 비율과 최대 휘도 기준값으로 추정. 소프트웨어 방식은 디밍 값 사용. (PRD-BRT-010)
+            let level = value ?? GammaService.shared.adjustment(for: display.id).dimming
+            print("  휘도: \(reference.summary(level: level))")
         }
         if BrightnessService.hasAutoBrightness(display.id) {
             print("  자동 밝기: \(BrightnessService.autoBrightnessEnabled(display.id).map { $0 ? "켜짐" : "꺼짐" } ?? "미확인")")

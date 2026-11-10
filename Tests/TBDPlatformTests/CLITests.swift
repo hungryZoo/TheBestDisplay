@@ -168,3 +168,18 @@ struct CableTrustOutputTests {
         // e-marker가 없는 구성에서는 확인할 항목 없음.
     }
 }
+
+/// TC-BRT-015 (조회 부분): 최대 휘도 기준값 조회. 읽기 전용.
+@Suite("TC-BRT-015 최대 휘도 기준값 조회")
+struct LuminanceReferenceCommandTests {
+    @Test func 기준값_조회_출력() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let result = try CLI.run(["luminance-reference", "main", "--json"])
+        #expect(result.status == 0)
+        let root = try #require(JSONSerialization.jsonObject(with: result.stdout) as? [String: Any])
+        #expect(root["display"] is [String: Any])
+        // 범위 밖 값은 저장하지 않고 사용법 오류.
+        #expect(try CLI.run(["luminance-reference", "main", "5"]).status == 2)
+        #expect(try CLI.run(["luminance-reference", "main", "abc"]).status == 2)
+    }
+}

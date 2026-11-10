@@ -33,6 +33,9 @@ final class BrightnessViewModel {
     var overlayStrength = 0.0
     /// 내장 패널의 현재 휘도. (PRD-BRT-008)
     var luminance: BacklightLuminance?
+    /// 최대 휘도 기준값: 휘도를 직접 읽을 수 없는 디스플레이의 추정 휘도와 휘도 기준 동기화에 사용. (PRD-BRT-010)
+    var reference: LuminanceReference?
+    var referenceText = ""
     /// 결합 밝기: 하드웨어 밝기와 전달 테이블 디밍을 한 값으로 조절. (PRD-BRT-009)
     var combinedEnabled = false
     var combined = 1.0
@@ -45,6 +48,7 @@ final class BrightnessViewModel {
         loadGeneration += 1
         let generation = loadGeneration
         isProbing = false
+        loadReference(display)
         ddcControls = []
         ddcOtherCodes = []
         ddcPreview = false
@@ -122,6 +126,32 @@ final class BrightnessViewModel {
         guard let index = arguments.firstIndex(of: "-ddcCapabilitiesPreview"), index + 1 < arguments.count else { return nil }
         return arguments[index + 1]
     }()
+
+    private func loadReference(_ display: DisplaySummary) {
+        let store = LuminanceReferenceStore.standard
+        reference = store.reference(for: display.identity, edidMaximum: BrightnessSyncService.edidMaximum(display))
+        referenceText = store.userValue(for: display.identity).map { BacklightLuminance.format($0) } ?? ""
+    }
+
+    /// 최대 휘도 기준값 지정. 빈 문자열이면 해제.
+    func applyReference(display: DisplaySummary) {
+        let text = referenceText.trimmingCharacters(in: .whitespaces)
+        do {
+            if text.isEmpty {
+                try LuminanceReferenceStore.standard.set(nil, for: display.identity)
+            } else {
+                guard let value = Double(text) else {
+                    message = "최대 휘도는 숫자로 입력"
+                    return
+                }
+                try LuminanceReferenceStore.standard.set(value, for: display.identity)
+            }
+            message = nil
+        } catch {
+            message = RevertCoordinator.describe(error)
+        }
+        loadReference(display)
+    }
 
     private static func combinedKey(_ display: DisplaySummary) -> String {
         "combinedBrightness.\(display.identity.uuid ?? String(display.id))"
@@ -298,6 +328,25 @@ struct BrightnessTab: View {
                     LabeledContent("휘도", value: luminance.summary)
                         .help("백라이트 드라이버가 보고하는 현재 휘도. 자동 밝기와 HDR 표시 상태에 따라 변함")
                 }
+                if model.luminance == nil, !model.isProbing {
+                    if let reference = model.reference {
+                        LabeledContent("휘도", value: reference.summary(level: model.brightness))
+                            .help("밝기 비율과 최대 휘도 기준값을 곱한 추정값. 측정값 아님")
+                    }
+                    LabeledContent("최대 휘도 기준값") {
+                        HStack(spacing: 6) {
+                            TextField("최대 휘도", text: $model.referenceText, prompt: Text("미지정"))
+                                .labelsHidden()
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 80)
+                                .onSubmit { model.applyReference(display: display) }
+                            Text("cd/m²").foregroundStyle(.secondary)
+                            Button("적용") { model.applyReference(display: display) }
+                                .controlSize(.small)
+                        }
+                    }
+                    .help("추정 휘도 표시와 휘도 기준 밝기 동기화에 사용. 비우고 적용하면 해제 (EDID가 알린 값이 있으면 그 값 사용)")
+                }
                 if model.method != .software, !model.isProbing {
                     Toggle("결합 밝기 (하드웨어 최저 아래는 소프트웨어 디밍)", isOn: Binding(get: { model.combinedEnabled }, set: { model.setCombinedEnabled($0, display: display) }))
                         .help("조절 범위의 아래쪽 25%는 하드웨어 밝기를 최저에 둔 채 전달 테이블로 더 어둡게 함. 디밍은 앱 실행 중에만 유지")
@@ -339,9 +388,11 @@ struct BrightnessTab: View {
                             if isOn { sync.start(source: display.id) } else { sync.stop() }
                         }
                     ))
+                    Toggle("휘도 기준으로 맞춤", isOn: Binding(get: { sync.normalizesLuminance }, set: { sync.normalizesLuminance = $0 }))
+                        .help("원본의 휘도(cd/m²)를 대상의 최대 휘도 기준값으로 나눠 대상 밝기를 정함. 휘도를 알 수 없는 디스플레이는 비율 기준으로 처리")
                     if sync.isSource(display.id) {
                         ForEach(sync.lastResults, id: \.displayID) { result in
-                            LabeledContent(result.displayName, value: "\(result.method.title) \(Int((result.level * 100).rounded()))%" + (result.failure.map { ", 실패: \($0)" } ?? ""))
+                            LabeledContent(result.displayName, value: "\(result.method.title) \(Int((result.level * 100).rounded()))%" + (result.targetNits.map { ", 목표 \(BacklightLuminance.format($0)) cd/m²" } ?? "") + (result.failure.map { ", 실패: \($0)" } ?? ""))
                         }
                     }
                     Text("1초마다 이 디스플레이의 밝기를 읽어 나머지 디스플레이에 같은 비율로 적용. 대상은 시스템 밝기 제어, DDC, 소프트웨어 디밍 순으로 방식 선택. 앱 실행 중에만 동작")

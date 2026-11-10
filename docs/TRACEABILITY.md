@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 106 |
-| SRS 설계 요구사항 | 77 |
-| TC | 116 |
+| PRD 요구사항 | 107 |
+| SRS 설계 요구사항 | 78 |
+| TC | 118 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -87,6 +87,7 @@
 | PRD-BRT-007 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-004 | TC-BRT-008, TC-BRT-009 | `Sources/TBDPlatform/OverlayDimService.swift`<br>`Sources/TBDCore/OverlayDim.swift` | 통과 2 |
 | PRD-BRT-008 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-005 | TC-BRT-010, TC-BRT-011 | `Sources/TBDCore/BacklightLuminance.swift`<br>`Sources/TBDPlatform/BrightnessService.swift`<br>`Sources/TBDApp/Views/BrightnessTab.swift` | 통과 2 |
 | PRD-BRT-009 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-006 | TC-BRT-012, TC-BRT-013 | `Sources/TBDCore/CombinedBrightness.swift`<br>`Sources/TBDPlatform/BrightnessService.swift`<br>`Sources/tbdctl/CombinedBrightnessCommand.swift` | 통과 2 |
+| PRD-BRT-010 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-007 | TC-BRT-014, TC-BRT-015 | `Sources/TBDCore/LuminanceReference.swift`<br>`Sources/TBDCore/BrightnessSync.swift`<br>`Sources/TBDPlatform/BrightnessSyncService.swift`<br>`Sources/TBDApp/BrightnessSyncController.swift` | 통과 2 |
 | PRD-DDC-001 | P4 | 필수 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |
 | PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
 | PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |

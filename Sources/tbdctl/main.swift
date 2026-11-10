@@ -29,7 +29,8 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "night-shift-sync", summary: "Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 (지정 시간 동안)", positionals: ["디스플레이"], valueOptions: ["--seconds"]),
     CommandSpec(name: "hdr-profile", summary: "SDR과 HDR 상태별 색 프로파일 지정과 적용", positionals: ["디스플레이", "sdr|hdr|apply", "프로파일"], optionalPositionals: 2),
     CommandSpec(name: "preset", summary: "디스플레이 프리셋 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "번호 또는 이름"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
-    CommandSpec(name: "brightness-sync", summary: "원본 디스플레이의 밝기를 다른 디스플레이에 동기화 (지정 시간 동안)", positionals: ["원본 디스플레이"], valueOptions: ["--seconds"]),
+    CommandSpec(name: "brightness-sync", summary: "원본 디스플레이의 밝기를 다른 디스플레이에 동기화 (지정 시간 동안)", positionals: ["원본 디스플레이"], valueOptions: ["--seconds"], flags: ["--nits"]),
+    CommandSpec(name: "luminance-reference", summary: "디스플레이의 최대 휘도 기준값 조회, 지정, 해제", positionals: ["디스플레이", "cd/m² 또는 reset"], optionalPositionals: 1),
     CommandSpec(name: "combined-brightness", summary: "결합 밝기: 하드웨어 밝기와 소프트웨어 디밍을 한 값으로 적용 (지정 시간 동안 유지)", positionals: ["디스플레이", "0-100"], valueOptions: ["--seconds"]),
     CommandSpec(name: "overlay-dim", summary: "오버레이 방식 디밍 (지정 시간 동안 유지)", positionals: ["디스플레이", "강도 %"], valueOptions: ["--seconds"]),
     CommandSpec(name: "xdr", summary: "XDR 밝기 업스케일 조회와 적용 (지정 시간 동안 유지)", positionals: ["디스플레이", "배율 %"], optionalPositionals: 1, valueOptions: ["--seconds"]),
@@ -202,6 +203,9 @@ case "hdr-profile":
 
 case "preset":
     runPreset(command, json: json)
+
+case "luminance-reference":
+    runLuminanceReference(command, json: json)
 
 case "brightness-sync":
     runBrightnessSync(command)

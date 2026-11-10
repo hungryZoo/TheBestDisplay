@@ -15,6 +15,13 @@ public enum BrightnessSync {
         }
     }
 
+    /// 휘도 기준 변환: 원본의 휘도(cd/m²)를 대상의 최대 휘도로 나눈 비율을 대상 밝기로 사용. (PRD-BRT-010)
+    /// 원본이 대상의 최대 휘도보다 밝으면 대상은 최대 밝기. 대상의 최대 휘도가 0 이하면 nil.
+    public static func normalizedLevel(sourceNits: Double, targetMaximumNits: Double, method: BrightnessMethod) -> Double? {
+        guard targetMaximumNits > 0, sourceNits >= 0 else { return nil }
+        return targetLevel(source: sourceNits / targetMaximumNits, method: method)
+    }
+
     /// 마지막 적용값과의 차이가 임계값 이상이면 적용.
     public static func shouldApply(new: Double, last: Double?) -> Bool {
         guard let last else { return true }
@@ -30,12 +37,15 @@ public struct BrightnessSyncResult: Codable, Hashable, Sendable {
     public var level: Double
     /// 실패 사유. 성공이면 nil.
     public var failure: String?
+    /// 휘도 기준으로 계산한 경우의 목표 휘도 (cd/m²). 비율 기준이면 nil.
+    public var targetNits: Double?
 
-    public init(displayID: UInt32, displayName: String, method: BrightnessMethod, level: Double, failure: String?) {
+    public init(displayID: UInt32, displayName: String, method: BrightnessMethod, level: Double, failure: String?, targetNits: Double? = nil) {
         self.displayID = displayID
         self.displayName = displayName
         self.method = method
         self.level = level
         self.failure = failure
+        self.targetNits = targetNits
     }
 }
