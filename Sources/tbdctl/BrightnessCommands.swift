@@ -9,6 +9,8 @@ struct BrightnessOutput: Encodable {
     var percent: Double?
     var autoBrightnessAvailable: Bool
     var autoBrightnessEnabled: Bool?
+    /// 내장 패널의 현재 휘도. 값을 얻을 수 없으면 nil. (PRD-BRT-008)
+    var luminance: BacklightLuminance?
 }
 
 /// `tbdctl brightness <디스플레이> [0-100] [--json]` (PRD-BRT-001, PRD-BRT-002, PRD-CLI-002)
@@ -29,7 +31,7 @@ func runBrightness(_ command: ParsedCommand, json: Bool) {
     guard command.positionals.count > 1 else {
         let value = current()
         if json {
-            printJSON(BrightnessOutput(display: display.identity, method: method, percent: value.map { ($0 * 1000).rounded() / 10 }, autoBrightnessAvailable: BrightnessService.hasAutoBrightness(display.id), autoBrightnessEnabled: BrightnessService.autoBrightnessEnabled(display.id)))
+            printJSON(BrightnessOutput(display: display.identity, method: method, percent: value.map { ($0 * 1000).rounded() / 10 }, autoBrightnessAvailable: BrightnessService.hasAutoBrightness(display.id), autoBrightnessEnabled: BrightnessService.autoBrightnessEnabled(display.id), luminance: BrightnessService.backlightLuminance(for: display)))
             return
         }
         print("\(display.identity.name) [id:\(display.id)] 밝기 제어 방식: \(method.title)")
@@ -37,6 +39,9 @@ func runBrightness(_ command: ParsedCommand, json: Bool) {
             print("  밝기: \(String(format: "%.1f", value * 100))%")
         } else {
             print("  밝기: 하드웨어 밝기 값을 읽을 수 없음" + (probe.map { " (\($0.reason))" } ?? ""))
+        }
+        if let luminance = BrightnessService.backlightLuminance(for: display) {
+            print("  휘도: \(luminance.summary)")
         }
         if BrightnessService.hasAutoBrightness(display.id) {
             print("  자동 밝기: \(BrightnessService.autoBrightnessEnabled(display.id).map { $0 ? "켜짐" : "꺼짐" } ?? "미확인")")

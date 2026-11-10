@@ -60,6 +60,18 @@ public enum BrightnessService {
 
     // MARK: - 자동 밝기 (PRD-BRT-004)
 
+    /// 내장 패널의 현재 휘도. 내장 디스플레이가 아니거나 프레임버퍼 노드에 값이 없으면 nil. (SRS-BRT-005)
+    /// 외장 디스플레이의 같은 속성은 백라이트와 무관한 고정값(200 cd/m²)이라 제외 (T52 실측).
+    public static func backlightLuminance(for display: DisplaySummary) -> BacklightLuminance? {
+        guard display.identity.isBuiltin, let node = SignalService.framebufferNode(for: display) else { return nil }
+        defer { IOObjectRelease(node.service) }
+        var properties: [String: Any] = [:]
+        for key in ["IOMFBBrightnessLevel", "BLNitsCap", "IOMFBIndicatorNitsCap"] {
+            properties[key] = IORegistry.property(node.service, key)
+        }
+        return BacklightLuminance(framebufferProperties: properties)
+    }
+
     public static func hasAutoBrightness(_ display: CGDirectDisplayID, symbols: PrivateSymbols = .shared) -> Bool {
         symbols.function("DisplayServicesHasAmbientLightCompensation", in: .displayServices, as: QueryFn.self)?(display) ?? false
     }

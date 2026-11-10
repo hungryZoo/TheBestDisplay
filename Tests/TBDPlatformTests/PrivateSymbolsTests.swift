@@ -374,6 +374,52 @@ struct BrightnessServiceTests {
     }
 }
 
+/// TC-BRT-011: 내장 패널 휘도 조회. 밝기를 0.1 바꿔 휘도가 같은 방향으로 변하는지 확인한 뒤 복원.
+@Suite("TC-BRT-011 내장 패널 휘도", .serialized)
+struct BacklightLuminanceServiceTests {
+    /// 백라이트는 목표값까지 서서히 변하므로 (앞선 시험의 밝기 복원 포함) 연속 두 번 같은 값이 읽힐 때까지 대기. 최대 4초.
+    static func settledLuminance(_ display: DisplaySummary) -> BacklightLuminance? {
+        var previous = BrightnessService.backlightLuminance(for: display)
+        for _ in 0..<13 {
+            usleep(300_000)
+            let current = BrightnessService.backlightLuminance(for: display)
+            if current == previous { return current }
+            previous = current
+        }
+        return previous
+    }
+
+    @Test(.enabled(if: Hardware.hasBuiltinDisplay, "내장 디스플레이 필요"))
+    func 휘도_조회와_밝기_연동() throws {
+        let builtin = try #require(DisplayCatalog.displays().first { $0.identity.isBuiltin })
+        let before = try #require(Self.settledLuminance(builtin))
+        if let peak = before.peakMilliNits { #expect(before.currentMilliNits <= peak) }
+
+        let original = try #require(BrightnessService.nativeBrightness(builtin.id))
+        let target = original > 0.5 ? original - 0.1 : original + 0.1
+        try BrightnessService.setNativeBrightness(target, on: builtin.id)
+        usleep(300_000)
+        let changed = try #require(Self.settledLuminance(builtin))
+        try BrightnessService.setNativeBrightness(original, on: builtin.id)
+        usleep(300_000)
+        let restored = try #require(Self.settledLuminance(builtin))
+
+        if target < original {
+            #expect(changed.currentMilliNits < before.currentMilliNits)
+        } else {
+            #expect(changed.currentMilliNits > before.currentMilliNits)
+        }
+        // 복원 뒤 휘도는 시험 전 값의 5% 이내.
+        #expect(abs(restored.currentMilliNits - before.currentMilliNits) <= max(before.currentMilliNits / 20, 500))
+    }
+
+    @Test func 외장_디스플레이는_휘도_값_없음() {
+        for display in DisplayCatalog.displays() where !display.identity.isBuiltin {
+            #expect(BrightnessService.backlightLuminance(for: display) == nil)
+        }
+    }
+}
+
 /// TC-BRT-002 실측: 전달 테이블 적용과 복원. 화면이 잠깐 어두워짐.
 @Suite("TC-BRT-002 소프트웨어 디밍 실측", .serialized)
 struct GammaServiceTests {

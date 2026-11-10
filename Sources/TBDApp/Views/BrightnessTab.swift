@@ -26,10 +26,18 @@ final class BrightnessViewModel {
     var xdrMessage: String?
     /// 오버레이 디밍 강도 (0-0.9). (PRD-BRT-007)
     var overlayStrength = 0.0
+    /// 내장 패널의 현재 휘도. (PRD-BRT-008)
+    var luminance: BacklightLuminance?
 
     @ObservationIgnored private var pendingWrite: Task<Void, Never>?
+    /// 조회 순번. DDC 탐지를 기다리는 사이 다른 디스플레이로 넘어가면 늦게 끝난 탐지 결과를 버림. (T52 실측)
+    @ObservationIgnored private var loadGeneration = 0
 
     func load(_ display: DisplaySummary) async {
+        loadGeneration += 1
+        let generation = loadGeneration
+        isProbing = false
+        luminance = BrightnessService.backlightLuminance(for: display)
         message = nil
         xdrSupported = XDRBoostService.isSupported(display.id)
         xdrMaximum = XDRBoostService.maximumBoost(display.id)
@@ -48,6 +56,7 @@ final class BrightnessViewModel {
         // DDC 탐지는 응답 대기가 있으므로 메인 스레드 밖에서 수행.
         isProbing = true
         let result = await Task.detached { DDCService.probe(for: display) }.value
+        guard generation == loadGeneration else { return }
         isProbing = false
         probe = result
         ddcValues = [:]
@@ -170,6 +179,10 @@ struct BrightnessTab: View {
                         .monospacedDigit()
                         .frame(width: 44, alignment: .trailing)
                 }
+                if let luminance = model.luminance {
+                    LabeledContent("휘도", value: luminance.summary)
+                        .help("백라이트 드라이버가 보고하는 현재 휘도. 자동 밝기와 HDR 표시 상태에 따라 변함")
+                }
                 if model.method == .software, !model.isProbing {
                     Text("하드웨어 밝기 제어를 쓸 수 없어 전달 테이블로 화면 출력값을 낮춤. 백라이트는 그대로이며 앱을 종료하면 원래 밝기로 복귀")
                         .font(.caption)
@@ -255,7 +268,15 @@ struct BrightnessTab: View {
             }
         }
         .formStyle(.grouped)
-        .task(id: display.id) { await model.load(display) }
+        .task(id: display.id) {
+            await model.load(display)
+            // 휘도는 밝기 조절, 자동 밝기, HDR 표시에 따라 변하므로 탭이 보이는 동안 1초 간격으로 다시 읽음.
+            while !Task.isCancelled {
+                model.luminance = BrightnessService.backlightLuminance(for: display)
+                guard model.luminance != nil else { break }
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
     }
 
     private var sliderRange: ClosedRange<Double> {
