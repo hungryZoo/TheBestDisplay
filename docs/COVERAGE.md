@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 40행, 부분 15행, 미구현 3행
+- 집계: 구현 41행, 부분 14행, 미구현 3행
 
 ## 1. 대조표
 
@@ -15,7 +15,7 @@
 | 4 | 해상도 | 커스텀 타이밍 | 구현 | PRD-EDO-005 | LG TV에서 적용 확인 (TC-EDO-006) |
 | 5 | 해상도 | 네이티브 및 기본 해상도 override, 디스플레이 역할 변경 | 미구현 |  | 오버라이드 파일의 해당 키 동작 근거 미확보 |
 | 6 | HiDPI | HiDPI와 LoDPI 토글, notch 모드 토글 | 구현 | PRD-MOD-001, PRD-MOD-011 | HiDPI와 LoDPI는 모드 목록의 배율 필터와 선택으로 전환 |
-| 7 | HiDPI | Flexible scaling(다단계 HiDPI 스케일) | 부분 | PRD-VRT-002, PRD-MOD-007 | 가상 디스플레이 미러 방식 스케일링과 사용자 정의 스케일 해상도 제공. 다단계 자동 생성 없음 |
+| 7 | HiDPI | Flexible scaling(다단계 HiDPI 스케일) | 구현 | PRD-VRT-002, PRD-MOD-007, PRD-MOD-013 | 다단계 일괄 등록의 실제 설치와 반영은 관리자 인증 필요 (TC-MOD-007) |
 | 8 | HiDPI | 렌더링 한계 표시 | 부분 | PRD-MOD-009 | 모드 목록에서 관찰한 최대 백킹 크기 표시. 시스템 한도 값의 직접 조회 없음 |
 | 9 | HiDPI | HiDPI 개념 설명 | 구현 | PRD-MOD-001, PRD-MOD-012 | 해상도 탭의 용어 설명 팝오버 |
 | 10 | 주사율 | 현재 모드 기준 주사율 목록, VRR 표기 | 구현 | PRD-MOD-005 |  |

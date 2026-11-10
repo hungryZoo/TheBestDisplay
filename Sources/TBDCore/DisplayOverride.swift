@@ -130,3 +130,32 @@ public struct DisplayOverrideFile: Sendable {
         return parts.count == 2 ? (parts[0], parts[1]) : nil
     }
 }
+
+public extension DisplayOverrideFile {
+    /// 다단계 스케일 해상도: 패널 해상도의 절반(HiDPI 1:1)부터 패널 해상도까지를 같은 종횡비로 `steps`단계 나눈 논리 해상도 목록.
+    /// 폭은 짝수로 맞추고 높이는 종횡비로 계산. (PRD-MOD-013)
+    static func ladder(nativeWidth: Int, nativeHeight: Int, steps: Int) -> [(width: Int, height: Int)] {
+        guard nativeWidth >= 640, nativeHeight >= 400, steps >= 2 else { return [] }
+        let low = Double(nativeWidth) / 2, high = Double(nativeWidth)
+        var result: [(Int, Int)] = []
+        for index in 0..<steps {
+            let width = Int((low + (high - low) * Double(index) / Double(steps - 1)) / 2) * 2
+            let height = Int((Double(width) * Double(nativeHeight) / Double(nativeWidth)).rounded())
+            if !result.contains(where: { $0.0 == width }) { result.append((width, height)) }
+        }
+        return result.map { (width: $0.0, height: $0.1) }
+    }
+
+    /// 다단계 목록을 항목으로 추가. 이미 있는 항목은 건너뜀. 추가한 개수 반환.
+    @discardableResult
+    mutating func addLadder(nativeWidth: Int, nativeHeight: Int, steps: Int) -> Int {
+        var added = 0
+        for size in Self.ladder(nativeWidth: nativeWidth, nativeHeight: nativeHeight, steps: steps) {
+            let entry = ScaleResolutionEntry(logicalWidth: size.width, logicalHeight: size.height)
+            guard Self.validate(logicalWidth: size.width, logicalHeight: size.height) == nil, !entries.contains(entry) else { continue }
+            entries.append(entry)
+            added += 1
+        }
+        return added
+    }
+}

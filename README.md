@@ -158,7 +158,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl info <디스플레이> [--edid-out <경로>] [--hex]` | 제품 정보, 싱크 능력, EDID 해석 |
 | `tbdctl modes <디스플레이> [--hidpi] [--outside-default]` | 전체 모드 목록 |
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환 |
-| `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도 조회, 추가, 삭제 |
+| `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이> \| ladder [<단계 수>]]` | 사용자 정의 스케일 해상도 조회, 추가, 삭제, 다단계 일괄 등록 |
 | `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 |
 | `tbdctl favorites <디스플레이> [list \| add [<모드>] \| remove [<모드>]]` | 즐겨찾기 모드 조회, 추가, 삭제 |
 | `tbdctl notch <디스플레이> [show\|hide] [--timeout <초>] [--yes]` | notch 영역 사용 여부 조회와 전환 |
@@ -256,8 +256,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 94건 중 통과 88건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 35행, 부분 20행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 99건 중 통과 93건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 41행, 부분 14행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

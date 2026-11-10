@@ -5,6 +5,7 @@ import TBDPlatform
 
 /// 해상도 탭의 사용자 정의 스케일 해상도 영역: 디스플레이 오버라이드 파일의 항목 조회, 추가, 삭제. (PRD-MOD-007)
 struct ScaledResolutionSection: View {
+    @Environment(DisplayStore.self) private var store
     let display: DisplaySummary
 
     @State private var file: DisplayOverrideFile?
@@ -36,6 +37,8 @@ struct ScaledResolutionSection: View {
                     Text("HiDPI")
                     Button("추가") { add() }
                         .disabled(Int(width) == nil || Int(height) == nil)
+                    Button("다단계 5개 일괄 추가") { addLadder() }
+                        .help("패널 해상도의 절반부터 패널 해상도까지 같은 종횡비로 5단계 등록")
                 }
                 .textFieldStyle(.roundedBorder)
                 .controlSize(.small)
@@ -74,6 +77,22 @@ struct ScaledResolutionSection: View {
             return
         }
         save(edited, done: "\(w) x \(h) HiDPI 등록 완료. 디스플레이 재연결 또는 재시동 후 반영")
+    }
+
+    /// 다단계 스케일 해상도 일괄 등록. (PRD-MOD-013)
+    private func addLadder() {
+        guard var edited = file else { return }
+        let modes = store.modes[display.id] ?? []
+        guard let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first else {
+            message = "패널 원본 해상도를 확인할 수 없음"
+            return
+        }
+        let added = edited.addLadder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: 5)
+        guard added > 0 else {
+            message = "추가할 항목 없음 (이미 등록됨)"
+            return
+        }
+        save(edited, done: "\(added)개 등록 완료. 디스플레이 재연결 또는 재시동 후 반영")
     }
 
     private func remove(_ entry: ScaleResolutionEntry) {

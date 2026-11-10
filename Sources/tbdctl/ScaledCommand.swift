@@ -45,6 +45,37 @@ func runScaled(_ command: ParsedCommand, json: Bool) {
         if file.entries.isEmpty { print("  등록된 스케일 해상도 없음") }
         for entry in file.entries { print("  \(entry.label)") }
 
+    case "ladder":
+        // 다단계 스케일 해상도 일괄 등록. 단계 수 기본 5.
+        let steps = command.positionals.count > 2 ? Int(command.positionals[2]) ?? 0 : 5
+        guard (2...12).contains(steps) else {
+            writeError("오류: 단계 수는 2-12")
+            exit(.usage)
+        }
+        let modes = ModeService.modes(for: display.id)
+        guard let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first else {
+            writeError("오류: 패널 원본 해상도를 확인할 수 없음")
+            exit(.unsupported)
+        }
+        let sizes = DisplayOverrideFile.ladder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: steps)
+        print("패널 \(native.pixelWidth) x \(native.pixelHeight) 기준 \(sizes.count)단계: " + sizes.map { "\($0.width)x\($0.height)" }.joined(separator: ", "))
+        let added = file.addLadder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: steps)
+        guard added > 0 else {
+            print("추가할 항목 없음 (이미 등록됨)")
+            return
+        }
+        do {
+            try service.write(file)
+            print("\(added)개 추가 완료. 디스플레이 재연결 또는 재시동 후 모드 목록에 반영")
+        } catch DisplayOverrideService.ServiceError.needsPrivilege(_, let commands) {
+            writeError("관리자 권한 필요. 다음 명령을 차례로 실행한 뒤 디스플레이 재연결 또는 재시동:")
+            for line in commands { writeError("  sudo \(line)") }
+            exit(.failure)
+        } catch {
+            writeError("오류: \(RevertCoordinator.describe(error))")
+            exit(.failure)
+        }
+
     case "add", "remove":
         guard command.positionals.count > 2, let size = DisplayOverrideFile.parseSize(command.positionals[2]) else {
             writeError("오류: 해상도 형식은 <폭>x<높이> (HiDPI 논리 해상도)")
@@ -73,7 +104,7 @@ func runScaled(_ command: ParsedCommand, json: Bool) {
         }
 
     default:
-        writeError("오류: 동작은 list, add, remove 중 하나")
+        writeError("오류: 동작은 list, add, remove, ladder 중 하나")
         exit(.usage)
     }
 }

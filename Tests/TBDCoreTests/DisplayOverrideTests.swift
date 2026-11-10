@@ -70,3 +70,25 @@ struct DisplayOverrideTests {
         #expect(!fresh.hasOtherKeys)
     }
 }
+
+/// TC-MOD-014: 다단계 스케일 해상도 목록.
+@Suite("TC-MOD-014 다단계 스케일 해상도")
+struct ScaleLadderTests {
+    @Test func 패널_절반부터_패널_해상도까지_같은_종횡비() {
+        let ladder = DisplayOverrideFile.ladder(nativeWidth: 3840, nativeHeight: 2160, steps: 5)
+        #expect(ladder.map(\.width) == [1920, 2400, 2880, 3360, 3840])
+        #expect(ladder.map(\.height) == [1080, 1350, 1620, 1890, 2160])
+        #expect(DisplayOverrideFile.ladder(nativeWidth: 3024, nativeHeight: 1964, steps: 3).map(\.width) == [1512, 2268, 3024])
+        #expect(DisplayOverrideFile.ladder(nativeWidth: 3840, nativeHeight: 2160, steps: 1).isEmpty)
+        #expect(DisplayOverrideFile.ladder(nativeWidth: 320, nativeHeight: 200, steps: 5).isEmpty)
+    }
+
+    @Test func 일괄_추가는_중복을_건너뜀() throws {
+        var file = DisplayOverrideFile(vendorID: 0x1E6D, productID: 0xC0C8)
+        try file.add(logicalWidth: 1920, logicalHeight: 1080)
+        #expect(file.addLadder(nativeWidth: 3840, nativeHeight: 2160, steps: 5) == 4)
+        #expect(file.entries.count == 5)
+        #expect(file.addLadder(nativeWidth: 3840, nativeHeight: 2160, steps: 5) == 0)
+        #expect(file.entries.last?.label == "3840 x 2160 HiDPI (백킹 7680 x 4320)")
+    }
+}

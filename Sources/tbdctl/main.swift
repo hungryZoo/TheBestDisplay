@@ -9,7 +9,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "capabilities", summary: "기능별 가용성"),
     CommandSpec(name: "info", summary: "제품 정보와 EDID 해석", positionals: ["디스플레이"], valueOptions: ["--edid-out"], flags: ["--hex"]),
     CommandSpec(name: "modes", summary: "전체 모드 목록", positionals: ["디스플레이"], flags: ["--hidpi", "--outside-default"]),
-    CommandSpec(name: "scaled", summary: "사용자 정의 스케일 해상도 조회, 추가, 삭제 (오버라이드 파일, 관리자 권한)", positionals: ["디스플레이", "list|add|remove", "해상도"], optionalPositionals: 2),
+    CommandSpec(name: "scaled", summary: "사용자 정의 스케일 해상도 조회, 추가, 삭제 (오버라이드 파일, 관리자 권한)", positionals: ["디스플레이", "list|add|remove|ladder", "해상도 또는 단계 수"], optionalPositionals: 2),
     CommandSpec(name: "refresh", summary: "주사율 측정 (화면 갱신 콜백 기준)", positionals: ["디스플레이"], valueOptions: ["--seconds"]),
     CommandSpec(name: "favorites", summary: "즐겨찾기 모드 조회, 추가, 삭제", positionals: ["디스플레이", "list|add|remove", "모드"], optionalPositionals: 2),
     CommandSpec(name: "notch", summary: "notch 영역 사용 여부 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "show|hide"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
