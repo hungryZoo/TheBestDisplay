@@ -21,7 +21,7 @@
 | 10 | 주사율 | 현재 모드 기준 주사율 목록, VRR 표기 | 구현 | PRD-MOD-005 |  |
 | 11 | 주사율 | 연결 수준 비노출 주사율 선택 | 구현 | PRD-COL-007 | LG TV에서 59.94 Hz 전환 확인 (TC-COL-009) |
 | 12 | 주사율 | 주사율 측정 표시 | 구현 | PRD-MOD-008 |  |
-| 13 | HDR | HDR 토글과 상태 표시 | 부분 | PRD-HDR-001-003 | 토글, EOTF, 최대 휘도, EDR 헤드룸 제공. Forced HDR 없음 |
+| 13 | HDR | HDR 토글과 상태 표시 | 부분 | PRD-HDR-001-003 | 토글, EOTF, 최대 휘도, EDR 헤드룸 제공. HDR 미선언 디스플레이용 EDID HDR 선언 추가 편집 제공 (PRD-EDO-006), 실제 적용은 미실행 (TC-EDO-008) |
 | 14 | HDR | XDR 프리셋 선택 | 구현 | PRD-CLR-005 |  |
 | 15 | HDR | XDR/HDR 밝기 업스케일 | 구현 | PRD-BRT-005 | 색 테이블 방식. 육안 확인 미수행 |
 | 16 | 색 모드 | RGB 또는 YCbCr, chroma, range, 비트 심도, EOTF 조합 목록과 선택 | 구현 | PRD-COL-002, PRD-COL-003 |  |

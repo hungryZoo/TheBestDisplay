@@ -77,7 +77,7 @@ private func runEDIDEdit(_ patches: [EDIDPatch], command: ParsedCommand, display
     } else {
         print("EDID \(source) 편집")
         for result in output.results {
-            print("  \(result.title): \(result.changed ? result.changes.joined(separator: ", ") : "대상 선언 없음 (변경 없음)")")
+            print("  \(result.title): \(result.summary)")
         }
         print("능력 요약 (편집 전 → 편집 후)")
         for (a, b) in zip(before.comparisonRows, after.comparisonRows) {
@@ -126,7 +126,7 @@ func runEDID(_ command: ParsedCommand, json: Bool) {
 
     case "patch":
         guard let value, let patches = EDIDPatch.parseList(value) else {
-            writeError("오류: 편집 목록 형식은 쉼표로 이은 remove-dsc, remove-hdr, remove-ycbcr, remove-420, remove-vrr, limit-frl:<0-6>, limit-tmds:<MHz>")
+            writeError("오류: 편집 목록 형식은 쉼표로 이은 remove-dsc, remove-hdr, remove-ycbcr, remove-420, remove-vrr, add-hdr[:<cd/m²>], limit-frl:<0-6>, limit-tmds:<MHz>")
             exit(.usage)
         }
         runEDIDEdit(patches, command: command, display: display, displays: displays, json: json)

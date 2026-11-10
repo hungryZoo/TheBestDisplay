@@ -81,7 +81,7 @@ struct EDIDOverrideSection: View {
             }
             if let preview {
                 ForEach(preview.results, id: \.title) { result in
-                    LabeledContent(result.title, value: result.changed ? result.changes.joined(separator: ", ") : "대상 선언 없음 (변경 없음)")
+                    LabeledContent(result.title, value: result.summary)
                 }
                 let before = record.parsed.sinkCapabilities.comparisonRows
                 let after = EDIDParser.parse(preview.data).sinkCapabilities.comparisonRows

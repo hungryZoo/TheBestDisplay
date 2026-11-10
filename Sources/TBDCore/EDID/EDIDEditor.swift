@@ -18,6 +18,8 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
     case limitTMDSRate(Int)
     /// 상세 타이밍 추가. `preferred`가 참이면 선호 타이밍으로 지정. (PRD-EDO-005)
     case addTiming(DetailedTimingSpec, preferred: Bool)
+    /// HDR 선언 추가: HDR 정적 메타데이터 블록(SDR, PQ, 정적 메타데이터 1형)과 BT.2020 색 공간 선언. 최대 휘도(cd/m²)는 선택. (PRD-EDO-006)
+    case addHDR(maxNits: Int?)
 
     public var title: String {
         switch self {
@@ -29,10 +31,11 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
         case .limitFRLRate(let rate): "FRL 최대 속도 단계 \(rate) 이하로 제한"
         case .limitTMDSRate(let mhz): "TMDS 최대 속도 \(mhz) MHz 이하로 제한"
         case .addTiming(let spec, let preferred): "상세 타이밍 추가\(preferred ? " (선호)" : ""): \(spec.label)"
+        case .addHDR(let maxNits): "HDR 선언 추가 (PQ, BT.2020)" + (maxNits.map { ", 최대 \($0) cd/m²" } ?? "")
         }
     }
 
-    /// 명령행 표기: `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`.
+    /// 명령행 표기: `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`, `add-hdr[:<cd/m²>]`.
     public static func parse(_ text: String) -> EDIDPatch? {
         let lower = text.lowercased()
         switch lower {
@@ -41,6 +44,7 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
         case "remove-ycbcr", "rgb-only": return .removeYCbCr
         case "remove-420", "remove-ycbcr420": return .removeYCbCr420
         case "remove-vrr": return .removeVRR
+        case "add-hdr": return .addHDR(maxNits: nil)
         default: break
         }
         let parts = lower.split(separator: ":").map(String.init)
@@ -48,6 +52,7 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
         switch parts[0] {
         case "limit-frl": return (0...6).contains(value) ? .limitFRLRate(value) : nil
         case "limit-tmds": return (25...600).contains(value) ? .limitTMDSRate(value) : nil
+        case "add-hdr": return EDIDPatch.hdrNitsRange.contains(value) ? .addHDR(maxNits: value) : nil
         default: return nil
         }
     }
@@ -60,7 +65,9 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
     }
 
     /// 매개변수가 없는 편집 항목. 화면의 선택 목록에 사용.
-    public static let simpleCases: [EDIDPatch] = [.removeDSC, .removeHDR, .removeYCbCr, .removeYCbCr420, .removeVRR]
+    public static let simpleCases: [EDIDPatch] = [.removeDSC, .removeHDR, .removeYCbCr, .removeYCbCr420, .removeVRR, .addHDR(maxNits: nil)]
+    /// HDR 선언에 넣을 최대 휘도의 범위 (cd/m²).
+    public static let hdrNitsRange = 100...10000
 }
 
 /// 편집 한 건의 결과.
@@ -69,18 +76,26 @@ public struct EDIDPatchResult: Hashable, Sendable, Codable {
     /// 실제로 바뀐 내용. 비어 있으면 대상 선언이 없어 변경 없음.
     public var changes: [String]
 
+    /// 변경이 없을 때의 사유. 제거 편집은 대상 선언이 없는 경우, 추가 편집은 이미 선언된 경우.
+    public var unchangedNote: String = "대상 선언 없음 (변경 없음)"
+
     public var changed: Bool { !changes.isEmpty }
+    /// 화면과 명령 출력에 쓰는 요약: 바뀐 내용 또는 변경 없음 사유.
+    public var summary: String { changed ? changes.joined(separator: ", ") : unchangedNote }
 }
 
 public enum EDIDEditError: Error, Equatable, LocalizedError {
     case invalid([String])
     /// 편집 결과가 블록 크기를 넘음.
     case overflow(String)
+    /// 이 EDID 구조에서는 할 수 없는 편집.
+    case unsupported(String)
 
     public var errorDescription: String? {
         switch self {
         case .invalid(let issues): "EDID 검증 실패: " + issues.joined(separator: ", ")
         case .overflow(let detail): "EDID 블록 공간 부족: \(detail)"
+        case .unsupported(let detail): "이 EDID에는 적용할 수 없음: \(detail)"
         }
     }
 }
@@ -124,7 +139,9 @@ public enum EDIDEditor {
         for patch in patches {
             var changes: [String] = []
             try apply(patch, to: &blocks, changes: &changes)
-            results.append(EDIDPatchResult(title: patch.title, changes: changes))
+            var result = EDIDPatchResult(title: patch.title, changes: changes)
+            if case .addHDR = patch { result.unchangedNote = "이미 선언됨 (변경 없음)" }
+            results.append(result)
         }
         let output = blocks.flatMap(withChecksum)
         return (Data(output), results)
@@ -198,6 +215,10 @@ public enum EDIDEditor {
             try addTiming(spec, preferred: preferred, to: &blocks, changes: &changes)
             return
         }
+        if case .addHDR(let maxNits) = patch {
+            try addHDR(maxNits: maxNits, to: &blocks, changes: &changes)
+            return
+        }
         if patch == .removeYCbCr {
             // 기본 블록: EDID 1.4 디지털 입력의 기능 바이트(24) 비트 4-3이 YCbCr 지원.
             if blocks[0][19] >= 4, blocks[0][20] & 0x80 != 0, blocks[0][24] & 0x18 != 0 {
@@ -263,10 +284,75 @@ public enum EDIDEditor {
                         changes.append("HDMI 블록의 TMDS 최대 클록을 \(limit) MHz 이하로 제한")
                     }
                 }
-            case .addTiming:
+            case .addTiming, .addHDR:
                 break
             }
             blocks[index] = try cta.serialized()
+        }
+    }
+
+    /// HDR 정적 메타데이터의 휘도 부호: 50 x 2^(부호 / 32) cd/m².
+    static func luminanceCode(_ nits: Int) -> UInt8 {
+        UInt8(min(max((32 * log2(Double(nits) / 50)).rounded(), 1), 255))
+    }
+
+    /// HDR 선언 추가. 이미 PQ를 선언한 EDID는 변경 없음. CTA 확장 블록(3판 이상)이 있어야 하며 공간이 부족하면 오류.
+    static func addHDR(maxNits: Int?, to blocks: inout [[UInt8]], changes: inout [String]) throws {
+        let ctaIndices = blocks.indices.dropFirst().filter { blocks[$0][0] == 0x02 && blocks[$0][1] >= 3 }
+        guard !ctaIndices.isEmpty else { throw EDIDEditError.unsupported("CTA 확장 블록(3판 이상) 없음") }
+        var ctas: [Int: CTABlock] = [:]
+        for index in ctaIndices { ctas[index] = CTABlock(blocks[index]) }
+
+        // (1) HDR 정적 메타데이터 블록 (확장 태그 6).
+        var hasStatic = false
+        for index in ctaIndices {
+            guard var cta = ctas[index], let position = cta.dataBlocks.firstIndex(where: { CTABlock.extendedTag($0) == 6 && $0.count >= 4 }) else { continue }
+            hasStatic = true
+            if cta.dataBlocks[position][2] & 0x04 == 0 {
+                cta.dataBlocks[position][2] |= 0x05
+                cta.dataBlocks[position][3] |= 0x01
+                ctas[index] = cta
+                changes.append("기존 HDR 정적 메타데이터 블록에 PQ 선언 추가")
+            }
+            break
+        }
+        if !hasStatic {
+            // EOTF: SDR(비트 0)와 PQ(비트 2). 정적 메타데이터 1형.
+            var body: [UInt8] = [0x06, 0x05, 0x01]
+            if let maxNits {
+                let code = luminanceCode(maxNits)
+                body += [code, code, 0]
+            }
+            let block = [0xE0 | UInt8(body.count)] + body
+            guard let index = ctaIndices.first(where: { (ctas[$0]?.freeBytes ?? 0) >= block.count }) else {
+                throw EDIDEditError.overflow("HDR 정적 메타데이터 블록 \(block.count)바이트를 넣을 자리 없음")
+            }
+            ctas[index]?.dataBlocks.append(block)
+            changes.append("HDR 정적 메타데이터 블록 추가 (SDR, PQ" + (maxNits.map { ", 최대 \($0) cd/m²" } ?? "") + ")")
+        }
+
+        // (2) 색 공간 블록 (확장 태그 5)의 BT.2020 RGB와 YCC.
+        var hasColorimetry = false
+        for index in ctaIndices {
+            guard var cta = ctas[index], let position = cta.dataBlocks.firstIndex(where: { CTABlock.extendedTag($0) == 5 && $0.count >= 3 }) else { continue }
+            hasColorimetry = true
+            if cta.dataBlocks[position][2] & 0xC0 != 0xC0 {
+                cta.dataBlocks[position][2] |= 0xC0
+                ctas[index] = cta
+                changes.append("색 공간 블록에 BT.2020 선언 추가")
+            }
+            break
+        }
+        if !hasColorimetry {
+            let block: [UInt8] = [0xE3, 0x05, 0xC0, 0x00]
+            guard let index = ctaIndices.first(where: { (ctas[$0]?.freeBytes ?? 0) >= block.count }) else {
+                throw EDIDEditError.overflow("색 공간 블록 \(block.count)바이트를 넣을 자리 없음")
+            }
+            ctas[index]?.dataBlocks.append(block)
+            changes.append("색 공간 블록 추가 (BT.2020 RGB, YCC)")
+        }
+        for index in ctaIndices {
+            if let cta = ctas[index] { blocks[index] = try cta.serialized() }
         }
     }
 

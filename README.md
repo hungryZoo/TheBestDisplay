@@ -71,7 +71,7 @@ open -a "TheBestDisplay"
 | 영역 | 내용 |
 | --- | --- |
 | 디스플레이 정보 | 제품 정보, 물리 크기, EDID 해석(기본 블록, CTA-861, DisplayID), 싱크 능력 요약, EDID 원본 저장 |
-| EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, FRL과 TMDS 상한), 사용자 정의 타이밍 추가(CVT-RB, CVT-RB2, 직접 지정), 가상 EDID 적용과 해제, 디스플레이 재감지 |
+| EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, HDR 선언 추가, FRL과 TMDS 상한), 사용자 정의 타이밍 추가(CVT-RB, CVT-RB2, 직접 지정), 가상 EDID 적용과 해제, 디스플레이 재감지 |
 | 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시, 사용자 정의 스케일 해상도 등록, 주사율 측정, 즐겨찾기 모드, 해상도 슬라이더, 렌더링 한계 표시 |
 | 색 모드 | 현재 송출 신호(픽셀 인코딩, 비트 심도, 레인지, EOTF, 색 공간) 표시, 현재 타이밍에서 선택 가능한 색 모드 전환, 연결 수준 타이밍 직접 선택 |
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
@@ -295,7 +295,7 @@ tbdctl diagnose
 - 디스플레이 지정: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
 - 모드 형식: `<폭>x<높이>[@<주사율>][:hidpi|:lodpi]` 또는 `mode:<번호>`
 - 색 모드 형식: `id:<번호>` 또는 `<rgb|ycbcr444|ycbcr422|ycbcr420>[:<bpc>][:<full|limited>][:<sdr|pq|hlg>]`
-- EDID 편집 목록: 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`
+- EDID 편집 목록: 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `add-hdr[:<cd/m²>]`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`
 - 타이밍 형식: `<폭>x<높이>@<주사율>[:rb|:rb2]` (CVT 축소 블랭킹, 기본 rb2) 또는 `raw:<수평 활성>,<프런트 포치>,<동기>,<백 포치>,<수직 활성>,<프런트 포치>,<동기>,<백 포치>,<픽셀 클록 kHz>[,+h|-h][,+v|-v]`
 - 종료 코드: 0 성공, 1 실행 실패, 2 사용법 오류, 3 미지원 기능 또는 대상 없음
 
@@ -352,7 +352,7 @@ tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 125건 중 통과 120건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 검증 결과 | TC 127건 중 통과 121건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
 | 참고 제품 기능 대조 | 58행 중 구현 51행, 부분 4행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
@@ -427,7 +427,8 @@ uv run scripts/trace_check.py
 - [x] P7 출시: 버전 정보와 업데이트 확인, 릴리스 빌드, Homebrew cask
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
 - [ ] 미구현 기능 3행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
-- [ ] EDID에 HDR 선언 추가 (HDR 미선언 디스플레이의 HDR 사용)
+- [x] EDID에 HDR 선언 추가 편집 (1.0.0 이후 추가, 다음 릴리스에 포함)
+- [ ] HDR 선언 추가의 실제 적용 실측
 - [ ] Developer ID 서명과 공증
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
