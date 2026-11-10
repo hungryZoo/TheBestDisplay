@@ -398,3 +398,76 @@ struct GammaServiceTests {
         #expect(service.adjustment(for: display.id).isIdentity)
     }
 }
+
+/// TC-CLR-001: 색 프로파일 열거와 지정. 지정 뒤 원래 프로파일로 복원.
+@Suite("TC-CLR-001 색 프로파일", .serialized)
+struct ColorProfileServiceTests {
+    @Test func 목록과_현재_프로파일() throws {
+        for display in DisplayCatalog.displays() {
+            let available = ColorProfileService.available(for: display.id)
+            #expect(!available.isEmpty, "\(display.identity.name)")
+            #expect(Set(available.map(\.path)).count == available.count)
+            #expect(available.filter(\.isFactoryDefault).count <= 1)
+            let current = try #require(ColorProfileService.current(for: display.id))
+            #expect(!current.name.isEmpty)
+        }
+    }
+
+    @Test func 지정_후_복원() throws {
+        let display = try #require(DisplayCatalog.displays().first)
+        let original = try #require(ColorProfileService.current(for: display.id))
+        let available = ColorProfileService.available(for: display.id)
+        let target = try #require(available.first { $0.name.hasPrefix("sRGB") && $0.path != original.path } ?? available.first { $0.path != original.path && !$0.isFactoryDefault })
+        try ColorProfileService.set(target, for: display.id)
+        usleep(500_000)
+        let changed = ColorProfileService.current(for: display.id)
+        try ColorProfileService.set(original, for: display.id)
+        usleep(500_000)
+        let restored = ColorProfileService.current(for: display.id)
+        #expect(changed?.name == target.name)
+        #expect(restored?.name == original.name)
+        #expect(restored?.path == original.path)
+    }
+}
+
+/// TC-CLR-002: Night Shift와 True Tone. 반전 뒤 원래 상태로 복원.
+@Suite("TC-CLR-002 Night Shift와 True Tone", .serialized)
+struct NightShiftTrueToneTests {
+    @Test func Night_Shift_반전과_복원() throws {
+        let original = try #require(NightShiftService.status())
+        try #require(original.isSupported, "Night Shift 미지원 기기")
+        try NightShiftService.setEnabled(!original.isEnabled)
+        usleep(600_000)
+        let changed = NightShiftService.status()
+        try NightShiftService.setEnabled(original.isEnabled)
+        usleep(600_000)
+        let restored = NightShiftService.status()
+        #expect(changed?.isEnabled == !original.isEnabled)
+        #expect(restored?.isEnabled == original.isEnabled)
+    }
+
+    @Test func Night_Shift_강도_변경과_복원() throws {
+        let original = try #require(NightShiftService.status())
+        let strength = try #require(original.strength)
+        let target = strength > 0.5 ? strength - 0.2 : strength + 0.2
+        try NightShiftService.setStrength(target)
+        usleep(300_000)
+        let changed = NightShiftService.status()?.strength
+        try NightShiftService.setStrength(strength)
+        usleep(300_000)
+        #expect(abs((changed ?? -1) - target) < 0.02)
+        #expect(abs((NightShiftService.status()?.strength ?? -1) - strength) < 0.02)
+    }
+
+    @Test func True_Tone_반전과_복원() throws {
+        let original = try #require(TrueToneService.status())
+        try #require(original.isSupported && original.isAvailable, "True Tone을 쓸 수 없는 구성")
+        try TrueToneService.setEnabled(!original.isEnabled)
+        usleep(600_000)
+        let changed = TrueToneService.status()
+        try TrueToneService.setEnabled(original.isEnabled)
+        usleep(600_000)
+        #expect(changed?.isEnabled == !original.isEnabled)
+        #expect(TrueToneService.status()?.isEnabled == original.isEnabled)
+    }
+}

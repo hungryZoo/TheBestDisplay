@@ -183,3 +183,43 @@ struct GammaTableTests {
         #expect(BrightnessMethod.software.title == "소프트웨어 디밍")
     }
 }
+
+@Suite("TC-CLR-002 색 설정 모델")
+struct ColorSettingsTests {
+    @Test func Night_Shift_상태_구조체_해석() throws {
+        var bytes = [UInt8](repeating: 0, count: 40)
+        bytes[0] = 1   // 활성
+        bytes[1] = 1   // 켜짐
+        bytes[4] = 2   // 사용자 지정 시간
+        bytes[32] = 1  // 사용 가능
+        let status = try #require(NightShiftStatus.decodeStatus(bytes, strength: 0.5))
+        #expect(status.isSupported)
+        #expect(status.isEnabled)
+        #expect(status.isActive)
+        #expect(status.scheduleMode == 2)
+        #expect(status.scheduleName == "사용자 지정 시간")
+        #expect(status.strength == 0.5)
+        let off = try #require(NightShiftStatus.decodeStatus([UInt8](repeating: 0, count: 64), strength: nil))
+        #expect(!off.isSupported && !off.isEnabled && !off.isActive)
+        #expect(off.scheduleName == "일정 없음")
+        #expect(NightShiftStatus.decodeStatus([UInt8](repeating: 0, count: 39), strength: nil) == nil)
+    }
+
+    @Test func True_Tone_상태_문구() {
+        #expect(TrueToneStatus(isSupported: false, isAvailable: false, isEnabled: false).stateLabel == "미지원")
+        #expect(TrueToneStatus(isSupported: true, isAvailable: false, isEnabled: true).stateLabel == "현재 사용 불가")
+        #expect(TrueToneStatus(isSupported: true, isAvailable: true, isEnabled: true).stateLabel == "켜짐")
+        #expect(TrueToneStatus(isSupported: true, isAvailable: true, isEnabled: false).stateLabel == "꺼짐")
+    }
+
+    @Test func 프로파일_정렬과_중복_제거() {
+        let list = [
+            ColorProfileInfo(name: "sRGB IEC61966-2.1", path: "/s.icc", isFactoryDefault: false),
+            ColorProfileInfo(name: "Display P3", path: "/p3.icc", isFactoryDefault: false),
+            ColorProfileInfo(name: "Color LCD", path: "/lcd.icc", isFactoryDefault: true),
+            ColorProfileInfo(name: "Display P3 사본", path: "/p3.icc", isFactoryDefault: false),
+            ColorProfileInfo(name: "adobe RGB", path: "/a.icc", isFactoryDefault: false),
+        ]
+        #expect(ColorProfileCatalog.sorted(list).map(\.name) == ["Color LCD", "adobe RGB", "Display P3", "sRGB IEC61966-2.1"])
+    }
+}

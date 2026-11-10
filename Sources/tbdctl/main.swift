@@ -19,6 +19,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "hdr", summary: "HDR 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "brightness", summary: "밝기 조회와 설정 (0-100)", positionals: ["디스플레이", "값"], optionalPositionals: 1),
     CommandSpec(name: "ddc", summary: "DDC 탐지와 VCP 읽기, 쓰기", positionals: ["디스플레이", "probe|get|set", "코드", "값"], optionalPositionals: 2),
+    CommandSpec(name: "color", summary: "색 프로파일, Night Shift, True Tone 상태", positionals: ["디스플레이"], flags: ["--profiles"]),
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
     CommandSpec(name: "help", summary: "사용법"),
 ])
@@ -142,6 +143,9 @@ case "brightness":
 
 case "ddc":
     runDDC(command, json: json)
+
+case "color":
+    runColor(command, json: json)
 
 case "revert-pending":
     runRevertPending(command)

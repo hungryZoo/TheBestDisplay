@@ -66,10 +66,10 @@
 | PRD-DDC-001 | P4 | 필수 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
 | PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
 | PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |
-| PRD-CLR-001 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-002 | TC-CLR-001 | `Sources/TBDPlatform/ColorProfileService.swift` | 미실행 1 |
+| PRD-CLR-001 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-002 | TC-CLR-001 | `Sources/TBDPlatform/ColorProfileService.swift` | 통과 1 |
 | PRD-CLR-002 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 1 |
-| PRD-CLR-003 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 미실행 1 |
-| PRD-CLR-004 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 미실행 1 |
+| PRD-CLR-003 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
+| PRD-CLR-004 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
 | PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
 | PRD-ARR-002 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-002 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
 | PRD-ARR-003 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-003 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
