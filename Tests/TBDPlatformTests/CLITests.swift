@@ -212,3 +212,19 @@ struct FramebufferLimitsServiceTests {
         #expect((limits["maxSourceWidths"] as? [Int])?.isEmpty == false)
     }
 }
+
+/// TC-UPD-002 (명령행 부분): 버전 표시. 네트워크를 쓰지 않는 항목만 확인.
+@Suite("TC-UPD-002 버전 명령")
+struct VersionCommandTests {
+    @Test func 버전_출력은_단일_출처와_일치() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let flag = try CLI.run(["--version"])
+        #expect(flag.status == 0)
+        #expect(String(decoding: flag.stdout, as: UTF8.self) == "tbdctl \(AppVersion.current)\n")
+        let command = try CLI.run(["version", "--json"])
+        #expect(command.status == 0)
+        let root = try #require(JSONSerialization.jsonObject(with: command.stdout) as? [String: String])
+        #expect(root["version"] == AppVersion.current)
+        #expect(SemanticVersion(AppVersion.current) != nil)
+    }
+}

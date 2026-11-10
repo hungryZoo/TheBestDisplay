@@ -7,10 +7,10 @@
 
 | 항목 | 값 |
 | --- | --- |
-| MRD 항목 | 54 |
-| PRD 요구사항 | 109 |
-| SRS 설계 요구사항 | 80 |
-| TC | 122 |
+| MRD 항목 | 55 |
+| PRD 요구사항 | 113 |
+| SRS 설계 요구사항 | 82 |
+| TC | 124 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -131,3 +131,7 @@
 | PRD-EDO-003 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 | SRS-EDO-002 | TC-EDO-003, TC-EDO-006 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 2 |
 | PRD-EDO-004 | P6 | 권장 | MRD-SCP-016 | SRS-EDO-002 | TC-EDO-004 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
 | PRD-EDO-005 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-003 | TC-EDO-005, TC-EDO-006 | `Sources/TBDCore/EDID/CustomTiming.swift`<br>`Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
+| PRD-UPD-001 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-001 | TC-UPD-001 | `Sources/TBDCore/Update/`<br>`scripts/build_app.sh`<br>`Sources/tbdctl/UpdateCommand.swift` | 통과 1 |
+| PRD-UPD-002 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-002 | TC-UPD-002 | `Sources/TBDApp/UpdateController.swift`<br>`Sources/TBDApp/Views/UpdateView.swift`<br>`Sources/TBDCore/Update/InstallMethod.swift` | 통과 1 |
+| PRD-UPD-003 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-002 | TC-UPD-002 | `Sources/TBDApp/UpdateController.swift`<br>`Sources/TBDApp/Views/UpdateView.swift`<br>`Sources/TBDCore/Update/InstallMethod.swift` | 통과 1 |
+| PRD-UPD-004 | P7 | 권장 | MRD-SCP-017, MRD-SCP-015 | SRS-UPD-001 | TC-UPD-001 | `Sources/TBDCore/Update/`<br>`scripts/build_app.sh`<br>`Sources/tbdctl/UpdateCommand.swift` | 통과 1 |

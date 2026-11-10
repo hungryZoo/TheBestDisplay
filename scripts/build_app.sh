@@ -5,7 +5,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 CONFIG="${1:-release}"
-VERSION="${TBD_VERSION:-0.1.0}"
+# 버전은 AppVersion.current 한 곳에서 관리. 앱 번들과 tbdctl이 같은 값을 씀. (SRS-UPD-001)
+VERSION="$(sed -n 's/.*static let current = "\([0-9.]*\)".*/\1/p' Sources/TBDCore/Update/AppVersion.swift)"
+[ -n "$VERSION" ] || { echo "버전을 읽지 못함: Sources/TBDCore/Update/AppVersion.swift" >&2; exit 1; }
 APP="build/TheBestDisplay.app"
 
 swift build -c "$CONFIG" --product TheBestDisplay

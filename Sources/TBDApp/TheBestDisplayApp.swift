@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import TBDCore
 import TBDPlatform
 
 /// 단일 창 앱 진입점. 메뉴 막대 상태 항목 없음. (PRD-APP-001, SRS-UI-002, ADR-0004)
@@ -27,6 +28,9 @@ struct TheBestDisplayApp: App {
                 .onAppear {
                     autoDisconnect.start()
                     hdrProfiles.start()
+                    // 메인 창 표시 직후: 캐시에 새 버전이 있으면 업데이트 창 표시, 주기가 지났으면 백그라운드 확인. (PRD-UPD-001)
+                    UpdateController.shared.presentPendingUpdateIfNeeded()
+                    UpdateController.shared.startBackgroundCheckIfNeeded()
                     appDelegate.onTerminate = { [autoDisconnect] in autoDisconnect.shutdown() }
                     changes.onChanged = { [store] in store.scheduleRefresh() }
                     changes.onUserChange = { [protection] in protection.userChangedConfiguration() }
@@ -40,12 +44,19 @@ struct TheBestDisplayApp: App {
         .defaultSize(width: 1040, height: 680)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(replacing: .help) {
+                Button("업데이트 확인…") { UpdateController.shared.checkNow() }
+                Button("릴리스 페이지 열기") { NSWorkspace.shared.open(AppVersion.releasesURL) }
+            }
             CommandGroup(after: .toolbar) {
                 Button("새로 고침") { store.refresh() }
                     .keyboardShortcut("r", modifiers: .command)
                 Button("진단 보고서 내보내기") { ReportSaver.save(store: store, redact: false, asText: false) }
                     .keyboardShortcut("e", modifiers: .command)
             }
+        }
+        Settings {
+            UpdateSettingsView()
         }
     }
 }

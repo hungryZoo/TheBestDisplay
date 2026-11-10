@@ -52,6 +52,8 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "edid", summary: "EDID 검증, 편집, 오버라이드 적용과 해제 (자동 복귀 적용)", positionals: ["디스플레이", "check|i2c|patch|timing|apply|reset", "값"], optionalPositionals: 1, valueOptions: ["--in", "--out", "--timeout"], flags: ["--apply", "--preferred", "--yes"]),
     CommandSpec(name: "redetect", summary: "디스플레이 재감지 요청"),
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
+    CommandSpec(name: "version", summary: "버전 표시 (--version과 같음)"),
+    CommandSpec(name: "check-update", summary: "GitHub 최신 릴리스 조회와 현재 버전 비교"),
     CommandSpec(name: "help", summary: "사용법"),
 ])
 
@@ -89,6 +91,10 @@ func resolveDisplay(_ selector: String) -> (DisplaySummary, [DisplaySummary]) {
 }
 
 let arguments = Array(CommandLine.arguments.dropFirst())
+if arguments == ["--version"] || arguments == ["-V"] {
+    print("tbdctl \(AppVersion.current)")
+    exit(.success)
+}
 if arguments.isEmpty || arguments.contains("--help") || arguments.contains("-h") {
     print(parser.usage)
     exit(arguments.isEmpty ? .usage : .success)
@@ -111,6 +117,12 @@ let json = command.has("--json")
 switch command.name {
 case "help":
     print(parser.usage)
+
+case "version":
+    if json { printJSON(["version": AppVersion.current]) } else { print("tbdctl \(AppVersion.current)") }
+
+case "check-update":
+    runCheckUpdate(json: json)
 
 case "list":
     let displays = DisplayCatalog.displays()
