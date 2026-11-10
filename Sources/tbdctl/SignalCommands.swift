@@ -56,6 +56,9 @@ func runSignal(_ command: ParsedCommand, json: Bool) {
     if let current {
         print("현재 색 모드 [id:\(current.id)]: \(current.label), 색 공간 \(Colorimetry.name(current.colorimetry))")
     }
+    if let mode = ModeService.currentMode(for: display.id, in: ModeService.modes(for: display.id)), let bits = info.linkData?.bitsPerComponent ?? current?.bitsPerComponent {
+        print("심도 비교: \(DepthComparison.note(framebufferBits: mode.bitsPerSample, linkBits: bits))")
+    }
     print("DSC: \(dsc.summary). 소스 \(describe(dsc.sourceSupportsDSC)), 싱크 \(describe(dsc.sinkSupportsDSC)). DSC 필요 모드 \(dsc.dscRequiredModeCount)개, 불필요 모드 \(dsc.dscFreeModeCount)개")
     print("선택 가능한 색 모드 \(info.selectableColorModes.count)개 (현재 타이밍 기준)")
     for element in info.selectableColorModes.sorted(by: colorOrder) {

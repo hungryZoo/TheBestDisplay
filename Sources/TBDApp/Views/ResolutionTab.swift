@@ -11,6 +11,7 @@ struct ResolutionTab: View {
     @State private var filter = ModeFilter()
     @State private var favorites: [ModeDescriptor] = []
     @State private var sliderIndex: Double = 0
+    @State private var showsHiDPIHelp = false
 
     private let favoriteStore = ModeFavoritesStore.standard
 
@@ -56,6 +57,23 @@ struct ResolutionTab: View {
                 Text("표시 \(shown)개, 전체 \(modes.count)개")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Button("해상도 용어", systemImage: "questionmark.circle") { showsHiDPIHelp = true }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                    .help("논리 해상도, 백킹 해상도, 패널 해상도의 뜻")
+                    .popover(isPresented: $showsHiDPIHelp) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("해상도 용어").font(.headline)
+                            Text("논리 해상도: 창과 글자의 크기를 정하는 좌표 크기 (포인트). 값이 작을수록 화면 요소가 크게 보임.")
+                            Text("백킹 해상도: 시스템이 실제로 그리는 픽셀 크기. HiDPI 모드는 논리 해상도의 2배로 그림.")
+                            Text("패널 해상도: 디스플레이로 보내는 신호의 픽셀 크기. 백킹 해상도와 다르면 시스템이 크기를 맞춰 보냄.")
+                            Text("HiDPI: 논리 1포인트를 2 x 2 픽셀로 그리는 방식. 백킹 해상도가 패널 해상도와 같을 때 가장 선명하고, 더 크면 축소되어 약간 부드럽게 보임.")
+                            Text("예: 4K 패널(3840 x 2160)에서 1920 x 1080 HiDPI는 백킹 3840 x 2160으로 1:1 표시, 2560 x 1440 HiDPI는 백킹 5120 x 2880을 3840 x 2160으로 축소해 표시.")
+                        }
+                        .font(.callout)
+                        .frame(width: 420)
+                        .padding(16)
+                    }
             }
             HStack(spacing: 14) {
                 Picker("배율", selection: $filter.hiDPI) {

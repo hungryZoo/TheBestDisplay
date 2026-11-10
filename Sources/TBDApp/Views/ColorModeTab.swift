@@ -78,6 +78,9 @@ struct ColorModeTab: View {
                 Text("현재 색 모드를 확인할 수 없음").foregroundStyle(.secondary)
             }
             LabeledContent("전송 방식", value: info.transport ?? "미확인")
+            if let mode = store.currentModes[display.id], let bits = info.linkData?.bitsPerComponent ?? info.currentColor?.bitsPerComponent {
+                LabeledContent("심도 비교", value: DepthComparison.note(framebufferBits: mode.bitsPerSample, linkBits: bits))
+            }
             if let dither {
                 Toggle("GPU 디더링", isOn: Binding(get: { dither }, set: { value in
                     do {

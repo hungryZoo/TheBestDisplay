@@ -63,6 +63,7 @@
 | T41 | P6 | GPU 디더링 조회와 전환, `dither` 명령, 색 모드 탭 토글 | PRD-COL-008 | TC-COL-010 | 완료 |
 | T42 | P6 | Thunderbolt 스위치 토폴로지와 레인 구성 판정 | PRD-PRT-006 | TC-PRT-005-006 | 완료 |
 | T43 | P6 | EDID 타일 배치 해석 | PRD-INF-006 | TC-INF-007 | 완료 |
+| T44 | P6 | 프레임버퍼 심도 비교 안내, 해상도 용어 설명 | PRD-COL-009, PRD-MOD-012 | TC-COL-011 | 완료 |
 
 ## 3. 사용자 참여 항목
 

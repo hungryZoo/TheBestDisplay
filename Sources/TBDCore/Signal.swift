@@ -403,3 +403,17 @@ public enum ColorSpec: Equatable, Sendable {
         }
     }
 }
+
+/// 프레임버퍼 심도와 연결 심도의 비교 안내. (PRD-COL-009)
+/// 프레임버퍼 심도는 윈도우 서버 모드의 채널당 비트, 연결 심도는 링크로 송출하는 채널당 비트.
+public enum DepthComparison {
+    public static func note(framebufferBits: Int, linkBits: Int) -> String {
+        if linkBits < framebufferBits {
+            return "프레임버퍼 \(framebufferBits) bpc, 연결 \(linkBits) bpc: 연결 심도가 낮아 차이는 디더링으로 표현 (GPU 디더링 설정 참고)"
+        }
+        if linkBits > framebufferBits {
+            return "프레임버퍼 \(framebufferBits) bpc, 연결 \(linkBits) bpc: 연결 심도가 높음. 화면 내용의 계조는 프레임버퍼 심도까지"
+        }
+        return "프레임버퍼와 연결 모두 \(linkBits) bpc"
+    }
+}

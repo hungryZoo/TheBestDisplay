@@ -245,3 +245,13 @@ struct HDRStatusTests {
         #expect(Toggle.parse("toggle") == nil)
     }
 }
+
+/// TC-COL-011: 프레임버퍼 심도와 연결 심도 비교 문구.
+@Suite("TC-COL-011 심도 비교")
+struct DepthComparisonTests {
+    @Test func 낮음_높음_같음() {
+        #expect(DepthComparison.note(framebufferBits: 10, linkBits: 8) == "프레임버퍼 10 bpc, 연결 8 bpc: 연결 심도가 낮아 차이는 디더링으로 표현 (GPU 디더링 설정 참고)")
+        #expect(DepthComparison.note(framebufferBits: 10, linkBits: 12) == "프레임버퍼 10 bpc, 연결 12 bpc: 연결 심도가 높음. 화면 내용의 계조는 프레임버퍼 심도까지")
+        #expect(DepthComparison.note(framebufferBits: 10, linkBits: 10) == "프레임버퍼와 연결 모두 10 bpc")
+    }
+}
