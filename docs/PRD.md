@@ -88,6 +88,7 @@
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 시스템 밝기 제어 또는 DDC. 소프트웨어 디밍은 창 앱 전용 |
 | `tbdctl xdr <디스플레이> [<배율 %>] [--seconds <초>]` | XDR 밝기 업스케일 가능 여부와 EDR 헤드룸 조회. 배율(100-200)을 주면 지정 시간(기본 10초) 동안 적용한 뒤 해제 |
+| `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 조회 |
 | `tbdctl arrangement` | 디스플레이별 위치, 크기, 회전, 미러 상태 조회 |
@@ -212,6 +213,7 @@
 | PRD-CLR-002 | 감마, 색온도, RGB 게인, 대비의 소프트웨어 조정과 초기화 | P4 | 필수 | MRD-SCP-010 |
 | PRD-CLR-003 | Night Shift 상태 표시, 전환, 강도 조절 | P4 | 권장 | MRD-SCP-010 |
 | PRD-CLR-004 | True Tone 상태 표시와 전환 | P4 | 권장 | MRD-SCP-010 |
+| PRD-CLR-005 | 디스플레이 프리셋(기준 모드) 목록 표시와 전환: 이름, 설명, 현재와 기본 표시. 전환에 자동 복귀 사용 | P6 | 권장 | MRD-SCP-010 |
 
 ### 6.12 배치 (ARR)
 

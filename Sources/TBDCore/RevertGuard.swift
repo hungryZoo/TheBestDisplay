@@ -119,6 +119,8 @@ public enum RevertAction: Codable, Hashable, Sendable {
     case reconnect(displayID: UInt32, name: String)
     /// 가상 EDID 해제. 적용 뒤 식별 정보가 바뀔 수 있어 AV 서비스의 레지스트리 항목 ID로 지정.
     case edidReset(serviceEntryID: UInt64, name: String)
+    /// 디스플레이 프리셋 복귀.
+    case preset(target: DisplayRef, index: Int, name: String)
 }
 
 public struct PendingRevert: Codable, Hashable, Sendable {

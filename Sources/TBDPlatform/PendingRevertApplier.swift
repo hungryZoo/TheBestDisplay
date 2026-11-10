@@ -25,6 +25,9 @@ public enum PendingRevertApplier {
                 try ArrangementService.reconnect(displayID)
             case .edidReset(let serviceEntryID, _):
                 try EDIDOverrideService.reset(registryEntryID: serviceEntryID)
+            case .preset(let target, let index, _):
+                guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
+                try PresetService.setActive(index: index, on: display.id)
             }
         }
     }

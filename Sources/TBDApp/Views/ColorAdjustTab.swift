@@ -12,8 +12,11 @@ final class ColorAdjustViewModel {
     var nightShift: NightShiftStatus?
     var trueTone: TrueToneStatus?
     var message: String?
+    /// 디스플레이 프리셋 (사용 가능한 것만). (PRD-CLR-005)
+    var presets: [DisplayPreset] = []
 
     func load(_ display: DisplaySummary) {
+        presets = PresetService.presets(for: display.id).filter(\.isValid)
         profiles = ColorProfileService.available(for: display.id)
         let current = ColorProfileService.current(for: display.id)
         currentProfilePath = current?.path ?? ""
@@ -44,13 +47,42 @@ final class ColorAdjustViewModel {
     }
 }
 
-/// 색 조정 탭: 색 프로파일, 소프트웨어 조정, Night Shift, True Tone. (PRD-CLR-001-004)
+/// 색 조정 탭: 디스플레이 프리셋, 색 프로파일, 소프트웨어 조정, Night Shift, True Tone. (PRD-CLR-001-005)
 struct ColorAdjustTab: View {
+    @Environment(ChangeController.self) private var changes
     let display: DisplaySummary
     @State private var model = ColorAdjustViewModel()
 
     var body: some View {
         Form {
+            if !model.presets.isEmpty {
+                Section("디스플레이 프리셋") {
+                    ForEach(model.presets) { preset in
+                        HStack(alignment: .firstTextBaseline) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack(spacing: 6) {
+                                    Text(preset.name).fontWeight(preset.isActive ? .semibold : .regular)
+                                    if preset.isActive { Badge(text: "현재", color: .accentColor) }
+                                    if preset.isDefault { Badge(text: "기본", color: .gray) }
+                                }
+                                if !preset.detail.isEmpty {
+                                    Text(preset.detail).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                                }
+                            }
+                            Spacer(minLength: 12)
+                            Button("적용") {
+                                guard let current = model.presets.first(where: \.isActive) else { return }
+                                changes.request(DisplayChanges.presetChange(display: display, from: current, to: preset), targetDisplayID: display.id)
+                            }
+                            .controlSize(.small)
+                            .disabled(preset.isActive || changes.isBusy)
+                        }
+                    }
+                    Text("프리셋은 밝기 범위, 색 공간, 전달 함수를 묶은 기준 모드. 프리셋에 따라 밝기 조절과 HDR 사용 범위가 달라짐")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
             Section("색 프로파일") {
                 Picker("프로파일", selection: Binding(get: { model.currentProfilePath }, set: { path in
                     guard let profile = model.profiles.first(where: { $0.path == path }) else { return }

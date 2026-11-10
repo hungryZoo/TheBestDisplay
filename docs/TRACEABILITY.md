@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 76 |
-| SRS 설계 요구사항 | 50 |
-| TC | 70 |
+| PRD 요구사항 | 77 |
+| SRS 설계 요구사항 | 51 |
+| TC | 72 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -74,6 +74,7 @@
 | PRD-CLR-002 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 1 |
 | PRD-CLR-003 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
 | PRD-CLR-004 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
+| PRD-CLR-005 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-004 | TC-CLR-003, TC-CLR-004 | `Sources/TBDPlatform/PresetService.swift`<br>`Sources/TBDCore/DisplayPreset.swift` | 통과 2 |
 | PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
 | PRD-ARR-002 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-002 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-003 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-003 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
@@ -91,7 +92,7 @@
 | PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-CLI-001 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-001 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
-| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-COL-007, TC-CLI-002, TC-EDO-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 보류 1, 통과 2 |
+| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-COL-007, TC-CLR-004, TC-CLI-002, TC-EDO-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 보류 1, 통과 3 |
 | PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
 | PRD-EDO-001 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-001 | TC-EDO-001, TC-EDO-002 | `Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
 | PRD-EDO-002 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-001 | TC-EDO-001, TC-EDO-002 | `Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |

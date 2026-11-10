@@ -21,6 +21,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "dsc", summary: "DSC 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "hdr", summary: "HDR 상태 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "on|off"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "brightness", summary: "밝기 조회와 설정 (0-100)", positionals: ["디스플레이", "값"], optionalPositionals: 1),
+    CommandSpec(name: "preset", summary: "디스플레이 프리셋 조회와 전환 (자동 복귀 적용)", positionals: ["디스플레이", "번호 또는 이름"], optionalPositionals: 1, valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "xdr", summary: "XDR 밝기 업스케일 조회와 적용 (지정 시간 동안 유지)", positionals: ["디스플레이", "배율 %"], optionalPositionals: 1, valueOptions: ["--seconds"]),
     CommandSpec(name: "ddc", summary: "DDC 탐지와 VCP 읽기, 쓰기", positionals: ["디스플레이", "probe|get|set", "코드", "값"], optionalPositionals: 2),
     CommandSpec(name: "color", summary: "색 프로파일, Night Shift, True Tone 상태", positionals: ["디스플레이"], flags: ["--profiles"]),
@@ -164,6 +165,9 @@ case "hdr":
 
 case "brightness":
     runBrightness(command, json: json)
+
+case "preset":
+    runPreset(command, json: json)
 
 case "xdr":
     MainActor.assumeIsolated { runXDR(command, json: json) }

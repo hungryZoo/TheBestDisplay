@@ -70,7 +70,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 포트와 케이블 | 포트별 지원 전송, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로 |
 | 진단 | 포트별 화면 출력 점검 6단계, 발견 항목(근거와 조치), 이벤트 기록, 진단 보고서 내보내기 |
 | 밝기와 DDC | 시스템 밝기, DDC 밝기, 소프트웨어 디밍, 자동 밝기, XDR 밝기 업스케일, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
-| 색 조정 | 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
+| 색 조정 | 디스플레이 프리셋(기준 모드), 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
 | 배치 | 회전, 미러, 메인 지정, 위치 편집, 논리적 연결 해제와 재연결, 언더스캔 |
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
 | 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
@@ -141,7 +141,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | 색 모드 | HDR 전환, 현재 송출 신호, DSC 상태, 색 모드 목록과 적용, 싱크 타이밍 |
 | 링크 | 링크 속도와 레인, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD |
 | 밝기 | 밝기, 자동 밝기, XDR 밝기 업스케일, DDC 기능 |
-| 색 조정 | 색 프로파일, 소프트웨어 조정, Night Shift, True Tone |
+| 색 조정 | 디스플레이 프리셋, 색 프로파일, 소프트웨어 조정, Night Shift, True Tone |
 | 배치 | 위치 편집, 회전, 메인 지정, 미러, 연결 해제 |
 | 연결 진단 | 발견 항목, 포트와 연결 경로, 이벤트 기록, 보고서 내보내기 |
 | 가상 디스플레이 | 가상 디스플레이 추가, 켜기와 끄기, 삭제 |
@@ -176,6 +176,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정 |
 | `tbdctl xdr <디스플레이> [<배율 %>] [--seconds <초>]` | XDR 밝기 업스케일 조회, 지정 시간 동안 적용 |
+| `tbdctl preset <디스플레이> [<번호 또는 이름>] [--timeout <초>] [--yes]` | 디스플레이 프리셋 조회와 전환 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 |
 | `tbdctl arrangement` | 위치, 회전, 미러 상태 |
@@ -200,7 +201,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 
 ### 자동 복귀 안전장치
 
-- 대상: 모드, 색 모드, DSC, HDR, EDID 오버라이드, 회전, 미러, 연결 해제, HiDPI 스케일링, 프로파일 적용
+- 대상: 모드, 색 모드, DSC, HDR, 디스플레이 프리셋, EDID 오버라이드, 회전, 미러, 연결 해제, HiDPI 스케일링, 프로파일 적용
 - 창 앱: 확인 대화상자에서 15초 안에 유지를 누르지 않으면 이전 설정으로 복귀
 - 명령행: Return을 입력하면 확정, 제한 시간(`--timeout`, 기본 15초) 안에 입력이 없으면 복귀. `--yes`는 확인 없이 확정
 - 확인 전에 앱이 종료되면 다음 실행 시 복귀 제안 표시. 명령행은 `tbdctl revert-pending`

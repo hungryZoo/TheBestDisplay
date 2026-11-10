@@ -171,3 +171,5 @@
 | T17 | `SLSDetectDisplays` 실행: 내장 디스플레이만 온라인인 상태에서 반환값 0, 디스플레이 목록과 모드 유지 |
 | T19 | 시스템 오버라이드 폴더(`/System/Library/Displays/Contents/Resources/Overrides`)의 `scale-resolutions` 항목은 12바이트(폭, 높이, 플래그 0x1) 형식. `/Library/Displays` 폴더는 실험 기기에 없음. 내장 패널 식별값은 제조사 0x610, 제품 0xa05e |
 | T20 | 실험 03 (`spikes/03_xdr_probe`): 내장 XDR 패널의 잠재 EDR 헤드룸 16.0. EDR 창 표시와 1.4배 전달 테이블 지정 시 `CGGetDisplayTransferByTable` 최댓값 1.4 유지, 복원 뒤 1.0. `NSScreen`의 헤드룸 값은 프로세스가 화면 정보를 읽은 시점 값이라 적용 중 변화는 별도 프로세스로 측정: 적용 중 6.17배, 해제 약 25초 뒤 1.00배 |
+| T24 | `MPDisplay` 프리셋 메서드 형식 부호: `hasPresets` B, `presets` @, `activePreset` @, `defaultPreset` @, `setActivePreset:` B(객체 인자). `MPDisplayPreset`: `presetIndex` Q, `presetName` @, `presetDescription` @, `presetGroup` q, `isValid` B, `isWritable` B. 내장 XDR 패널은 51개 자리 중 11개 사용 가능. P3-600 nits 전환과 복귀 실측 |
+| T24 | 레지스트리 조사: `AppleT8132TypeCPhy` 노드 4개의 `AppleTypeCPhyLane`은 연결이 없으면 빈 사전. `AppleHDCPInterface` 노드에 `HDCPCapabilityMask`(2 또는 3)와 `HDCPChannel` 존재, 값의 의미는 미확인. 포트 노드의 `PlugOrientation`은 연결이 없을 때 0. 충전기 미연결 상태의 `AdapterDetails`는 `FamilyCode` 0뿐 |

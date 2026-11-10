@@ -126,6 +126,19 @@ public enum DisplayChanges {
         )
     }
 
+    /// 디스플레이 프리셋 전환. 복귀는 이전 프리셋 재적용. (SRS-CLR-004)
+    public static func presetChange(display: DisplaySummary, from previous: DisplayPreset, to target: DisplayPreset) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        let displayID = display.id
+        return RevertCoordinator.Change(
+            summary: "\(name): 프리셋 \(previous.name) → \(target.name)",
+            pending: PendingRevert(createdAt: Date(), summary: "\(name) 프리셋을 \(previous.name)(으)로 복귀", actions: [.preset(target: DisplayRef(display.identity), index: previous.index, name: previous.name)]),
+            apply: { try PresetService.setActive(index: target.index, on: displayID) },
+            commit: { guard ModeService.isOnline(displayID) else { throw DisplayChangeError.displayNotFound } },
+            restore: { try PresetService.setActive(index: previous.index, on: displayID) }
+        )
+    }
+
     /// 가상 EDID 적용. 복귀는 가상 EDID 해제(원본 EDID 복귀). (SRS-EDO-002)
     /// 적용 뒤 시스템이 디스플레이를 다시 감지하므로 디스플레이 ID와 식별 정보가 바뀔 수 있음.
     public static func edidOverrideChange(display: DisplaySummary, among displays: [DisplaySummary], edid: Data, detail: String) throws -> RevertCoordinator.Change {
