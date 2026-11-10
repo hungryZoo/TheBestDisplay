@@ -10,6 +10,7 @@ struct VirtualDisplaysView: View {
     @State private var height = "1080"
     @State private var hiDPI = true
     @State private var restoreAtLaunch = false
+    @State private var hdr = false
     @State private var message: String?
 
     var body: some View {
@@ -62,6 +63,7 @@ struct VirtualDisplaysView: View {
                     .fixedSize()
                 }
                 Toggle("HiDPI (백킹 해상도 2배)", isOn: $hiDPI)
+                Toggle("HDR 가상 디스플레이", isOn: $hdr)
                 Toggle("앱 실행 시 자동으로 켜기", isOn: $restoreAtLaunch)
                 Button("추가하고 켜기") { add() }
             }
@@ -79,7 +81,7 @@ struct VirtualDisplaysView: View {
             message = "폭과 높이는 정수"
             return
         }
-        let config = VirtualDisplayConfig(name: name.trimmingCharacters(in: .whitespaces), width: w, height: h, hiDPI: hiDPI, restoreAtLaunch: restoreAtLaunch)
+        let config = VirtualDisplayConfig(name: name.trimmingCharacters(in: .whitespaces), width: w, height: h, hiDPI: hiDPI, restoreAtLaunch: restoreAtLaunch, hdr: hdr)
         let issues = config.validationIssues()
         guard issues.isEmpty else {
             message = issues.joined(separator: ", ")

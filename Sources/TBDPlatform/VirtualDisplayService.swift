@@ -77,11 +77,13 @@ public final class VirtualDisplayService: @unchecked Sendable {
               let display = unsafeBitCast(allocated.method(for: initSelector), to: InitFn.self)(allocated, initSelector, descriptor)?.takeRetainedValue()
         else { throw DisplayChangeError.system(operation: "가상 디스플레이 생성", code: -1) }
 
-        // initWithWidth:height:refreshRate: `@32@0:8I16I20d24`
-        typealias ModeInitFn = @convention(c) (NSObject, Selector, UInt32, UInt32, Double) -> Unmanaged<NSObject>?
-        let modeSelector = NSSelectorFromString("initWithWidth:height:refreshRate:")
-        guard let modeAllocated = modeClass.perform(NSSelectorFromString("alloc"))?.takeUnretainedValue() as? NSObject,
-              let mode = unsafeBitCast(modeAllocated.method(for: modeSelector), to: ModeInitFn.self)(modeAllocated, modeSelector, UInt32(config.width), UInt32(config.height), config.refreshRate)?.takeRetainedValue()
+        // initWithWidth:height:refreshRate:transferFunction: `@36@0:8I16I20d24I32`
+        // 전달 함수 값 1은 HDR 지원 디스플레이, 0과 2는 SDR로 인식 (실험 04).
+        typealias ModeInitFn = @convention(c) (NSObject, Selector, UInt32, UInt32, Double, UInt32) -> Unmanaged<NSObject>?
+        let modeSelector = NSSelectorFromString("initWithWidth:height:refreshRate:transferFunction:")
+        guard modeClass.instancesRespond(to: modeSelector),
+              let modeAllocated = modeClass.perform(NSSelectorFromString("alloc"))?.takeUnretainedValue() as? NSObject,
+              let mode = unsafeBitCast(modeAllocated.method(for: modeSelector), to: ModeInitFn.self)(modeAllocated, modeSelector, UInt32(config.width), UInt32(config.height), config.refreshRate, config.hdr ? 1 : 0)?.takeRetainedValue()
         else { throw DisplayChangeError.system(operation: "가상 디스플레이 모드 생성", code: -1) }
 
         let settings = settingsClass.init()

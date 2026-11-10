@@ -194,7 +194,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl auto-disconnect [on\|off]` | 외장 연결 시 내장 자동 연결 해제 설정 |
 | `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]` | 논리적 연결 해제 |
 | `tbdctl reconnect [<디스플레이 ID>]` | 연결 해제한 디스플레이 재연결 |
-| `tbdctl virtual <폭>x<높이> [--hidpi] [--name <이름>] [--seconds <초>]` | 가상 디스플레이 생성과 유지 |
+| `tbdctl virtual <폭>x<높이> [--hidpi] [--hdr] [--name <이름>] [--seconds <초>]` | 가상 디스플레이 생성과 유지 |
 | `tbdctl profile <list\|show\|save\|apply\|rename\|delete> [<이름>] [<새 이름>] [--replace] [--timeout <초>] [--yes]` | 구성 프로파일 |
 | `tbdctl profile check <이름>` | 프로파일과 현재 구성의 차이 조회 |
 | `tbdctl profile protect <이름>`, `profile unprotect`, `profile protection` | 구성 보호 설정, 해제, 상태 조회 |

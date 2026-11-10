@@ -17,7 +17,7 @@ func runVirtual(_ command: ParsedCommand) {
         }
         seconds = value
     }
-    let config = VirtualDisplayConfig(name: command.options["--name"] ?? "tbdctl 가상 디스플레이", width: width, height: height, hiDPI: command.has("--hidpi"), refreshRate: rate ?? 60)
+    let config = VirtualDisplayConfig(name: command.options["--name"] ?? "tbdctl 가상 디스플레이", width: width, height: height, hiDPI: command.has("--hidpi"), refreshRate: rate ?? 60, hdr: command.has("--hdr"))
     let issues = config.validationIssues()
     guard issues.isEmpty else {
         writeError("오류: \(issues.joined(separator: ", "))")

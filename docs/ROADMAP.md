@@ -65,6 +65,7 @@
 | T43 | P6 | EDID 타일 배치 해석 | PRD-INF-006 | TC-INF-007 | 완료 |
 | T44 | P6 | 프레임버퍼 심도 비교 안내, 해상도 용어 설명 | PRD-COL-009, PRD-MOD-012 | TC-COL-011 | 완료 |
 | T45 | P6 | 다단계 스케일 해상도 일괄 등록, `scaled ... ladder` | PRD-MOD-013 | TC-MOD-014 | 완료 (실제 설치는 관리자 인증 필요) |
+| T46 | P6 | HDR 가상 디스플레이 옵션, `virtual ... --hdr` | PRD-VRT-004 | TC-VRT-003 | 완료 |
 
 ## 3. 사용자 참여 항목
 

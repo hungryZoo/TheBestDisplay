@@ -86,3 +86,21 @@ struct HiDPIScalingTests {
         #expect(HiDPIScaling.sharpnessNote(logicalWidth: 1600, nativeWidth: 3840) == "3200픽셀로 그린 뒤 패널 3840픽셀로 확대 (120%)")
     }
 }
+
+/// TC-VRT-003: 가상 디스플레이 구성의 HDR 옵션.
+@Suite("TC-VRT-003 가상 디스플레이 HDR 옵션")
+struct VirtualDisplayHDRTests {
+    @Test func 구성_표기와_저장_왕복() throws {
+        let config = VirtualDisplayConfig(name: "HDR", width: 1920, height: 1080, hiDPI: true, hdr: true)
+        #expect(config.label == "1920 x 1080 HiDPI, 60 Hz, HDR")
+        let data = try JSONEncoder().encode(config)
+        #expect(try JSONDecoder().decode(VirtualDisplayConfig.self, from: data) == config)
+    }
+
+    @Test func 이전_판_저장_파일은_HDR_꺼짐으로_해석() throws {
+        let old = #"{"hiDPI":true,"height":1080,"id":"7B1D2C3E-0A4F-4B6A-9C8D-1E2F3A4B5C6D","name":"이전","refreshRate":60,"restoreAtLaunch":false,"width":1920}"#
+        let config = try JSONDecoder().decode(VirtualDisplayConfig.self, from: Data(old.utf8))
+        #expect(config.hdr == false)
+        #expect(config.label == "1920 x 1080 HiDPI, 60 Hz")
+    }
+}

@@ -183,3 +183,5 @@
 | T39 | LG TV 대상 HiDPI 스케일링 2560x1440: 가상 디스플레이(백킹 5120x2880)가 메인, TV가 미러 대상. 스케일링 중 TV 송출은 3840x2160 120 Hz, RGB 4:4:4 8 bpc SDR로 바뀌며 HDR은 꺼짐. 해제 뒤 YCbCr 4:2:2 12 bpc PQ와 HDR 켜짐으로 복귀 |
 | T41 | 프레임버퍼 노드(`IOMobileFramebufferShim`)의 `enableDither` 속성: 내장 Yes, 12 bpc 송출 중인 LG TV No, 빈 노드 Yes. 비권한 프로세스의 `IORegistryEntrySetCFProperty`로 내장 노드 값을 No로 바꾼 뒤 다시 Yes로 복원 확인. `IOMobileFramebufferEnableDisableDithering`은 내부 함수 표로 바로 분기해 인자 구성을 확정하지 못해 사용하지 않음 |
 | T40 | `SLSConfigureDisplayEnabled`로 LG TV가 온라인인 상태에서 내장 디스플레이 해제와 재연결 확인 (재연결은 7초 안) |
+| T46 | 실험 04 (`spikes/04_virtual_hdr_probe`): `CGVirtualDisplayMode`의 전달 함수 값 0, 1, 2로 가상 디스플레이 생성. 값 1만 `SLSDisplaySupportsHDRMode` 참, HDR 켜짐. 0과 2는 HDR 미지원 |
+| T46 | CoreDisplay의 `CoreDisplay_Display_GetDisplayBrightnessInNits` 등 nits 함수는 디스플레이 ID가 아닌 내부 객체 포인터를 첫 인자로 받음 (역어셈블). 객체를 얻는 공개 근거가 없어 사용하지 않음 |

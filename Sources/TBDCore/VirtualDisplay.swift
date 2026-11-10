@@ -12,8 +12,26 @@ public struct VirtualDisplayConfig: Codable, Hashable, Sendable, Identifiable {
     public var refreshRate: Double
     /// 앱 실행 시 자동 생성 여부.
     public var restoreAtLaunch: Bool
+    /// HDR 가상 디스플레이 여부. 모드의 전달 함수 값을 1로 지정 (실험 04). (PRD-VRT-004)
+    public var hdr: Bool = false
 
-    public init(id: UUID = UUID(), name: String, width: Int, height: Int, hiDPI: Bool, refreshRate: Double = 60, restoreAtLaunch: Bool = false) {
+    enum CodingKeys: String, CodingKey { case id, name, width, height, hiDPI, refreshRate, restoreAtLaunch, hdr }
+
+    /// 이전 판의 저장 파일에는 `hdr` 키가 없으므로 없으면 거짓.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        width = try c.decode(Int.self, forKey: .width)
+        height = try c.decode(Int.self, forKey: .height)
+        hiDPI = try c.decode(Bool.self, forKey: .hiDPI)
+        refreshRate = try c.decode(Double.self, forKey: .refreshRate)
+        restoreAtLaunch = try c.decode(Bool.self, forKey: .restoreAtLaunch)
+        hdr = try c.decodeIfPresent(Bool.self, forKey: .hdr) ?? false
+    }
+
+    public init(id: UUID = UUID(), name: String, width: Int, height: Int, hiDPI: Bool, refreshRate: Double = 60, restoreAtLaunch: Bool = false, hdr: Bool = false) {
+        self.hdr = hdr
         self.id = id
         self.name = name
         self.width = width
@@ -39,7 +57,7 @@ public struct VirtualDisplayConfig: Codable, Hashable, Sendable, Identifiable {
     }
 
     public var label: String {
-        "\(width) x \(height)\(hiDPI ? " HiDPI" : ""), \(DisplaySummary.formatHz(refreshRate)) Hz"
+        "\(width) x \(height)\(hiDPI ? " HiDPI" : ""), \(DisplaySummary.formatHz(refreshRate)) Hz\(hdr ? ", HDR" : "")"
     }
 
     public static let widthRange = 640...7680
