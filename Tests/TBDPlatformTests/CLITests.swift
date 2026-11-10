@@ -152,3 +152,19 @@ struct DDCPlanCommandTests {
         #expect(root["model"] as? String == "SAMPLE27")
     }
 }
+
+/// TC-PRT-010: 케이블 신뢰 신호 출력. 읽기 전용.
+@Suite("TC-PRT-010 케이블 신뢰 신호 출력")
+struct CableTrustOutputTests {
+    @Test func 케이블_단계의_식별_정보() throws {
+        let inventory = PortService.inventory()
+        let paths = ConnectionPathBuilder.build(inventory: inventory, displays: DisplayCatalog.displays())
+        for cable in inventory.cables {
+            let path = try #require(paths.first { $0.port.key == cable.port })
+            let step = try #require(path.steps.first { $0.kind == .cable })
+            #expect(step.detail.contains(CableTrust.identity(cable)))
+            for signal in CableTrust.signals(cable) { #expect(step.detail.contains(signal)) }
+        }
+        // e-marker가 없는 구성에서는 확인할 항목 없음.
+    }
+}

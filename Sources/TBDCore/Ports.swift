@@ -85,6 +85,44 @@ public struct CableEMarker: Codable, Hashable, Sendable {
     /// 최대 전압 부호 (비트 10-9). 0은 20 V, 3은 50 V.
     public var maxVoltageCode: Int
     public var eprCapable: Bool
+    /// USB-IF 인증 시험 ID (Cert Stat VDO). 0은 미기재.
+    public var certificationID: UInt32
+    /// 제품 ID와 장치 판 (Product VDO).
+    public var productID: Int
+    public var deviceVersion: Int
+    /// 케이블 VDO의 하드웨어 판 (비트 31-28)과 펌웨어 판 (비트 27-24).
+    public var hardwareVersion: Int
+    public var firmwareVersion: Int
+    /// 케이블 지연 시간 부호 (비트 16-13). 1은 10 ns 미만, 2는 10-20 ns, 8은 70 ns 초과.
+    public var latencyCode: Int
+
+    public init(port: PortKey, productType: String, vendorID: Int, speedCode: Int, currentCode: Int, maxVoltageCode: Int, eprCapable: Bool, certificationID: UInt32 = 0, productID: Int = 0, deviceVersion: Int = 0, hardwareVersion: Int = 0, firmwareVersion: Int = 0, latencyCode: Int = 0) {
+        self.port = port
+        self.productType = productType
+        self.vendorID = vendorID
+        self.speedCode = speedCode
+        self.currentCode = currentCode
+        self.maxVoltageCode = maxVoltageCode
+        self.eprCapable = eprCapable
+        self.certificationID = certificationID
+        self.productID = productID
+        self.deviceVersion = deviceVersion
+        self.hardwareVersion = hardwareVersion
+        self.firmwareVersion = firmwareVersion
+        self.latencyCode = latencyCode
+    }
+
+    public var isPassive: Bool { productType.lowercased().contains("passive") }
+
+    /// 지연 시간 표기. 패시브 케이블은 1 m당 약 5 ns이므로 부호 n은 길이 약 n m에 해당.
+    public var latencyName: String? {
+        switch latencyCode {
+        case 1: "10 ns 미만 (약 1 m)"
+        case 2...7: "\((latencyCode - 1) * 10)-\(latencyCode * 10) ns (약 \(latencyCode) m)"
+        case 8: "70 ns 초과 (7 m 초과)"
+        default: nil
+        }
+    }
 
     public var speedName: String {
         switch speedCode {
@@ -126,7 +164,13 @@ public struct CableEMarker: Codable, Hashable, Sendable {
             speedCode: Int(cable & 0x7),
             currentCode: Int((cable >> 5) & 0x3),
             maxVoltageCode: Int((cable >> 9) & 0x3),
-            eprCapable: (cable >> 17) & 0x1 == 1
+            eprCapable: (cable >> 17) & 0x1 == 1,
+            certificationID: vdos[1],
+            productID: intValue(node, "Product ID") ?? Int(vdos[2] >> 16),
+            deviceVersion: Int(vdos[2] & 0xFFFF),
+            hardwareVersion: Int((cable >> 28) & 0xF),
+            firmwareVersion: Int((cable >> 24) & 0xF),
+            latencyCode: Int((cable >> 13) & 0xF)
         )
     }
 }
@@ -528,7 +572,10 @@ public enum ConnectionPathBuilder {
 
         // (2) 케이블
         if let cable {
-            let detail = "\(cable.productType), \(cable.speedName), \(cable.currentName), 최대 \(cable.maxVoltage) V\(cable.eprCapable ? ", EPR 지원" : "")"
+            var detail = "\(cable.productType), \(cable.speedName), \(cable.currentName), 최대 \(cable.maxVoltage) V\(cable.eprCapable ? ", EPR 지원" : "")"
+            detail += ". " + CableTrust.identity(cable)
+            let signals = CableTrust.signals(cable)
+            if !signals.isEmpty { detail += ". 신뢰 신호: " + signals.joined(separator: "; ") }
             result.append(.init(kind: .cable, title: "케이블", detail: detail, status: cable.supportsHighSpeedData ? .ok : .broken))
         } else if port.key.type == "USB-C" {
             result.append(.init(kind: .cable, title: "케이블", detail: "e-marker 응답 없음 (e-marker가 없는 케이블이거나 케이블 일체형 장치)", status: .unknown))
