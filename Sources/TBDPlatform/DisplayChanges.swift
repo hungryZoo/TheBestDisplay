@@ -166,12 +166,26 @@ public enum DisplayChanges {
         guard let service = EDIDOverrideService.service(for: display, among: displays) else { throw EDIDOverrideService.OverrideError.serviceNotFound }
         let name = display.identity.name
         let entryID = service.registryEntryID
+        let ref = DisplayRef(display.identity)
+        // 가상 EDID 적용과 해제는 재감지를 일으켜 HDR 상태가 꺼질 수 있으므로 적용 전 상태를 기억했다가 복귀 뒤 되돌림 (T37 실측).
+        let hdrWasEnabled = HDRService.isSupported(display.id) && HDRService.isEnabled(display.id)
         return RevertCoordinator.Change(
             summary: "\(name): EDID 오버라이드 (\(detail))",
             pending: PendingRevert(createdAt: Date(), summary: "\(name) 원본 EDID 복귀", actions: [.edidReset(serviceEntryID: entryID, name: name)]),
             apply: { try EDIDOverrideService.apply(edid, to: display, among: displays) },
             commit: {},
-            restore: { try EDIDOverrideService.reset(registryEntryID: entryID) }
+            restore: {
+                try EDIDOverrideService.reset(registryEntryID: entryID)
+                guard hdrWasEnabled else { return }
+                // 재감지가 끝나 HDR 지원이 다시 보일 때까지 최대 8초 대기.
+                for _ in 0..<16 {
+                    usleep(500_000)
+                    if let live = ref.resolve(in: DisplayCatalog.displays()), HDRService.isSupported(live.id) {
+                        if !HDRService.isEnabled(live.id) { _ = try? HDRService.setEnabled(true, on: live.id) }
+                        return
+                    }
+                }
+            }
         )
     }
 }

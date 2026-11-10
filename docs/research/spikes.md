@@ -174,3 +174,7 @@
 | T24 | `MPDisplay` 프리셋 메서드 형식 부호: `hasPresets` B, `presets` @, `activePreset` @, `defaultPreset` @, `setActivePreset:` B(객체 인자). `MPDisplayPreset`: `presetIndex` Q, `presetName` @, `presetDescription` @, `presetGroup` q, `isValid` B, `isWritable` B. 내장 XDR 패널은 51개 자리 중 11개 사용 가능. P3-600 nits 전환과 복귀 실측 |
 | T24 | 레지스트리 조사: `AppleT8132TypeCPhy` 노드 4개의 `AppleTypeCPhyLane`은 연결이 없으면 빈 사전. `AppleHDCPInterface` 노드에 `HDCPCapabilityMask`(2 또는 3)와 `HDCPChannel` 존재, 값의 의미는 미확인. 포트 노드의 `PlugOrientation`은 연결이 없을 때 0. 충전기 미연결 상태의 `AdapterDetails`는 `FamilyCode` 0뿐 |
 | T36 | LG TV 재연결 후 읽기 전용 실측: DDC 탐지는 응답 없음(종료 코드 3). DPCD 기준 싱크 HDCP는 1.x 지원으로 읽힘, 다운스프레드 지원. 실기기의 플러그 방향 2, PHY 3 레인 2개 CIO, DP 터널 8.10Gbps/lane (HBR3)로 픽스처와 일치. TV의 잠재 EDR 헤드룸 10.0, 프리셋 없음 |
+| T37 | LG TV(독 경유) 실측: `IOAVServiceSetVirtualEDIDMode`는 비권한 프로세스에서 성공. 적용 뒤 `IOAVServiceCopyEDID`가 가상 EDID를 반환하고 시스템이 HDR 미지원으로 인식. 해제 뒤 원본 복귀. 적용과 해제 과정에서 HDR 설정이 꺼짐 |
+| T37 | 가상 EDID에 넣은 DisplayID 상세 타이밍(2560x1440 100 Hz, CVT-RB2)이 싱크 타이밍 목록(새 ID 98)과 윈도우 서버 모드 목록에 반영됨 |
+| T37 | `IOMobileFramebufferSetDigitalOutMode`에 다른 타이밍 ID(60, 3840x2160 59.94 Hz)를 주면 링크가 그 타이밍으로 전환 (링크 데이터 59.94 Hz, 593.41 MHz). 디스플레이 온라인 유지. 윈도우 서버의 현재 모드 표기는 120 Hz로 남음 |
+| T37 | `MPDisplay setOrientation:`으로 LG TV 90도 회전과 복귀 확인. LG TV의 `supportsUnderscan`은 거짓 |

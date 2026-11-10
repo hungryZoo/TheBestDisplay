@@ -48,7 +48,7 @@
 | PRD-COL-004 | P2 | 필수 | MRD-SCP-004 | SRS-COL-004 | TC-COL-005 | `Sources/TBDCore/DSCAssessment.swift` | 통과 1 |
 | PRD-COL-005 | P2 | 권장 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-006 | P6 | 필수 | MRD-SCP-004 | SRS-COL-006 | TC-COL-006, TC-COL-007 | `Sources/TBDCore/DSCControl.swift` | 보류 1, 통과 1 |
-| PRD-COL-007 | P6 | 권장 | MRD-SCP-004 | SRS-COL-007 | TC-COL-008, TC-COL-009 | `Sources/TBDCore/TimingSelection.swift`<br>`Sources/TBDPlatform/SignalService.swift` | 미실행 1, 통과 1 |
+| PRD-COL-007 | P6 | 권장 | MRD-SCP-004 | SRS-COL-007 | TC-COL-008, TC-COL-009 | `Sources/TBDCore/TimingSelection.swift`<br>`Sources/TBDPlatform/SignalService.swift` | 통과 2 |
 | PRD-HDR-001 | P2 | 필수 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-001 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
 | PRD-HDR-002 | P2 | 필수 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-002 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
 | PRD-HDR-003 | P2 | 권장 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-001 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
@@ -85,12 +85,12 @@
 | PRD-CLR-003 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
 | PRD-CLR-004 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 통과 1 |
 | PRD-CLR-005 | P6 | 권장 | MRD-SCP-010 | SRS-CLR-004 | TC-CLR-003, TC-CLR-004 | `Sources/TBDPlatform/PresetService.swift`<br>`Sources/TBDCore/DisplayPreset.swift` | 통과 2 |
-| PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
+| PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-002 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-002 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-003 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-003 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-004 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-001 | TC-ARR-003 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-ARR-005 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
-| PRD-ARR-006 | P4 | 권장 | MRD-SCP-011 | SRS-ARR-004 | TC-ARR-005 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
+| PRD-ARR-006 | P4 | 권장 | MRD-SCP-011 | SRS-ARR-004 | TC-ARR-005 | `Sources/TBDPlatform/ArrangementService.swift` | 보류 1 |
 | PRD-ARR-007 | P6 | 권장 | MRD-SCP-011 | SRS-ARR-005 | TC-ARR-006, TC-ARR-007 | `Sources/TBDCore/Alignment.swift` | 통과 2 |
 | PRD-VRT-001 | P5 | 필수 | MRD-SCP-012 | SRS-VRT-001 | TC-VRT-001 | `Sources/TBDPlatform/VirtualDisplayService.swift`<br>`Sources/TBDCore/VirtualDisplay.swift` | 통과 1 |
 | PRD-VRT-002 | P5 | 필수 | MRD-SCP-012, MRD-SCN-003 | SRS-VRT-002 | TC-VRT-002 | `Sources/TBDPlatform/VirtualDisplayService.swift` | 미실행 1 |
@@ -103,10 +103,10 @@
 | PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 통과 1 |
 | PRD-CLI-001 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-001 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
-| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-MOD-013, TC-COL-007, TC-COL-009, TC-CLR-004, TC-CLI-002, TC-EDO-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1, 보류 1, 통과 4 |
+| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-MOD-013, TC-COL-007, TC-COL-009, TC-CLR-004, TC-CLI-002, TC-EDO-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 보류 1, 통과 5 |
 | PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
 | PRD-EDO-001 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-001 | TC-EDO-001, TC-EDO-002 | `Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
 | PRD-EDO-002 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-001 | TC-EDO-001, TC-EDO-002 | `Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
-| PRD-EDO-003 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 | SRS-EDO-002 | TC-EDO-003, TC-EDO-006 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 미실행 2 |
+| PRD-EDO-003 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 | SRS-EDO-002 | TC-EDO-003, TC-EDO-006 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 2 |
 | PRD-EDO-004 | P6 | 권장 | MRD-SCP-016 | SRS-EDO-002 | TC-EDO-004 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
-| PRD-EDO-005 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-003 | TC-EDO-005, TC-EDO-006 | `Sources/TBDCore/EDID/CustomTiming.swift`<br>`Sources/TBDCore/EDID/EDIDEditor.swift` | 미실행 1, 통과 1 |
+| PRD-EDO-005 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-003 | TC-EDO-005, TC-EDO-006 | `Sources/TBDCore/EDID/CustomTiming.swift`<br>`Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
