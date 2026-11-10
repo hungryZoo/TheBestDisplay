@@ -161,6 +161,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도 조회, 추가, 삭제 |
 | `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 |
 | `tbdctl favorites <디스플레이> [list \| add [<모드>] \| remove [<모드>]]` | 즐겨찾기 모드 조회, 추가, 삭제 |
+| `tbdctl notch <디스플레이> [show\|hide] [--timeout <초>] [--yes]` | notch 영역 사용 여부 조회와 전환 |
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환 |
 | `tbdctl set-timing <디스플레이> <타이밍> [--timeout <초>] [--yes]` | 연결 수준 타이밍 직접 선택 (`id:<번호>` 또는 `<폭>x<높이>@<주사율>`) |

@@ -134,6 +134,18 @@ struct ResolutionTab: View {
                     Text(selected.label).font(.callout.monospacedDigit()).frame(width: 190, alignment: .trailing)
                 }
             }
+            if let current, let pair = ModeCatalog.notchPair(modes, current: current) {
+                let usesNotch = pair.full.modeNumber == current.modeNumber
+                HStack(spacing: 8) {
+                    Text("notch").font(.callout.weight(.medium))
+                    Text(usesNotch ? "화면 전체 사용 (notch 영역 포함)" : "notch 아래 영역만 사용").font(.callout)
+                    Button(usesNotch ? "notch 아래 영역만 사용" : "화면 전체 사용") {
+                        apply(usesNotch ? pair.belowNotch : pair.full, current: current)
+                    }
+                    .controlSize(.small)
+                    .disabled(changes.isBusy)
+                }
+            }
             if let limits = ModeCatalog.renderingLimits(modes) {
                 Text("렌더링 한계 (모드 목록 기준): \(limits.summary)")
                     .font(.caption)

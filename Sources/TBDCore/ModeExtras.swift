@@ -112,3 +112,31 @@ public struct ModeFavoritesStore: Sendable {
         return true
     }
 }
+
+/// notch 모드 판정과 전환 대상. notch가 있는 내장 패널은 같은 폭에 높이가 다른 모드 쌍을 가짐:
+/// 화면 전체를 쓰는 모드(예: 1512 x 982)와 notch 아래 16:10 영역만 쓰는 모드(예: 1512 x 945). (PRD-MOD-011)
+public struct NotchModePair: Hashable, Sendable {
+    /// 화면 전체를 쓰는 모드 (notch 영역 포함).
+    public var full: DisplayMode
+    /// notch 아래 영역만 쓰는 16:10 모드.
+    public var belowNotch: DisplayMode
+}
+
+public extension ModeCatalog {
+    /// 현재 모드의 notch 모드 쌍. 같은 폭, 같은 배율, 같은 주사율과 가변 주사율 여부를 가진 모드 가운데
+    /// 한쪽이 16:10이고 다른 쪽이 그보다 높은 쌍을 찾음. 없으면 nil.
+    static func notchPair(_ modes: [DisplayMode], current: DisplayMode) -> NotchModePair? {
+        func is16by10(_ m: DisplayMode) -> Bool { m.width * 10 == m.height * 16 }
+        let siblings = modes.filter {
+            $0.width == current.width && $0.isHiDPI == current.isHiDPI && $0.isVRR == current.isVRR
+                && abs($0.refreshRate - current.refreshRate) < 0.01 && $0.height != current.height
+        }
+        if is16by10(current) {
+            // 현재가 notch 아래 모드: 같은 폭에서 더 높은 모드가 전체 모드. 높이 차이는 notch 높이(폭의 5% 이내).
+            guard let full = siblings.filter({ $0.height > current.height && ($0.height - current.height) * 20 <= current.width }).min(by: { $0.height < $1.height }) else { return nil }
+            return NotchModePair(full: full, belowNotch: current)
+        }
+        guard let below = siblings.first(where: { is16by10($0) && $0.height < current.height && (current.height - $0.height) * 20 <= current.width }) else { return nil }
+        return NotchModePair(full: current, belowNotch: below)
+    }
+}

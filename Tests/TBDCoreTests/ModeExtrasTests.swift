@@ -90,3 +90,31 @@ extension ModeExtrasTests {
         #expect(steps.map(\.width) == [1147, 1512, 1800])
     }
 }
+
+/// TC-MOD-012: notch 모드 쌍 판정.
+@Suite("TC-MOD-012 notch 모드 쌍")
+struct NotchModeTests {
+    static let modes: [DisplayMode] = [
+        ModeExtrasTests.mode(1, 1512, 982, scale: 2, hz: 120, vrr: true), ModeExtrasTests.mode(2, 1512, 945, scale: 2, hz: 120, vrr: true),
+        ModeExtrasTests.mode(3, 1512, 982, scale: 2, hz: 60), ModeExtrasTests.mode(4, 1512, 945, scale: 2, hz: 60),
+        ModeExtrasTests.mode(5, 1800, 1169, scale: 2, hz: 120, vrr: true), ModeExtrasTests.mode(6, 1800, 1125, scale: 2, hz: 120, vrr: true),
+        ModeExtrasTests.mode(7, 1920, 1080, scale: 2, hz: 60), ModeExtrasTests.mode(8, 1920, 1200, scale: 2, hz: 60),
+    ]
+
+    @Test func 전체_모드와_notch_아래_모드의_쌍() throws {
+        let fromFull = try #require(ModeCatalog.notchPair(Self.modes, current: Self.modes[0]))
+        #expect(fromFull.full.modeNumber == 1 && fromFull.belowNotch.modeNumber == 2)
+        let fromBelow = try #require(ModeCatalog.notchPair(Self.modes, current: Self.modes[1]))
+        #expect(fromBelow.full.modeNumber == 1 && fromBelow.belowNotch.modeNumber == 2)
+        // 주사율과 가변 주사율 여부가 같은 모드끼리 짝.
+        #expect(ModeCatalog.notchPair(Self.modes, current: Self.modes[2])?.belowNotch.modeNumber == 4)
+        #expect(ModeCatalog.notchPair(Self.modes, current: Self.modes[5])?.full.modeNumber == 5)
+    }
+
+    @Test func notch가_없는_디스플레이는_쌍_없음() {
+        // 1920x1080(16:9)과 1920x1200(16:10)은 높이 차이가 notch 범위를 넘음.
+        #expect(ModeCatalog.notchPair(Self.modes, current: Self.modes[6]) == nil)
+        #expect(ModeCatalog.notchPair(Self.modes, current: Self.modes[7]) == nil)
+        #expect(ModeCatalog.notchPair([Self.modes[0]], current: Self.modes[0]) == nil)
+    }
+}

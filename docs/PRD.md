@@ -72,6 +72,7 @@
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도(HiDPI 논리 해상도) 조회, 추가, 삭제. 쓰기 권한이 없으면 관리자 권한으로 실행할 명령 출력 |
 | `tbdctl align <디스플레이> <기준 디스플레이> <위치>` | 기준 디스플레이 대비 16방향 정렬. 위치는 `left-top`, `right-center`, `bottom-right`, `corner-top-left` 등 |
 | `tbdctl favorites <디스플레이> [list \| add [<모드>] \| remove [<모드>]]` | 즐겨찾기 모드 조회, 추가, 삭제. 모드를 생략하면 현재 모드 |
+| `tbdctl notch <디스플레이> [show\|hide] [--timeout <초>] [--yes]` | notch 영역 사용 여부 조회와 전환 |
 | `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 (기본 2초) |
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 또는 복귀 정보 삭제 |
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정. `--timings`는 싱크 타이밍 전체 |
@@ -144,6 +145,7 @@
 | PRD-MOD-008 | 주사율 측정 표시: 화면 갱신 콜백 시각으로 계산한 측정값, 콜백이 보고한 주기의 주사율, 현재 모드의 공칭값, 갱신 간격의 최소와 최대 | P6 | 권장 | MRD-SCP-003 |
 | PRD-MOD-009 | 렌더링 한계 표시: 모드 목록에서 관찰한 최대 백킹 크기와 가장 큰 HiDPI 모드 | P6 | 권장 | MRD-SCP-003 |
 | PRD-MOD-010 | 즐겨찾기 모드와 해상도 슬라이더: 디스플레이별 즐겨찾기 등록, 삭제, 한 번에 전환. 슬라이더는 현재 배율과 종횡비의 해상도를 크기 순으로 전환 | P6 | 권장 | MRD-SCP-003 |
+| PRD-MOD-011 | notch 모드 전환: notch가 있는 패널에서 화면 전체를 쓰는 모드와 notch 아래 16:10 영역만 쓰는 모드 사이 전환. 자동 복귀 적용 | P6 | 권장 | MRD-SCP-003 |
 
 ### 6.4 색 모드와 DSC (COL)
 
