@@ -126,4 +126,8 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T05 | 색 모드 전환 실측: `IOMobileFramebufferSetDigitalOutMode(색 ID, 타이밍 ID)`가 비권한 프로세스에서 0 반환. LG TV를 색 ID 117(YCbCr 4:2:2, 10 bpc, PQ)에서 122(12 bpc)로 전환하자 링크 데이터의 비트 심도가 12로 변경, 6초 뒤 자동 복귀로 10 확인. 디스플레이 온라인 유지 |
+| T05 | 재연결 후 색 ID가 122에서 117로 바뀜. 색 모드는 연결마다 시스템이 다시 선택하므로 저장과 복귀는 ID가 아닌 서술(인코딩, 비트 심도, 레인지, EOTF, 색 공간)로 수행 |
+| T05 | 3840x2160 120 Hz 타이밍(ID 96)의 선택 가능 색 모드 15개: RGB는 8 bpc SDR(Full, Limited)만, HDR(PQ, HLG)은 YCbCr 4:2:2 10 bpc와 12 bpc만 제공. 가상 형식 2개(ID 1, 2)는 프레임버퍼용이라 선택 목록에서 제외 |
+| T05 | 내장 패널의 정밀 주사율은 120.0005 Hz (`PreciseSyncRate` 7864351) |
 | T04 | MonitorPanel 경로 실측: 주사율 전환 3회, 해상도 전환 2회(2560x1440 HiDPI, 시스템 설정 목록 밖 1344x756 HiDPI), 창 앱 전환 1회 모두 디스플레이 온라인 유지와 자동 복귀 정상 |

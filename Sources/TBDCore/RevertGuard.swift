@@ -110,6 +110,7 @@ public struct DisplayRef: Codable, Hashable, Sendable {
 /// 되돌릴 대상과 되돌릴 값. 화면 변경 기능이 늘어날 때마다 경우 추가.
 public enum RevertAction: Codable, Hashable, Sendable {
     case displayMode(target: DisplayRef, mode: ModeDescriptor)
+    case colorMode(target: DisplayRef, color: ColorDescriptor)
 }
 
 public struct PendingRevert: Codable, Hashable, Sendable {

@@ -70,12 +70,13 @@
 | `tbdctl modes <디스플레이> [--hidpi] [--outside-default]` | 전체 모드 목록. HiDPI만, 시스템 설정 목록 밖만 필터 |
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환. 모드 형식은 `<폭>x<높이>[@<주사율>][:hidpi\|:lodpi]` 또는 `mode:<번호>`. Return 입력 시 확정, 제한 시간 내 입력이 없으면 복귀. `--yes`는 즉시 확정 |
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 또는 복귀 정보 삭제 |
-| `tbdctl signal <디스플레이>` | 현재 신호 형식과 색 모드 목록 |
+| `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정. `--timings`는 싱크 타이밍 전체 |
+| `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환. 형식은 `id:<번호>` 또는 `<rgb\|ycbcr444\|ycbcr422\|ycbcr420>[:<bpc>][:<full\|limited>][:<sdr\|pq\|hlg>]`. 생략 항목은 현재 값 우선 |
 | `tbdctl link <디스플레이>` | 링크 정보와 대역폭 |
 | `tbdctl ports` | 포트와 연결 경로 |
 | `tbdctl diagnose` | 진단 발견 항목 |
 | `tbdctl report <경로>` | 진단 보고서 저장 |
-| `tbdctl set-color`, `hdr`, `brightness`, `ddc`, `rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
+| `tbdctl hdr`, `brightness`, `ddc`, `rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정자: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부

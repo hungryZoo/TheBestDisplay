@@ -30,4 +30,32 @@ public enum DisplayChanges {
             }
         )
     }
+
+    /// 색 모드 전환. 타이밍은 유지. 복귀는 이전 색 모드 서술과 일치하는 색 모드로 수행.
+    public static func colorChange(display: DisplaySummary, timingID: Int, from previous: ColorElement, to target: ColorElement) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        return RevertCoordinator.Change(
+            summary: "\(name): \(previous.label) → \(target.label)",
+            pending: PendingRevert(
+                createdAt: Date(),
+                summary: "\(name) 색 모드를 \(previous.label)(으)로 복귀",
+                actions: [.colorMode(target: DisplayRef(display.identity), color: previous.descriptor)]
+            ),
+            apply: {
+                try SignalService.setColorMode(colorID: target.id, timingID: timingID, for: display)
+            },
+            commit: {
+                guard ModeService.isOnline(display.id) else { throw DisplayChangeError.displayNotFound }
+            },
+            restore: {
+                guard ModeService.isOnline(display.id) else { throw DisplayChangeError.displayNotFound }
+                // 같은 연결이면 ID로, ID가 바뀌었으면 서술로 복귀.
+                if let info = SignalService.signalInfo(for: display), info.currentTimingID == timingID, info.selectableColorModes.contains(where: { $0.id == previous.id && $0.descriptor == previous.descriptor }) {
+                    try SignalService.setColorMode(colorID: previous.id, timingID: timingID, for: display)
+                } else {
+                    try SignalService.setColorMode(matching: previous.descriptor, for: display)
+                }
+            }
+        )
+    }
 }

@@ -9,6 +9,9 @@ public enum PendingRevertApplier {
             case .displayMode(let target, let mode):
                 guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
                 try ModeService.setMode(matching: mode, on: display.id, permanently: true)
+            case .colorMode(let target, let color):
+                guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
+                try SignalService.setColorMode(matching: color, for: display)
             }
         }
     }

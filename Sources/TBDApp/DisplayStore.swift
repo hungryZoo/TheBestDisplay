@@ -16,6 +16,9 @@ final class DisplayStore {
     /// 디스플레이 ID별 전체 모드와 현재 모드.
     private(set) var modes: [UInt32: [DisplayMode]] = [:]
     private(set) var currentModes: [UInt32: DisplayMode] = [:]
+    /// 디스플레이 ID별 신호 상태와 DSC 판정.
+    private(set) var signals: [UInt32: SignalInfo] = [:]
+    private(set) var dscAssessments: [UInt32: DSCAssessment] = [:]
     /// 온라인 목록이 바뀔 때 호출.
     @ObservationIgnored var onDisplaysChanged: (Set<UInt32>) -> Void = { _ in }
 
@@ -55,6 +58,16 @@ final class DisplayStore {
         }
         modes = allModes
         currentModes = current
+        var signalMap: [UInt32: SignalInfo] = [:]
+        var dscMap: [UInt32: DSCAssessment] = [:]
+        let sourceDSC = SignalService.sourceSupportsDSC()
+        for display in snapshot.displays {
+            guard let info = SignalService.signalInfo(for: display) else { continue }
+            signalMap[display.id] = info
+            dscMap[display.id] = DSCAssessment.assess(signal: info, edidSupportsDSC: edidRecords[display.id]?.parsed.sinkCapabilities.supportsDSC, sourceSupportsDSC: sourceDSC)
+        }
+        signals = signalMap
+        dscAssessments = dscMap
         refreshCount += 1
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))
     }

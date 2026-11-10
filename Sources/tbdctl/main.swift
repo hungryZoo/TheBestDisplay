@@ -10,6 +10,8 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "info", summary: "제품 정보와 EDID 해석", positionals: ["디스플레이"], valueOptions: ["--edid-out"], flags: ["--hex"]),
     CommandSpec(name: "modes", summary: "전체 모드 목록", positionals: ["디스플레이"], flags: ["--hidpi", "--outside-default"]),
     CommandSpec(name: "set-mode", summary: "모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "모드"], valueOptions: ["--timeout", "--method"], flags: ["--yes"]),
+    CommandSpec(name: "signal", summary: "현재 신호 형식과 색 모드 목록", positionals: ["디스플레이"], flags: ["--timings"]),
+    CommandSpec(name: "set-color", summary: "색 모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "색 모드"], valueOptions: ["--timeout"], flags: ["--yes"]),
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
     CommandSpec(name: "help", summary: "사용법"),
 ])
@@ -106,6 +108,12 @@ case "modes":
 
 case "set-mode":
     runSetMode(command)
+
+case "signal":
+    runSignal(command, json: json)
+
+case "set-color":
+    runSetColor(command)
 
 case "revert-pending":
     runRevertPending(command)

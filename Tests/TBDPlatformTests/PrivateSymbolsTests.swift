@@ -1,4 +1,5 @@
 import CoreGraphics
+import IOKit
 import Foundation
 import Testing
 import TBDCore
@@ -166,6 +167,43 @@ struct ModeServiceTests {
             // 시스템 판정: 원본 모드 1개 이상, 현재 모드는 서술로 다시 찾을 수 있음.
             #expect(modes.contains { $0.isNative })
             #expect(current.descriptor.find(in: modes)?.modeNumber == current.modeNumber)
+        }
+    }
+}
+
+/// TC-COL-002: 현재 신호 형식 조회. 읽기 전용.
+@Suite("TC-COL-002 현재 신호 조회")
+struct SignalServiceTests {
+    @Test func 타이밍_ID와_색_모드가_레지스트리와_링크_데이터에_일치() throws {
+        let displays = DisplayCatalog.displays()
+        try #require(!displays.isEmpty)
+        for display in displays {
+            let info = try #require(SignalService.signalInfo(for: display), "신호 정보 없음: \(display.identity.name)")
+            let node = try #require(SignalService.framebufferNode(for: display))
+            defer { IOObjectRelease(node.service) }
+            // 현재 타이밍 ID가 레지스트리의 DPTimingModeId와 일치.
+            #expect(info.currentTimingID == (node.properties["DPTimingModeId"] as? NSNumber)?.intValue)
+            let timing = try #require(info.currentTiming)
+            let color = try #require(info.currentColor)
+            #expect(timing.colorModes.contains { $0.id == color.id })
+            // 프레임버퍼 해상도와 타이밍의 활성 픽셀 일치.
+            #expect(timing.hActive == (node.properties["DisplayWidth"] as? NSNumber)?.intValue)
+            #expect(timing.vActive == (node.properties["DisplayHeight"] as? NSNumber)?.intValue)
+            if display.identity.isBuiltin {
+                #expect(info.linkData == nil)
+            } else if let link = info.linkData {
+                // 실제 송출값과 선택된 색 모드, 타이밍이 일치.
+                #expect(link.pixelEncoding == color.pixelEncoding)
+                #expect(link.bitsPerComponent == color.bitsPerComponent)
+                #expect(link.dynamicRange == color.dynamicRange)
+                #expect(link.eotf == color.eotf)
+                #expect((link.hActive, link.vActive) == (timing.hActive, timing.vActive))
+                #expect((link.hTotal, link.vTotal) == (timing.hTotal, timing.vTotal))
+                #expect(abs(link.refreshRate - timing.refreshRate) < 0.01)
+                #expect(abs(link.pixelClockHz - timing.pixelClockHz) < 1000)
+            } else {
+                Issue.record("외장 디스플레이의 링크 데이터를 읽지 못함: \(display.identity.name)")
+            }
         }
     }
 }
