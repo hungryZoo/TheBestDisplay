@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 45행, 부분 10행, 미구현 3행
+- 집계: 구현 46행, 부분 9행, 미구현 3행
 
 ## 1. 대조표
 
@@ -29,7 +29,7 @@
 | 18 | 색 모드 | 색 모드 유지(변경 감지 후 복원) | 구현 | PRD-PRF-004 | 프로파일 단위 구성 보호. 색 모드 복원 실측 없음 |
 | 19 | 색 모드 | GPU 디더링 토글 | 구현 | PRD-COL-008 | 프레임버퍼 노드의 `enableDither` 속성 사용. 화면의 계조 변화는 측정하지 않음 |
 | 20 | DDC | 밝기, 대비, 볼륨, 음소거, RGB gain, 입력 전환, 전원 | 구현 | PRD-BRT-002, PRD-DDC-002, PRD-DDC-003 | RGB gain은 임의 VCP로 지정. DDC 지원 모니터 미보유로 보류 (TC-DDC-003) |
-| 21 | DDC | capabilities 탐지와 자동 구성, 임의 VCP 읽기 및 쓰기 | 부분 | PRD-DDC-001, PRD-DDC-003, PRD-DDC-004 | 응답 탐지, capabilities 해석, 임의 VCP 제공. capabilities 기반 화면 자동 구성 없음. 실제 모니터 조회는 보류 (TC-DDC-005) |
+| 21 | DDC | capabilities 탐지와 자동 구성, 임의 VCP 읽기 및 쓰기 | 구현 | PRD-DDC-001, PRD-DDC-003, PRD-DDC-004, PRD-DDC-005 | 응답 탐지, capabilities 해석, 표준 코드의 제어 항목 자동 구성, 임의 VCP 제공. 실제 모니터 대상은 보류 (TC-DDC-005), 화면 구성은 합성 문자열로 확인 |
 | 22 | DDC | 내장 HDMI 포트 DDC | 미구현 |  | 내장 HDMI 경로의 칩 주소 실측 필요 (HDMI 직결 구성 없음) |
 | 23 | 밝기 | 하드웨어, 소프트웨어, 결합 밝기와 nits 표시 | 부분 | PRD-BRT-001-003, PRD-BRT-008, PRD-BRT-009 | 하드웨어와 소프트웨어 밝기, 결합 밝기, 내장 패널의 현재 휘도(cd/m²) 표시 제공. 외장 디스플레이의 현재 휘도 값 없음. DDC 모니터의 결합 밝기는 미검증 |
 | 24 | 밝기 | 소프트웨어 디밍(색 테이블, 오버레이), 0% 미만 디밍 | 구현 | PRD-BRT-003, PRD-BRT-007 | 오버레이 디밍으로 하드웨어 밝기 0% 아래까지 낮춤 |

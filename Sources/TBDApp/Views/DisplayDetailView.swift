@@ -41,7 +41,8 @@ enum DisplayTab: String, CaseIterable, Identifiable {
 
 struct DisplayDetailView: View {
     let display: DisplaySummary
-    @State private var tab: DisplayTab = .overview
+    /// 마지막으로 연 탭을 저장해 다음 실행에서도 유지.
+    @AppStorage("displayDetail.selectedTab") private var tab: DisplayTab = .overview
 
     var body: some View {
         TabView(selection: $tab) {

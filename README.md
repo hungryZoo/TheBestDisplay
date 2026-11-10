@@ -188,7 +188,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl night-shift [on\|off]` | 시스템 Night Shift 조회와 전환 |
 | `tbdctl night-shift-sync <디스플레이> [--seconds <초>]` | Night Shift 상태에 맞춘 색온도를 대상 디스플레이에 적용 |
 | `tbdctl hdr-profile <디스플레이> [sdr\|hdr <프로파일\|none> \| apply]` | SDR과 HDR 상태별 색 프로파일 지정과 적용 |
-| `tbdctl ddc <디스플레이> probe \| caps \| get <코드> \| set <코드> <값>` | DDC 탐지, capabilities 조회, VCP 읽기와 쓰기 |
+| `tbdctl ddc <디스플레이> probe \| caps \| plan [--caps <문자열>] \| get <코드> \| set <코드> <값>` | DDC 탐지, capabilities 조회, capabilities 기반 제어 구성, VCP 읽기와 쓰기 |
 | `tbdctl color <디스플레이> [--profiles] [--set <프로파일>]` | 색 프로파일 조회와 지정, Night Shift, True Tone 상태 |
 | `tbdctl arrangement` | 위치, 회전, 미러 상태 |
 | `tbdctl rotate <디스플레이> <각도> [--timeout <초>] [--yes]` | 회전 (0, 90, 180, 270) |
@@ -262,8 +262,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 112건 중 통과 107건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 45행, 부분 10행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 114건 중 통과 109건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 46행, 부분 9행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

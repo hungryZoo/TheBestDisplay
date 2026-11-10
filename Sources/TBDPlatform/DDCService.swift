@@ -9,7 +9,9 @@ public enum DDCService {
     static let queue = DispatchQueue(label: "dev.thebestdisplay.ddc")
     static let chipAddress: UInt32 = 0x37
     static let dataAddress: UInt32 = 0x51
-    static let retries = 3
+    public static let retries = 3
+    /// 요청 1회가 이 시간을 넘겨 실패하면 싱크가 I2C에 응답하지 않는 상태로 봄.
+    static let slowFailureThreshold: TimeInterval = 1.5
     /// 쓰기 뒤 디스플레이가 응답을 준비할 시간.
     static let replyDelay: useconds_t = 50_000
     static let retryDelay: useconds_t = 20_000
@@ -46,11 +48,11 @@ public enum DDCService {
     }
 
     /// VCP 값 읽기. 응답이 없거나 해석할 수 없으면 nil.
-    public static func read(_ code: UInt8, service: AVService, symbols: PrivateSymbols = .shared) -> DDCPacket.Reply? {
+    public static func read(_ code: UInt8, service: AVService, symbols: PrivateSymbols = .shared, attempts: Int = retries) -> DDCPacket.Reply? {
         guard let io = functions(symbols) else { return nil }
         return queue.sync {
             var request = DDCPacket.getRequest(code)
-            for _ in 0..<retries {
+            for _ in 0..<max(1, attempts) {
                 guard io.write(service.ref, chipAddress, dataAddress, &request, UInt32(request.count)) == 0 else {
                     usleep(retryDelay)
                     continue
@@ -94,10 +96,13 @@ public enum DDCService {
         return queue.sync {
             var collected: [UInt8] = []
             var failures = 0
+            let started = Date()
             while collected.count < 4096, failures < retries {
                 var request = DDCCapabilities.request(offset: collected.count)
                 guard io.write(service.ref, chipAddress, dataAddress, &request, UInt32(request.count)) == 0 else {
                     failures += 1
+                    // 첫 조각부터 느리게 실패하면 응답하지 않는 싱크로 보고 중단.
+                    if collected.isEmpty, Date().timeIntervalSince(started) > slowFailureThreshold { return nil }
                     usleep(retryDelay)
                     continue
                 }
@@ -107,6 +112,8 @@ public enum DDCService {
                       let fragment = DDCCapabilities.parseFragment(reply), fragment.offset == collected.count
                 else {
                     failures += 1
+                    // 첫 조각부터 느리게 실패하면 응답하지 않는 싱크로 보고 중단.
+                    if collected.isEmpty, Date().timeIntervalSince(started) > slowFailureThreshold { return nil }
                     usleep(retryDelay)
                     continue
                 }
@@ -126,7 +133,15 @@ public enum DDCService {
             return DDCProbe(status: .noChannel)
         }
         var values: [UInt8: [UInt16]] = [:]
-        for code in [VCPCode.brightness, .contrast, .volume, .inputSource] {
+        // 응답하지 않는 싱크는 I2C 호출 하나가 시스템 제한 시간까지 걸림 (LG TV 실측: 호출당 약 8초, 탐지 전체 50초).
+        // 첫 요청이 오래 걸린 끝에 실패하면 재시도 없이 미응답으로 판정. (T55 실측)
+        let started = Date()
+        let first = read(VCPCode.brightness.rawValue, service: service, symbols: symbols, attempts: 1)
+        if first == nil, Date().timeIntervalSince(started) > slowFailureThreshold {
+            return DDCProbe(status: .noResponse)
+        }
+        if let first { values[VCPCode.brightness.rawValue] = [first.current, first.maximum] }
+        for code in [VCPCode.brightness, .contrast, .volume, .inputSource] where values[code.rawValue] == nil {
             if let reply = read(code.rawValue, service: service, symbols: symbols) {
                 values[code.rawValue] = [reply.current, reply.maximum]
             } else if values.isEmpty, code == .contrast {

@@ -123,3 +123,32 @@ struct ChargingDiagnosisTests {
         }
     }
 }
+
+/// TC-DDC-007: capabilities 문자열로 제어 구성 출력. 디스플레이에 요청을 보내지 않음.
+@Suite("TC-DDC-007 DDC 제어 구성 출력")
+struct DDCPlanCommandTests {
+    static let sample = "(prot(monitor)type(lcd)model(SAMPLE27)vcp(10 12 60(0F 11 1B) 62 D6(01 04) E0)mccs_ver(2.1))"
+
+    @Test func 문자열_입력의_구성_출력() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let result = try CLI.run(["ddc", "main", "plan", "--caps", Self.sample])
+        #expect(result.status == 0)
+        let text = String(decoding: result.stdout, as: UTF8.self)
+        #expect(text.contains("DDC 제어 구성: 모델 SAMPLE27, MCCS 2.1, 제어 항목 4개"))
+        #expect(text.contains("0x12 대비: 조절 막대"))
+        #expect(text.contains("0x60 입력 소스: 선택: DisplayPort 1(0F), HDMI 1(11), 값 0x1B(1B) [화면 출력이 끊길 수 있음]"))
+        #expect(text.contains("0x10 밝기: 밝기 조절에서 사용"))
+        #expect(text.contains("그 밖의 지원 코드 1개"))
+    }
+
+    @Test func JSON_출력() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let result = try CLI.run(["ddc", "main", "plan", "--caps", Self.sample, "--json"])
+        #expect(result.status == 0)
+        let root = try #require(JSONSerialization.jsonObject(with: result.stdout) as? [String: Any])
+        let controls = try #require(root["controls"] as? [[String: Any]])
+        #expect(controls.compactMap { $0["code"] as? Int } == [0x12, 0x62, 0x60, 0xD6])
+        #expect(root["otherCodes"] as? [Int] == [0xE0])
+        #expect(root["model"] as? String == "SAMPLE27")
+    }
+}

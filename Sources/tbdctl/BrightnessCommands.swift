@@ -71,7 +71,14 @@ func runBrightness(_ command: ParsedCommand, json: Bool) {
     print("밝기 \(String(format: "%.0f", percent))% 설정 (\(method.title))")
 }
 
-/// `tbdctl ddc <디스플레이> probe | get <코드> | set <코드> <값>` (PRD-DDC-001-003)
+struct DDCPlanOutput: Encodable {
+    var model: String?
+    var mccsVersion: String?
+    var controls: [DDCControl]
+    var otherCodes: [Int]
+}
+
+/// `tbdctl ddc <디스플레이> probe | caps | plan [--caps <문자열>] | get <코드> | set <코드> <값>` (PRD-DDC-001-005)
 /// 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자(0x10).
 func runDDC(_ command: ParsedCommand, json: Bool) {
     let (display, _) = resolveDisplay(command.positionals[0])
@@ -84,11 +91,42 @@ func runDDC(_ command: ParsedCommand, json: Bool) {
         } else {
             print("\(display.identity.name) [id:\(display.id)] DDC: \(probe.reason)")
             for (code, values) in probe.values.sorted(by: { $0.key < $1.key }) where values.count == 2 {
-                let name = VCPCode(rawValue: code)?.title ?? "VCP"
+                let name = DDCControlPlan.title(for: code) ?? "VCP"
                 print("  \(name) (0x\(String(format: "%02X", code))): 현재 \(values[0]), 최대 \(values[1])")
             }
         }
         if probe.status != .supported { exit(.unsupported) }
+        return
+    }
+
+    if action == "plan" {
+        // capabilities 문자열을 직접 주면 디스플레이 조회 없이 구성만 계산. (PRD-DDC-005)
+        let caps: DDCCapabilities
+        if let text = command.options["--caps"] {
+            caps = DDCCapabilities.parse(text)
+        } else {
+            guard !display.identity.isBuiltin, let service = SignalService.avService(for: display) else {
+                writeError("오류: \(DDCProbe(status: display.identity.isBuiltin ? .notApplicable : .noChannel).reason)")
+                exit(.unsupported)
+            }
+            guard let read = DDCService.capabilities(service: service) else {
+                writeError("오류: capabilities 응답 없음")
+                exit(.unsupported)
+            }
+            caps = read
+        }
+        let controls = DDCControlPlan.controls(for: caps)
+        let others = DDCControlPlan.otherCodes(in: caps)
+        if json {
+            printJSON(DDCPlanOutput(model: caps.model, mccsVersion: caps.mccsVersion, controls: controls, otherCodes: others.map(Int.init)))
+            return
+        }
+        print("DDC 제어 구성: 모델 \(caps.model ?? "미보고"), MCCS \(caps.mccsVersion ?? "미보고"), 제어 항목 \(controls.count)개")
+        for control in controls { print("  \(DDCControlPlan.describe(control))") }
+        if caps.supports(VCPCode.brightness.rawValue) { print("  0x10 밝기: 밝기 조절에서 사용") }
+        if !others.isEmpty {
+            print("  그 밖의 지원 코드 \(others.count)개 (임의 VCP 읽기와 쓰기로 접근): " + others.map { String(format: "%02X", $0) }.joined(separator: " "))
+        }
         return
     }
 
@@ -106,7 +144,7 @@ func runDDC(_ command: ParsedCommand, json: Bool) {
         } else {
             print("\(display.identity.name) [id:\(display.id)] DDC capabilities: 모델 \(caps.model ?? "미보고"), MCCS \(caps.mccsVersion ?? "미보고"), VCP 코드 \(caps.vcpCodes.count)개")
             for code in caps.vcpCodes {
-                let name = VCPCode(rawValue: code)?.title ?? "VCP"
+                let name = DDCControlPlan.title(for: code) ?? "VCP"
                 let values = caps.vcpValues[code].map { " 선택값 " + $0.map { String(format: "%02X", $0) }.joined(separator: " ") } ?? ""
                 print("  0x\(String(format: "%02X", code)) \(name)\(values)")
             }
@@ -115,7 +153,7 @@ func runDDC(_ command: ParsedCommand, json: Bool) {
     }
 
     guard action == "get" || action == "set" else {
-        writeError("오류: 두 번째 인자는 probe, caps, get, set 중 하나")
+        writeError("오류: 두 번째 인자는 probe, caps, plan, get, set 중 하나")
         exit(.usage)
     }
     guard command.positionals.count > 2, let code = VCPCode.parse(command.positionals[2]) else {

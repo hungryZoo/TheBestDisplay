@@ -16,6 +16,11 @@ final class BrightnessViewModel {
     var message: String?
     /// DDC 연속 값 (코드별 현재값과 최댓값).
     var ddcValues: [UInt8: (current: Double, maximum: Double)] = [:]
+    /// capabilities 기반 제어 구성. capabilities를 읽지 못하면 빈 배열 (고정 구성 사용). (PRD-DDC-005)
+    var ddcControls: [DDCControl] = []
+    var ddcOtherCodes: [UInt8] = []
+    /// 화면 구성 미리 보기: 실행 인자 `-ddcCapabilitiesPreview <문자열>`로 준 capabilities로 DDC 구역을 구성. 모니터에 쓰지 않음.
+    var ddcPreview = false
     var rawCode = "0x10"
     var rawValue = ""
     var rawResult: String?
@@ -40,6 +45,9 @@ final class BrightnessViewModel {
         loadGeneration += 1
         let generation = loadGeneration
         isProbing = false
+        ddcControls = []
+        ddcOtherCodes = []
+        ddcPreview = false
         luminance = BrightnessService.backlightLuminance(for: display)
         message = nil
         xdrSupported = XDRBoostService.isSupported(display.id)
@@ -75,7 +83,45 @@ final class BrightnessViewModel {
             brightness = GammaService.shared.adjustment(for: display.id).dimming
         }
         loadCombined(display)
+        if result.status == .supported {
+            await loadDDCControls(display, generation: generation)
+        } else if let text = Self.previewCapabilities, !text.isEmpty {
+            // DDC 응답이 없는 외장 디스플레이에서 화면 구성만 확인하는 용도. 값은 임의의 중간값.
+            let capabilities = DDCCapabilities.parse(text)
+            ddcControls = DDCControlPlan.controls(for: capabilities)
+            ddcOtherCodes = DDCControlPlan.otherCodes(in: capabilities)
+            for control in ddcControls where control.isContinuous { ddcValues[control.code] = (50, 100) }
+            probe = DDCProbe(status: .supported)
+            ddcPreview = true
+        }
     }
+
+    /// capabilities를 읽어 제어 항목을 구성하고, 탐지에서 읽지 않은 연속 값 코드의 현재값을 읽음. (PRD-DDC-005)
+    private func loadDDCControls(_ display: DisplaySummary, generation: Int) async {
+        let known = Set(ddcValues.keys)
+        let loaded = await Task.detached { () -> (controls: [DDCControl], others: [UInt8], values: [UInt8: (Double, Double)])? in
+            guard let service = SignalService.avService(for: display), let capabilities = DDCService.capabilities(service: service) else { return nil }
+            let controls = DDCControlPlan.controls(for: capabilities)
+            var values: [UInt8: (Double, Double)] = [:]
+            for control in controls where control.isContinuous && !known.contains(control.code) {
+                if let reply = DDCService.read(control.code, service: service), reply.maximum > 0 {
+                    values[control.code] = (Double(reply.current), Double(reply.maximum))
+                }
+            }
+            return (controls, DDCControlPlan.otherCodes(in: capabilities), values)
+        }.value
+        guard generation == loadGeneration, let loaded else { return }
+        for (code, value) in loaded.values { ddcValues[code] = (value.0, value.1) }
+        ddcControls = loaded.controls
+        ddcOtherCodes = loaded.others
+    }
+
+    /// 실행 인자 `-ddcCapabilitiesPreview <문자열>`의 값. 괄호로 시작하는 값은 기본값 저장소가 배열로 해석하므로 인자 목록에서 직접 읽음.
+    private static let previewCapabilities: String? = {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let index = arguments.firstIndex(of: "-ddcCapabilitiesPreview"), index + 1 < arguments.count else { return nil }
+        return arguments[index + 1]
+    }()
 
     private static func combinedKey(_ display: DisplaySummary) -> String {
         "combinedBrightness.\(display.identity.uuid ?? String(display.id))"
@@ -181,10 +227,15 @@ final class BrightnessViewModel {
     }
 
     func setDDC(_ code: VCPCode, value: Double, display: DisplaySummary) {
-        if let existing = ddcValues[code.rawValue] { ddcValues[code.rawValue] = (value, existing.maximum) }
+        setDDC(code: code.rawValue, value: value, display: display)
+    }
+
+    func setDDC(code: UInt8, value: Double, display: DisplaySummary) {
+        if let existing = ddcValues[code] { ddcValues[code] = (value, existing.maximum) }
+        guard !ddcPreview else { return }
         scheduleDDC {
             guard let service = SignalService.avService(for: display) else { return }
-            DDCService.write(code.rawValue, value: UInt16(value.rounded()), service: service)
+            DDCService.write(code, value: UInt16(value.rounded()), service: service)
         }
     }
 
@@ -354,8 +405,77 @@ struct BrightnessTab: View {
         model.method == .software ? ColorAdjustment.dimmingRange : 0...1
     }
 
+    /// capabilities가 알린 코드로 구성한 제어 항목. (PRD-DDC-005)
+    @ViewBuilder
+    private var plannedDDCControls: some View {
+        if model.ddcPreview {
+            Label("화면 구성 미리 보기: 실행 인자로 준 capabilities 사용. 모니터에 쓰지 않음", systemImage: "eye")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        ForEach(model.ddcControls.filter(\.isContinuous)) { control in
+            if let value = model.ddcValues[control.code] {
+                HStack(spacing: 10) {
+                    Text(control.title).frame(width: 110, alignment: .leading)
+                    Slider(value: Binding(get: { value.current }, set: { model.setDDC(code: control.code, value: $0, display: display) }), in: 0...value.maximum)
+                    Text("\(Int(value.current.rounded()))").monospacedDigit().frame(width: 44, alignment: .trailing)
+                }
+            } else {
+                LabeledContent(control.title, value: "현재값 응답 없음 (\(control.codeLabel))")
+            }
+        }
+        ForEach(model.ddcControls.filter { !$0.isContinuous }) { control in
+            LabeledContent(control.title) {
+                if control.options.count > 5 {
+                    Menu("선택") {
+                        ForEach(control.options, id: \.value) { option in
+                            Button(option.name) { model.setDDC(code: control.code, value: Double(option.value), display: display) }
+                        }
+                    }
+                    .fixedSize()
+                } else {
+                    HStack(spacing: 6) {
+                        ForEach(control.options, id: \.value) { option in
+                            Button(option.name) { model.setDDC(code: control.code, value: Double(option.value), display: display) }
+                                .controlSize(.small)
+                        }
+                    }
+                }
+            }
+        }
+        if model.ddcControls.contains(where: \.isDisruptive) {
+            Text("입력 소스나 전원 모드를 바꾸면 이 Mac의 화면이 꺼질 수 있음. 되돌리려면 디스플레이의 버튼이나 리모컨 사용")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        if !model.ddcOtherCodes.isEmpty {
+            Text("그 밖의 지원 코드 \(model.ddcOtherCodes.count)개: " + model.ddcOtherCodes.map { String(format: "%02X", $0) }.joined(separator: " ") + ". 아래 임의 VCP 코드로 접근")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
     @ViewBuilder
     private var ddcControls: some View {
+        if !model.ddcControls.isEmpty {
+            plannedDDCControls
+        } else {
+            fixedDDCControls
+        }
+        DisclosureGroup("임의 VCP 코드") {
+            HStack {
+                TextField("코드 (예: 0x10)", text: $model.rawCode).frame(width: 130)
+                TextField("값", text: $model.rawValue).frame(width: 90)
+                Button("읽기") { Task { await model.readRaw(display: display) } }
+                Button("쓰기") { Task { await model.writeRaw(display: display) } }
+                if let result = model.rawResult { Text(result).foregroundStyle(.secondary) }
+            }
+        }
+    }
+
+    /// capabilities를 읽지 못한 모니터용 고정 구성.
+    @ViewBuilder
+    private var fixedDDCControls: some View {
         ForEach([VCPCode.contrast, .volume], id: \.self) { code in
             if let value = model.ddcValues[code.rawValue] {
                 HStack(spacing: 10) {
@@ -378,14 +498,5 @@ struct BrightnessTab: View {
         Text("입력 소스나 전원 모드를 바꾸면 이 Mac의 화면이 꺼질 수 있음. 되돌리려면 디스플레이의 버튼이나 리모컨 사용")
             .font(.caption)
             .foregroundStyle(.secondary)
-        DisclosureGroup("임의 VCP 코드") {
-            HStack {
-                TextField("코드 (예: 0x10)", text: $model.rawCode).frame(width: 130)
-                TextField("값", text: $model.rawValue).frame(width: 90)
-                Button("읽기") { Task { await model.readRaw(display: display) } }
-                Button("쓰기") { Task { await model.writeRaw(display: display) } }
-                if let result = model.rawResult { Text(result).foregroundStyle(.secondary) }
-            }
-        }
     }
 }
