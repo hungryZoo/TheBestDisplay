@@ -15,6 +15,14 @@ public enum PendingRevertApplier {
             case .hdr(let target, let enabled):
                 guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
                 try HDRService.setEnabled(enabled, on: display.id)
+            case .rotation(let target, let degrees):
+                guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
+                try ArrangementService.setRotation(degrees, on: display.id)
+            case .mirror(let target, let master):
+                guard let display = target.resolve(in: displays) else { throw DisplayChangeError.displayNotFound }
+                try ArrangementService.setMirror(display.id, master: master?.resolve(in: displays)?.id)
+            case .reconnect(let displayID, _):
+                try ArrangementService.reconnect(displayID)
             }
         }
     }

@@ -112,6 +112,11 @@ public enum RevertAction: Codable, Hashable, Sendable {
     case displayMode(target: DisplayRef, mode: ModeDescriptor)
     case colorMode(target: DisplayRef, color: ColorDescriptor)
     case hdr(target: DisplayRef, enabled: Bool)
+    case rotation(target: DisplayRef, degrees: Int)
+    /// `master`가 nil이면 미러 해제.
+    case mirror(target: DisplayRef, master: DisplayRef?)
+    /// 연결 해제한 디스플레이의 재연결. 해제된 디스플레이는 온라인 목록에 없으므로 ID로 지정.
+    case reconnect(displayID: UInt32, name: String)
 }
 
 public struct PendingRevert: Codable, Hashable, Sendable {

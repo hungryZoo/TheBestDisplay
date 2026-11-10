@@ -31,6 +31,8 @@ final class DisplayStore {
     private(set) var diagnosticSnapshot: DiagnosticSnapshot?
     private(set) var diagnosis = DiagnosticResult(findings: [], portDiagnoses: [])
     private(set) var eventLog = EventLog()
+    /// 이 앱에서 연결 해제한 디스플레이 (ID와 이름). 재연결 항목 표시에 사용.
+    private(set) var disconnected: [UInt32: String] = [:]
     @ObservationIgnored private var lastEventState: EventState?
     @ObservationIgnored private var lastInventory: PortInventory?
     @ObservationIgnored private var portPollTimer: Timer?
@@ -68,6 +70,8 @@ final class DisplayStore {
 
     func refresh() {
         snapshot = DisplayCatalog.snapshot()
+        // 다시 온라인이 된 디스플레이는 연결 해제 목록에서 제거.
+        for display in snapshot.displays { disconnected[display.id] = nil }
         edidRecords = Dictionary(EDIDSource.records(for: snapshot.displays).map { ($0.displayID, $0) }, uniquingKeysWith: { first, _ in first })
         var allModes: [UInt32: [DisplayMode]] = [:]
         var current: [UInt32: DisplayMode] = [:]
@@ -133,6 +137,23 @@ final class DisplayStore {
         // 재구성 뒤 시스템이 전달 테이블을 초기화하므로 소프트웨어 조정 값 재적용.
         GammaService.shared.reapply(onlineDisplays: snapshot.displays.map(\.id))
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))
+    }
+
+    func rememberDisconnected(_ display: DisplaySummary) {
+        disconnected[display.id] = display.identity.name
+    }
+
+    /// 연결 해제한 디스플레이 재연결. 실패 사유 반환.
+    func reconnect(_ id: UInt32) -> String? {
+        do {
+            try ArrangementService.reconnect(id, timeout: 8)
+            disconnected[id] = nil
+            scheduleRefresh()
+            return nil
+        } catch {
+            scheduleRefresh()
+            return RevertCoordinator.describe(error)
+        }
     }
 
     func scheduleRefresh() {

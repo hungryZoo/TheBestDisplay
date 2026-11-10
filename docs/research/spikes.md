@@ -126,6 +126,9 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T12 | `MPDisplay canChangeOrientation`은 내장 패널에도 참을 반환. 내장 패널 회전은 시스템 설정에 없는 동작이고 displayplacer에 충돌 경고가 있어 회전 대상에서 제외 |
+| T12 | `SLSGetDisplayList`는 케이블을 분리한 디스플레이의 ID(2, 3)도 계속 반환. 온라인이 아닌 ID 목록만으로는 논리적 연결 해제와 물리적 분리를 구분할 수 없어, 창 앱의 재연결 목록은 이 앱에서 연결 해제한 디스플레이로 한정 |
+| T12 | 마지막 온라인 디스플레이의 연결 해제 요청은 시스템 호출 전에 거부(종료 코드 3) 확인. 회전, 미러, 메인 지정, 위치, 연결 해제와 재연결의 실측은 LG TV 분리 상태라 미실행 |
 | T11 | `CBBlueLightClient` 형식 부호: `getBlueLightStatus:` `B24@0:8^{?=BBBi{?={?=ii}{?=ii}}QB}16`, `setEnabled:` `B20@0:8B16`, `setStrength:commit:` `B24@0:8f16B20`, `getStrength:` `B24@0:8^f16`. 상태 구조체는 40바이트: 1번 바이트 켜짐, 4번 일정 모드, 32번 사용 가능 |
 | T11 | Night Shift 상태 구조체의 0번 바이트는 Night Shift가 꺼진 상태에서도 참으로 관측. 의미 미확정으로 화면에 표시하지 않음 |
 | T11 | `CBTrueToneClient`: `supported`, `available`, `enabled`, `setEnabled:`(모두 BOOL 반환). 내장 패널에서 반전과 복원 정상 |

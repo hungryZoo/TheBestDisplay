@@ -75,4 +75,54 @@ public enum DisplayChanges {
             restore: { try HDRService.setEnabled(!enable, on: displayID, method: method) }
         )
     }
+
+    /// 회전. 복귀는 이전 각도 재적용.
+    public static func rotationChange(display: DisplaySummary, to degrees: Int) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        let displayID = display.id
+        let previous = Int(display.rotationDegrees.rounded())
+        return RevertCoordinator.Change(
+            summary: "\(name): 회전 \(previous)도 → \(degrees)도",
+            pending: PendingRevert(createdAt: Date(), summary: "\(name) 회전을 \(previous)도로 복귀", actions: [.rotation(target: DisplayRef(display.identity), degrees: previous)]),
+            apply: { try ArrangementService.setRotation(degrees, on: displayID) },
+            commit: { guard ModeService.isOnline(displayID) else { throw DisplayChangeError.displayNotFound } },
+            restore: { try ArrangementService.setRotation(previous, on: displayID) }
+        )
+    }
+
+    /// 미러 설정 또는 해제. 복귀는 이전 미러 상태 재적용.
+    public static func mirrorChange(display: DisplaySummary, master: DisplaySummary?, displays: [DisplaySummary]) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        let displayID = display.id
+        let previousMaster = display.mirrorsDisplayID.flatMap { id in displays.first { $0.id == id } }
+        return RevertCoordinator.Change(
+            summary: master.map { "\(name): \($0.identity.name) 미러" } ?? "\(name): 미러 해제",
+            pending: PendingRevert(
+                createdAt: Date(),
+                summary: previousMaster.map { "\(name)을(를) \($0.identity.name) 미러로 복귀" } ?? "\(name) 미러 해제로 복귀",
+                actions: [.mirror(target: DisplayRef(display.identity), master: previousMaster.map { DisplayRef($0.identity) })]
+            ),
+            apply: {
+                if let master, let refusal = ArrangementPlanner.mirrorRefusal(display: displayID, master: master.id, displays: displays) {
+                    throw DisplayChangeError.unavailable(refusal)
+                }
+                try ArrangementService.setMirror(displayID, master: master?.id)
+            },
+            commit: {},
+            restore: { try ArrangementService.setMirror(displayID, master: previousMaster?.id) }
+        )
+    }
+
+    /// 논리적 연결 해제. 복귀는 재연결.
+    public static func disconnectChange(display: DisplaySummary) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        let displayID = display.id
+        return RevertCoordinator.Change(
+            summary: "\(name): 연결 해제",
+            pending: PendingRevert(createdAt: Date(), summary: "\(name) 재연결", actions: [.reconnect(displayID: displayID, name: name)]),
+            apply: { try ArrangementService.disconnect(displayID) },
+            commit: {},
+            restore: { try ArrangementService.reconnect(displayID) }
+        )
+    }
 }

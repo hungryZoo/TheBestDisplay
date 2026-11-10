@@ -20,6 +20,13 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "brightness", summary: "밝기 조회와 설정 (0-100)", positionals: ["디스플레이", "값"], optionalPositionals: 1),
     CommandSpec(name: "ddc", summary: "DDC 탐지와 VCP 읽기, 쓰기", positionals: ["디스플레이", "probe|get|set", "코드", "값"], optionalPositionals: 2),
     CommandSpec(name: "color", summary: "색 프로파일, Night Shift, True Tone 상태", positionals: ["디스플레이"], flags: ["--profiles"]),
+    CommandSpec(name: "arrangement", summary: "배치, 회전, 미러 상태"),
+    CommandSpec(name: "rotate", summary: "회전 (자동 복귀 적용)", positionals: ["디스플레이", "각도"], valueOptions: ["--timeout"], flags: ["--yes"]),
+    CommandSpec(name: "mirror", summary: "미러 설정 또는 해제 (자동 복귀 적용)", positionals: ["디스플레이", "원본|off"], valueOptions: ["--timeout"], flags: ["--yes"]),
+    CommandSpec(name: "main", summary: "메인 디스플레이 지정", positionals: ["디스플레이"]),
+    CommandSpec(name: "move", summary: "디스플레이 위치 지정", positionals: ["디스플레이", "x", "y"]),
+    CommandSpec(name: "disconnect", summary: "논리적 연결 해제 (자동 복귀 적용)", positionals: ["디스플레이"], valueOptions: ["--timeout"], flags: ["--yes"]),
+    CommandSpec(name: "reconnect", summary: "연결 해제한 디스플레이 재연결", positionals: ["디스플레이 ID"], optionalPositionals: 1),
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
     CommandSpec(name: "help", summary: "사용법"),
 ])
@@ -146,6 +153,27 @@ case "ddc":
 
 case "color":
     runColor(command, json: json)
+
+case "arrangement":
+    runArrangement(command, json: json)
+
+case "rotate":
+    runRotate(command)
+
+case "mirror":
+    runMirror(command)
+
+case "main":
+    runMain(command)
+
+case "move":
+    runMove(command)
+
+case "disconnect":
+    runDisconnect(command)
+
+case "reconnect":
+    runReconnect(command)
 
 case "revert-pending":
     runRevertPending(command)

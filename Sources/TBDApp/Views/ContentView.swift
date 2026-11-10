@@ -13,6 +13,7 @@ struct ContentView: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
     @State private var selection: SidebarItem?
+    @State private var reconnectFailure: String?
 
     var body: some View {
         NavigationSplitView {
@@ -25,6 +26,21 @@ struct ContentView: View {
                     if store.displays.isEmpty {
                         Text("온라인 디스플레이 없음")
                             .foregroundStyle(.secondary)
+                    }
+                }
+                if !store.disconnected.isEmpty {
+                    Section("연결 해제됨") {
+                        ForEach(store.disconnected.sorted(by: { $0.key < $1.key }), id: \.key) { id, name in
+                            HStack {
+                                Label(name, systemImage: "display.trianglebadge.exclamationmark")
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Button("재연결") {
+                                    if let failure = store.reconnect(id) { reconnectFailure = failure }
+                                }
+                                .controlSize(.small)
+                            }
+                        }
                     }
                 }
                 Section("도구") {
@@ -45,6 +61,11 @@ struct ContentView: View {
         }
         .sheet(item: confirmationBinding) { item in
             ChangeConfirmationSheet(confirmation: item.value)
+        }
+        .alert("재연결 실패", isPresented: Binding(get: { reconnectFailure != nil }, set: { if !$0 { reconnectFailure = nil } })) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text((reconnectFailure ?? "") + ". 케이블을 뽑았다가 다시 연결")
         }
         .alert("이전 실행에서 확인하지 않은 변경", isPresented: pendingBinding, presenting: changes.pendingFromPreviousRun) { _ in
             Button("복귀") { changes.applyPendingFromPreviousRun(displays: store.displays) }

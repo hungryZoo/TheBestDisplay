@@ -63,6 +63,20 @@ final class MPDisplayBridge {
         return true
     }
 
+    /// int 인자 하나를 받는 반환 없는 설정 메서드 호출 (`setOrientation:`, `setUnderscan:`). 형식 부호 `v20@0:8i16` 실측.
+    func setInt(_ selectorName: String, _ value: Int32) -> Bool {
+        let selector = NSSelectorFromString(selectorName)
+        guard object.responds(to: selector) else { return false }
+        typealias Fn = @convention(c) (NSObject, Selector, Int32) -> Void
+        unsafeBitCast(object.method(for: selector), to: Fn.self)(object, selector, value)
+        return true
+    }
+
+    func int(_ key: String) -> Int? {
+        guard object.responds(to: NSSelectorFromString(key)) else { return nil }
+        return (object.value(forKey: key) as? NSNumber)?.intValue
+    }
+
     func bool(_ key: String) -> Bool? {
         guard object.responds(to: NSSelectorFromString(key)) else { return nil }
         return object.value(forKey: key) as? Bool

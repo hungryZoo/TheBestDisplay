@@ -80,7 +80,12 @@
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 시스템 밝기 제어 또는 DDC. 소프트웨어 디밍은 창 앱 전용 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 조회 |
-| `tbdctl rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
+| `tbdctl arrangement` | 디스플레이별 위치, 크기, 회전, 미러 상태 조회 |
+| `tbdctl rotate <디스플레이> <0\|90\|180\|270> [--timeout <초>] [--yes]` | 회전 |
+| `tbdctl mirror <디스플레이> <원본\|off> [--timeout <초>] [--yes]` | 미러 설정과 해제 |
+| `tbdctl main <디스플레이>`, `tbdctl move <디스플레이> <x> <y>` | 메인 디스플레이 지정, 위치 지정 |
+| `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]`, `tbdctl reconnect [<ID>]` | 논리적 연결 해제와 재연결 |
+| `tbdctl profile` | 프로파일 (T14에서 추가) |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정자: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부

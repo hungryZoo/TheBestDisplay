@@ -34,8 +34,7 @@ enum DisplayTab: String, CaseIterable, Identifiable {
     /// 구현 예정 단계. 구현된 탭은 nil.
     var pendingStage: String? {
         switch self {
-        case .overview, .resolution, .colorMode, .link, .brightness, .colorAdjust: nil
-        case .arrangement: "P4"
+        case .overview, .resolution, .colorMode, .link, .brightness, .colorAdjust, .arrangement: nil
         }
     }
 }
@@ -71,8 +70,8 @@ struct DisplayDetailView: View {
             BrightnessTab(display: display)
         case .colorAdjust:
             ColorAdjustTab(display: display)
-        default:
-            PendingFeatureView(title: item.title, systemImage: item.systemImage, stage: item.pendingStage ?? "")
+        case .arrangement:
+            ArrangementTab(display: display)
         }
     }
 }
