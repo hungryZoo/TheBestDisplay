@@ -76,7 +76,7 @@
 | PRD-BRT-005 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-002 | TC-BRT-004, TC-BRT-005 | `Sources/TBDPlatform/XDRBoostService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 2 |
 | PRD-BRT-006 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-003 | TC-BRT-006, TC-BRT-007 | `Sources/TBDCore/BrightnessSync.swift`<br>`Sources/TBDPlatform/BrightnessSyncService.swift` | 통과 2 |
 | PRD-BRT-007 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-004 | TC-BRT-008, TC-BRT-009 | `Sources/TBDPlatform/OverlayDimService.swift`<br>`Sources/TBDCore/OverlayDim.swift` | 통과 2 |
-| PRD-DDC-001 | P4 | 필수 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
+| PRD-DDC-001 | P4 | 필수 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |
 | PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
 | PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |
 | PRD-DDC-004 | P6 | 권장 | MRD-SCP-009 | SRS-DDC-002 | TC-DDC-004, TC-DDC-005 | `Sources/TBDCore/DDCCapabilities.swift`<br>`Sources/TBDPlatform/DDCService.swift` | 보류 1, 통과 1 |

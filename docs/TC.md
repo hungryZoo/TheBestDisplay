@@ -68,7 +68,7 @@
 | TC-BRT-008 | 오버레이 디밍 계산 확인 | PRD-BRT-007, SRS-BRT-004 | 없음 | 강도 범위 처리와 백분율 해석 | 강도는 0-0.9로 잘림. 90 초과 백분율 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-BRT-009 | 오버레이 디밍 적용 확인 | PRD-BRT-007, SRS-BRT-004 | 디스플레이 온라인 | `tbdctl overlay-dim builtin 30 --seconds 3` | 화면 크기의 덮개 창이 불투명도 0.30으로 화면에 표시, 지정 시간 뒤 해제 | 통합 | macOS 26, Apple Silicon | 통과 | 내장 패널: 덮개 창 1512 x 982, 윈도우 서버의 화면 표시 목록에서 확인. 육안 확인은 미수행 |
 | TC-DDC-001 | DDC 패킷 구성과 응답 해석 확인 | PRD-DDC-003, SRS-DDC-001 | 없음 | VCP 0x10 읽기 요청 패킷 생성, 쓰기 패킷 생성, 정상 응답과 체크섬 오류 응답 해석 | 요청 바이트열과 체크섬이 기대값과 일치. 정상 응답에서 현재값과 최댓값 추출. 오류 응답 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
-| TC-DDC-002 | DDC 미응답 탐지 확인 | PRD-DDC-001, SRS-DDC-001 | DDC 미응답 디스플레이 (LG TV) 온라인 | `tbdctl ddc <외장> probe` | 미응답 판정과 사유 문구 출력. 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 미실행 | LG TV 분리 상태. 재연결 후 실행 |
+| TC-DDC-002 | DDC 미응답 탐지 확인 | PRD-DDC-001, SRS-DDC-001 | DDC 미응답 디스플레이 (LG TV) 온라인 | `tbdctl ddc <외장> probe` | 미응답 판정과 사유 문구 출력. 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-DDC-003 | DDC 제어 확인 | PRD-DDC-002, PRD-BRT-002, SRS-DDC-001 | DDC 지원 모니터 온라인 | 밝기, 대비, 볼륨 읽기와 쓰기 후 복원 | 재조회 값이 설정값과 일치 | 통합 | macOS 26, Apple Silicon | 보류 | DDC 지원 모니터 필요 |
 | TC-DDC-004 | DDC capabilities 해석 확인 | PRD-DDC-004, SRS-DDC-002 | 없음 | 요청 바이트열, 응답 조각, 문자열 해석 | 요청 `83 F3 00 00 4F`. 조각의 오프셋과 자료 추출, 체크섬 오류 거부. 문자열에서 VCP 코드 10개와 선택값 추출, 잘린 문자열도 읽은 부분까지 해석 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-DDC-005 | DDC capabilities 조회 확인 | PRD-DDC-004, SRS-DDC-002 | DDC 지원 모니터 온라인 | `tbdctl ddc <외장> caps` | 모델, MCCS 판, VCP 코드 목록 출력 | 통합 | macOS 26, Apple Silicon | 보류 | DDC 지원 모니터 필요. 내장 디스플레이 대상 거부(종료 코드 3)는 확인 |
