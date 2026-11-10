@@ -193,6 +193,7 @@
 | PRD-PRT-003 | 연결 경로 표시: 포트, 케이블 또는 독, 링크, 디스플레이 순서 | P3 | 필수 | MRD-SCP-007, MRD-DIF-003 |
 | PRD-PRT-004 | 포트의 플러그 방향과 PHY 레인 정보 표시: 고속 레인별 전송 방식, USB2 선 사용 여부, DisplayPort 터널의 링크 속도 | P6 | 권장 | MRD-SCP-007 |
 | PRD-PRT-005 | 전원 어댑터 정보 표시: 연결 여부, 전력, 협상 전압과 전류, 이름, 어댑터가 제시한 전원 옵션 | P6 | 권장 | MRD-SCP-007 |
+| PRD-PRT-006 | Thunderbolt 또는 USB4 스위치 토폴로지(깊이, 경로, 제조사와 모델)와 포트의 고속 레인 구성 판정(Thunderbolt 또는 USB4, DisplayPort 대체 모드 4레인, 2레인 + USB3) 표시 | P6 | 권장 | MRD-SCP-007 |
 
 ### 6.8 진단 (DGN)
 

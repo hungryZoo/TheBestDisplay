@@ -212,8 +212,10 @@ public struct PortInventory: Codable, Hashable, Sendable {
     public var cables: [CableEMarker]
     public var phys: [PhyInfo]
     public var powerAdapter: PowerAdapterInfo?
+    /// Thunderbolt 또는 USB4 스위치. 깊이와 경로 순.
+    public var switches: [ThunderboltSwitch]
 
-    public init(ports: [PortInfo], dpStates: [DPTransportState], cioStates: [CIOState], usbStates: [USBState], cables: [CableEMarker], phys: [PhyInfo] = [], powerAdapter: PowerAdapterInfo? = nil) {
+    public init(ports: [PortInfo], dpStates: [DPTransportState], cioStates: [CIOState], usbStates: [USBState], cables: [CableEMarker], phys: [PhyInfo] = [], powerAdapter: PowerAdapterInfo? = nil, switches: [ThunderboltSwitch] = []) {
         self.ports = ports
         self.dpStates = dpStates
         self.cioStates = cioStates
@@ -221,6 +223,7 @@ public struct PortInventory: Codable, Hashable, Sendable {
         self.cables = cables
         self.phys = phys
         self.powerAdapter = powerAdapter
+        self.switches = switches
     }
 
     /// 클래스 이름별 노드 속성 사전에서 구성. 포트 컨트롤러 클래스는 칩 세대에 따라 다르므로 `PortTypeDescription`이 있는 노드를 전부 포트로 취급.
@@ -241,7 +244,8 @@ public struct PortInventory: Codable, Hashable, Sendable {
             cables: (nodesByClass["IOPortTransportComponentCCUSBPDSOPp"] ?? []).compactMap(CableEMarker.decode),
             // PHY 노드의 클래스 이름은 칩마다 달라 접미사로 판별.
             phys: nodesByClass.filter { $0.key.hasSuffix(Self.phyClassSuffix) }.flatMap(\.value).compactMap(PhyInfo.decode).sorted { $0.id < $1.id },
-            powerAdapter: nodesByClass[Self.batteryClass]?.first.map(PowerAdapterInfo.decode)
+            powerAdapter: nodesByClass[Self.batteryClass]?.first.map(PowerAdapterInfo.decode),
+            switches: (nodesByClass["IOThunderboltSwitch"] ?? []).compactMap(ThunderboltSwitch.decode).sorted { ($0.depth, $0.routeString, $0.registryEntryID) < ($1.depth, $1.routeString, $1.registryEntryID) }
         )
     }
 
@@ -254,7 +258,7 @@ public struct PortInventory: Codable, Hashable, Sendable {
         "AppleHPMInterfaceType10", "AppleHPMInterfaceType11", "AppleHPMInterfaceType12", "AppleHPMInterfaceType18",
         "AppleTCControllerType10", "AppleTCControllerType11", "AppleHDMIPortController",
         "IOPortTransportStateDisplayPort", "IOPortTransportStateCIO", "IOPortTransportStateUSB2", "IOPortTransportStateUSB3",
-        "IOPortTransportComponentCCUSBPDSOPp",
+        "IOPortTransportComponentCCUSBPDSOPp", "IOThunderboltSwitch",
     ]
 }
 
@@ -310,6 +314,21 @@ public struct PhyInfo: Codable, Hashable, Sendable, Identifiable {
         )
     }
 
+    /// 고속 레인 구성의 판정. PHY 레인 1개는 고속 선 2쌍이며 DisplayPort로 쓰면 DP 레인 2개에 해당. (PRD-PRT-006)
+    /// CIO 밖의 전송 방식 표기("DP", "USB3")는 실기기 표본 없이 이름 앞부분으로 판별.
+    public var laneConfiguration: String {
+        let transports = lanes.compactMap { $0.transport?.lowercased() }
+        guard !transports.isEmpty else { return "고속 레인 미사용" }
+        func isDP(_ t: String) -> Bool { t.hasPrefix("dp") || t.hasPrefix("displayport") }
+        func isUSB3(_ t: String) -> Bool { t.hasPrefix("usb3") || t == "usb" }
+        if transports.allSatisfy({ $0 == "cio" }) { return "Thunderbolt 또는 USB4 (레인 \(transports.count)개 모두 CIO, 영상은 터널로 전달)" }
+        let dp = transports.filter(isDP).count, usb = transports.filter(isUSB3).count
+        if dp == transports.count { return "DisplayPort 대체 모드 \(dp * 2)레인 (USB3 없음)" }
+        if dp > 0, usb > 0 { return "DisplayPort 대체 모드 \(dp * 2)레인 + USB3" }
+        if usb == transports.count { return "USB3 전용" }
+        return "혼합: " + transports.joined(separator: ", ")
+    }
+
     /// 예: "레인 0 CIO, 레인 1 CIO, USB2 사용, DP 터널 8.10Gbps/lane (HBR3)"
     public var summary: String {
         var parts = lanes.map { "\($0.name.replacingOccurrences(of: "Lane", with: "레인")) \($0.transport ?? "미사용")" }
@@ -317,6 +336,54 @@ public struct PhyInfo: Codable, Hashable, Sendable, Identifiable {
         for tunnel in dpTunnels { parts.append("DP 터널 \(tunnel.linkRate ?? "속도 미확인")") }
         if dpTunnels.isEmpty { for clock in dpPixelClocks { parts.append("DP \(clock.linkRate ?? "속도 미확인")") } }
         return parts.joined(separator: ", ")
+    }
+}
+
+/// Thunderbolt 또는 USB4 스위치(라우터) 1개. `IOThunderboltSwitch` 계열 노드에서 구성. (PRD-PRT-006)
+public struct ThunderboltSwitch: Codable, Hashable, Sendable, Identifiable {
+    public var registryEntryID: UInt64
+    /// 호스트 라우터는 0, 연결된 장치는 1부터.
+    public var depth: Int
+    /// 호스트에서 이 스위치까지의 경로. 깊이마다 8비트로 포트 번호를 담음.
+    public var routeString: UInt64
+    public var vendorName: String?
+    public var modelName: String?
+    /// `Thunderbolt Version` 원시 값 (실측: 호스트 64, USB4 독 32).
+    public var version: Int?
+    public var upstreamPort: Int?
+    public var maxPortNumber: Int?
+    public var className: String
+
+    public var id: UInt64 { registryEntryID }
+    public var isHost: Bool { depth == 0 }
+
+    /// 경로 문자열을 포트 번호 목록으로 풀이. 예: 0x0301 → [1, 3]
+    public var routePorts: [Int] {
+        (0..<max(depth, 0)).map { Int((routeString >> (UInt64($0) * 8)) & 0xFF) }
+    }
+
+    public static func decode(_ node: [String: Any]) -> ThunderboltSwitch? {
+        guard let depth = intValue(node, "Depth") else { return nil }
+        return ThunderboltSwitch(
+            registryEntryID: (node["IORegistryEntryID"] as? NSNumber)?.uint64Value ?? 0,
+            depth: depth,
+            routeString: (node["Route String"] as? NSNumber)?.uint64Value ?? 0,
+            vendorName: node["Device Vendor Name"] as? String,
+            modelName: node["Device Model Name"] as? String,
+            version: intValue(node, "Thunderbolt Version"),
+            upstreamPort: intValue(node, "Upstream Port Number"),
+            maxPortNumber: intValue(node, "Max Port Number"),
+            className: (node["IORegistryEntryName"] as? String) ?? (node["IOObjectClass"] as? String) ?? ""
+        )
+    }
+
+    /// 예: "깊이 1, Parade Technologies PS9010, 경로 1, 상향 포트 1, 판 값 32"
+    public var summary: String {
+        var parts = ["깊이 \(depth)", [vendorName, modelName].compactMap { $0 }.joined(separator: " ")]
+        if !routePorts.isEmpty { parts.append("경로 " + routePorts.map(String.init).joined(separator: " → ")) }
+        if let upstreamPort { parts.append("상향 포트 \(upstreamPort)") }
+        if let version { parts.append("판 값 \(version)") }
+        return parts.filter { !$0.isEmpty }.joined(separator: ", ")
     }
 }
 
@@ -456,7 +523,7 @@ public enum ConnectionPathBuilder {
 
         // PHY: 고속 레인의 전송 방식.
         if let phy, phy.isActive {
-            result.append(.init(kind: .phy, title: "PHY \(phy.id)", detail: phy.summary, status: .ok))
+            result.append(.init(kind: .phy, title: "PHY \(phy.id)", detail: phy.summary + ". 구성: " + phy.laneConfiguration, status: .ok))
         }
 
         // (2) 케이블

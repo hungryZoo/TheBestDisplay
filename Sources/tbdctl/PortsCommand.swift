@@ -34,5 +34,10 @@ func runPorts(_ command: ParsedCommand, json: Bool) {
         }
         if path.isConnected { print("  경로: \(path.summary)") }
     }
+    let devices = inventory.switches.filter { !$0.isHost }
+    if !inventory.switches.isEmpty {
+        print("Thunderbolt 또는 USB4 스위치: 호스트 라우터 \(inventory.switches.count - devices.count)개, 연결 장치 \(devices.count)개")
+        for device in devices { print("  \(device.summary)") }
+    }
     if let adapter = inventory.powerAdapter { print("전원 어댑터: \(adapter.summary)") }
 }

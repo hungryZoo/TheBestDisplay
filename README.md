@@ -176,7 +176,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 |
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl link <디스플레이>` | 링크 정보, 대역폭, DPCD |
-| `tbdctl ports` | 포트, PHY 레인, 케이블, 독, 연결 경로, 전원 어댑터 |
+| `tbdctl ports` | 포트, PHY 레인과 구성, 케이블, 독, 연결 경로, Thunderbolt 스위치, 전원 어댑터 |
 | `tbdctl diagnose` | 포트 점검과 발견 항목 |
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정 |

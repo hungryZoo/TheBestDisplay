@@ -55,6 +55,11 @@ struct DiagnosticsView: View {
             ForEach(store.connectionPaths) { path in
                 PortPathCard(path: path, diagnosis: store.diagnosis.portDiagnoses.first { $0.port == path.port.key })
             }
+            ForEach(store.thunderboltSwitches.filter { !$0.isHost }) { device in
+                Label("Thunderbolt 또는 USB4 장치: \(device.summary)", systemImage: "bolt.horizontal")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
             if let adapter = store.powerAdapter {
                 Label("전원 어댑터: \(adapter.summary)", systemImage: "powerplug")
                     .font(.callout)

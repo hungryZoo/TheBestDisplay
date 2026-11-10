@@ -29,6 +29,7 @@ final class DisplayStore {
     private(set) var connectionPaths: [ConnectionPath] = []
     /// 전원 어댑터 정보. 배터리 노드가 없는 기기는 nil. (PRD-PRT-005)
     private(set) var powerAdapter: PowerAdapterInfo?
+    private(set) var thunderboltSwitches: [ThunderboltSwitch] = []
     /// 진단 입력과 결과, 이벤트 기록.
     private(set) var diagnosticSnapshot: DiagnosticSnapshot?
     private(set) var diagnosis = DiagnosticResult(findings: [], portDiagnoses: [])
@@ -105,6 +106,7 @@ final class DisplayStore {
         transportStates = inventory.dpStates
         lastInventory = inventory
         powerAdapter = inventory.powerAdapter
+        thunderboltSwitches = inventory.switches
         connectionPaths = ConnectionPathBuilder.build(inventory: inventory, displays: snapshot.displays)
         var reports: [UInt32: LinkReport] = [:]
         var details: [UInt32: LinkDetails] = [:]

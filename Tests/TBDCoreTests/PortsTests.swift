@@ -114,7 +114,7 @@ struct ConnectionPathTests {
         #expect(path.steps.allSatisfy { $0.status == .ok })
         #expect(path.steps[0].detail.contains("플러그 방향 2"))
         #expect(path.steps[1].title == "PHY 3")
-        #expect(path.steps[1].detail == "레인 0 CIO, 레인 1 CIO, USB2 사용, DP 터널 8.10Gbps/lane (HBR3)")
+        #expect(path.steps[1].detail == "레인 0 CIO, 레인 1 CIO, USB2 사용, DP 터널 8.10Gbps/lane (HBR3). 구성: Thunderbolt 또는 USB4 (레인 2개 모두 CIO, 영상은 터널로 전달)")
         #expect(path.summary == "USB-C 4번 → 케이블 → Parade Technologies PS9010 → HBR3 x 4 → LG TV SSCR2")
         #expect(path.steps[4].detail.contains("터널링"))
 
