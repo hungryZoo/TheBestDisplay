@@ -5,6 +5,9 @@ import TBDPlatform
 struct PortsOutput: Encodable {
     var inventory: PortInventory
     var paths: [ConnectionPath]
+    /// 충전 상태 수치와 충전 제한 요소 판정. (PRD-PRT-007)
+    var charging: ChargingTelemetry?
+    var chargingFindings: [Finding]
 }
 
 /// `tbdctl ports [--json]` (PRD-PRT-001-003)
@@ -13,7 +16,7 @@ func runPorts(_ command: ParsedCommand, json: Bool) {
     let inventory = PortService.inventory()
     let paths = ConnectionPathBuilder.build(inventory: inventory, displays: displays)
     if json {
-        printJSON(PortsOutput(inventory: inventory, paths: paths))
+        printJSON(PortsOutput(inventory: inventory, paths: paths, charging: PortService.chargingTelemetry(), chargingFindings: PortService.chargingFindings(inventory: inventory)))
         return
     }
     if paths.isEmpty {
@@ -40,4 +43,12 @@ func runPorts(_ command: ParsedCommand, json: Bool) {
         for device in devices { print("  \(device.summary)") }
     }
     if let adapter = inventory.powerAdapter { print("전원 어댑터: \(adapter.summary)") }
+    let findings = PortService.chargingFindings(inventory: inventory)
+    if inventory.powerAdapter?.isConnected == true, !findings.isEmpty {
+        print("충전 진단")
+        for finding in findings {
+            print("  [\(finding.severity.label)] \(finding.title): \(finding.detail)")
+            if !finding.remedy.isEmpty, finding.severity != .info { print("    조치: \(finding.remedy)") }
+        }
+    }
 }

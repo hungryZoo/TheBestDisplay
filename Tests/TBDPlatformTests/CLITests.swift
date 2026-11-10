@@ -89,3 +89,37 @@ struct LiveDiagnosisTests {
         }
     }
 }
+
+/// TC-PRT-008: 충전 진단 출력. 읽기 전용.
+@Suite("TC-PRT-008 충전 진단 출력")
+struct ChargingDiagnosisTests {
+    @Test func 포트_명령의_충전_진단() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let result = try CLI.run(["ports", "--json"])
+        #expect(result.status == 0)
+        let root = try #require(JSONSerialization.jsonObject(with: result.stdout) as? [String: Any])
+        let findings = try #require(root["chargingFindings"] as? [[String: Any]])
+        let adapter = (root["inventory"] as? [String: Any])?["powerAdapter"] as? [String: Any]
+        guard adapter?["isConnected"] as? Bool == true else {
+            // 전원 미연결: 미연결 항목 1건 또는 배터리 없는 기기의 빈 목록.
+            #expect(findings.allSatisfy { $0["code"] as? String == "CHG.NOT_CONNECTED" })
+            return
+        }
+        // 전원 연결: 공급 전력 상한 판정 1건 포함, 충전 수치 포함.
+        let codes = findings.compactMap { $0["code"] as? String }
+        #expect(codes.contains("CHG.SOURCE_LIMIT") != codes.contains("CHG.CABLE_LIMIT"))
+        #expect(root["charging"] is [String: Any])
+        let text = String(decoding: try CLI.run(["ports"]).stdout, as: UTF8.self)
+        #expect(text.contains("충전 진단"))
+    }
+
+    @Test func 서비스_판정은_어댑터_정보와_일치() {
+        let inventory = PortService.inventory()
+        let findings = PortService.chargingFindings(inventory: inventory)
+        if inventory.powerAdapter?.isConnected == true {
+            #expect(!findings.isEmpty)
+        } else {
+            #expect(findings.allSatisfy { $0.code == "CHG.NOT_CONNECTED" })
+        }
+    }
+}

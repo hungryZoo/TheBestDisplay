@@ -67,7 +67,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
 | HDR | 지원 여부, 켜기와 끄기, 지원 EOTF, EDR 헤드룸 |
 | 링크 | 링크 속도, 레인 수, 터널링, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD(다운스프레드, HDCP 능력 포함), 링크 훈련 결과 |
-| 포트와 케이블 | 포트별 지원 전송, 플러그 방향, PHY 레인, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로, 전원 어댑터 |
+| 포트와 케이블 | 포트별 지원 전송, 플러그 방향, PHY 레인, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로, 전원 어댑터, 충전 제한 요소 판정 |
 | 진단 | 포트별 화면 출력 점검 6단계, 발견 항목(근거와 조치), 이벤트 기록, 진단 보고서 내보내기 |
 | 밝기와 DDC | 시스템 밝기, 내장 패널 휘도(cd/m²) 표시, DDC 밝기, 소프트웨어 디밍, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
 | 색 조정 | 디스플레이 프리셋(기준 모드), 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
@@ -176,7 +176,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 |
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl link <디스플레이>` | 링크 정보, 대역폭, DPCD |
-| `tbdctl ports` | 포트, PHY 레인과 구성, 케이블, 독, 연결 경로, Thunderbolt 스위치, 전원 어댑터 |
+| `tbdctl ports` | 포트, PHY 레인과 구성, 케이블, 독, 연결 경로, Thunderbolt 스위치, 전원 어댑터, 충전 진단 |
 | `tbdctl diagnose` | 포트 점검과 발견 항목 |
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 내장 패널은 현재 휘도(cd/m²)도 출력 |
@@ -261,8 +261,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 108건 중 통과 103건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 44행, 부분 11행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 110건 중 통과 105건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 45행, 부분 10행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 

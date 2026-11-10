@@ -65,6 +65,23 @@ struct DiagnosticsView: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
+            if store.powerAdapter?.isConnected == true {
+                ForEach(store.chargingFindings) { finding in
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("충전 진단: \(finding.title)")
+                            Text(finding.detail).font(.caption).foregroundStyle(.secondary)
+                            if finding.severity != .info, !finding.remedy.isEmpty {
+                                Text("조치: \(finding.remedy)").font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                    } icon: {
+                        Image(systemName: finding.severity == .info ? "bolt.batteryblock" : "exclamationmark.triangle")
+                            .foregroundStyle(finding.severity == .info ? Color.secondary : Color.orange)
+                    }
+                    .font(.callout)
+                }
+            }
         }
     }
 
