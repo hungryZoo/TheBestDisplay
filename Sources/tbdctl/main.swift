@@ -10,6 +10,7 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "info", summary: "제품 정보와 EDID 해석", positionals: ["디스플레이"], valueOptions: ["--edid-out"], flags: ["--hex"]),
     CommandSpec(name: "modes", summary: "전체 모드 목록", positionals: ["디스플레이"], flags: ["--hidpi", "--outside-default"]),
     CommandSpec(name: "scaled", summary: "사용자 정의 스케일 해상도 조회, 추가, 삭제 (오버라이드 파일, 관리자 권한)", positionals: ["디스플레이", "list|add|remove", "해상도"], optionalPositionals: 2),
+    CommandSpec(name: "refresh", summary: "주사율 측정 (화면 갱신 콜백 기준)", positionals: ["디스플레이"], valueOptions: ["--seconds"]),
     CommandSpec(name: "set-mode", summary: "모드 전환 (자동 복귀 적용)", positionals: ["디스플레이", "모드"], valueOptions: ["--timeout", "--method"], flags: ["--yes"]),
     CommandSpec(name: "signal", summary: "현재 신호 형식과 색 모드 목록", positionals: ["디스플레이"], flags: ["--timings"]),
     CommandSpec(name: "link", summary: "링크 정보와 대역폭", positionals: ["디스플레이"]),
@@ -130,6 +131,9 @@ case "modes":
 
 case "scaled":
     runScaled(command, json: json)
+
+case "refresh":
+    MainActor.assumeIsolated { runRefresh(command, json: json) }
 
 case "set-mode":
     runSetMode(command)

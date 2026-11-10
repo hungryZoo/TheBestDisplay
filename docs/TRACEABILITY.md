@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 74 |
-| SRS 설계 요구사항 | 48 |
-| TC | 66 |
+| PRD 요구사항 | 75 |
+| SRS 설계 요구사항 | 49 |
+| TC | 68 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -38,6 +38,7 @@
 | PRD-MOD-005 | P2 | 필수 | MRD-SCP-003 | SRS-MOD-002 | TC-MOD-004 | `Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/MPDisplayBridge.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
 | PRD-MOD-006 | P2 | 권장 | MRD-PRB-001 | SRS-MOD-003 | TC-MOD-002 | `Sources/TBDCore/ModeCatalog.swift` | 통과 1 |
 | PRD-MOD-007 | P6 | 권장 | MRD-SCP-003, MRD-SCP-012 | SRS-MOD-004 | TC-MOD-005, TC-MOD-006, TC-MOD-007 | `Sources/TBDCore/DisplayOverride.swift`<br>`Sources/TBDPlatform/DisplayOverrideService.swift` | 미실행 1, 통과 2 |
+| PRD-MOD-008 | P6 | 권장 | MRD-SCP-003 | SRS-MOD-005 | TC-MOD-008, TC-MOD-009 | `Sources/TBDCore/RefreshMeasurement.swift`<br>`Sources/TBDPlatform/RefreshRateMeter.swift` | 통과 2 |
 | PRD-COL-001 | P2 | 필수 | MRD-SCP-004, MRD-PRB-002, MRD-KPI-002 | SRS-COL-002 | TC-COL-002 | `Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-002 | P2 | 필수 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-003 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-003 | TC-COL-004 | `Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
@@ -65,7 +66,7 @@
 | PRD-BRT-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
 | PRD-BRT-003 | P4 | 필수 | MRD-SCP-009 | SRS-BRT-001, SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/BrightnessService.swift`<br>`Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 1 |
 | PRD-BRT-004 | P4 | 권장 | MRD-SCP-009 | SRS-BRT-001 | TC-BRT-003 | `Sources/TBDPlatform/BrightnessService.swift` | 통과 1 |
-| PRD-BRT-005 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-003 | TC-BRT-004, TC-BRT-005 | `Sources/TBDPlatform/XDRBoostService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 2 |
+| PRD-BRT-005 | P6 | 권장 | MRD-SCP-009 | SRS-BRT-002 | TC-BRT-004, TC-BRT-005 | `Sources/TBDPlatform/XDRBoostService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 2 |
 | PRD-DDC-001 | P4 | 필수 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
 | PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
 | PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |

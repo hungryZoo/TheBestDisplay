@@ -70,6 +70,7 @@
 | `tbdctl modes <디스플레이> [--hidpi] [--outside-default]` | 전체 모드 목록. HiDPI만, 시스템 설정 목록 밖만 필터 |
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환. 모드 형식은 `<폭>x<높이>[@<주사율>][:hidpi\|:lodpi]` 또는 `mode:<번호>`. Return 입력 시 확정, 제한 시간 내 입력이 없으면 복귀. `--yes`는 즉시 확정 |
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도(HiDPI 논리 해상도) 조회, 추가, 삭제. 쓰기 권한이 없으면 관리자 권한으로 실행할 명령 출력 |
+| `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 (기본 2초) |
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 또는 복귀 정보 삭제 |
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정. `--timings`는 싱크 타이밍 전체 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환. 형식은 `id:<번호>` 또는 `<rgb\|ycbcr444\|ycbcr422\|ycbcr420>[:<bpc>][:<full\|limited>][:<sdr\|pq\|hlg>]`. 생략 항목은 현재 값 우선 |
@@ -133,6 +134,7 @@
 | PRD-MOD-005 | 같은 해상도 안에서 주사율 단독 전환. VRR과 ProMotion 모드 선택 포함 | P2 | 필수 | MRD-SCP-003 |
 | PRD-MOD-006 | 시스템 설정 기본 목록에 없는 모드 구분 표시 | P2 | 권장 | MRD-PRB-001 |
 | PRD-MOD-007 | 사용자 정의 스케일 해상도: 디스플레이 오버라이드 파일의 HiDPI 해상도 항목 조회, 추가, 삭제. 저장에 관리자 인증 사용, 다른 키와 다른 도구가 만든 항목 보존. 반영 시점(재연결 또는 재시동) 안내 | P6 | 권장 | MRD-SCP-003, MRD-SCP-012 |
+| PRD-MOD-008 | 주사율 측정 표시: 화면 갱신 콜백 시각으로 계산한 측정값, 콜백이 보고한 주기의 주사율, 현재 모드의 공칭값, 갱신 간격의 최소와 최대 | P6 | 권장 | MRD-SCP-003 |
 
 ### 6.4 색 모드와 DSC (COL)
 

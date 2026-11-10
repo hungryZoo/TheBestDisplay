@@ -1,10 +1,13 @@
 import SwiftUI
 import TBDCore
+import TBDPlatform
 
 /// 개요 탭: 제품 정보와 현재 상태. (PRD-INF-001)
 struct OverviewTab: View {
     @Environment(DisplayStore.self) private var store
     let display: DisplaySummary
+    @State private var measurement: RefreshMeasurement?
+    @State private var isMeasuring = false
 
     var body: some View {
         Form {
@@ -21,6 +24,14 @@ struct OverviewTab: View {
                 LabeledContent("논리 해상도", value: "\(display.pointWidth) x \(display.pointHeight)\(display.isHiDPI ? " (HiDPI)" : "")")
                 LabeledContent("픽셀 해상도", value: "\(display.pixelWidth) x \(display.pixelHeight)")
                 LabeledContent("주사율", value: display.refreshRate > 0 ? "\(DisplaySummary.formatHz(display.refreshRate)) Hz" : "미보고")
+                LabeledContent("측정 주사율") {
+                    HStack(spacing: 10) {
+                        Text(isMeasuring ? "측정 중" : measurement?.summary ?? "미측정")
+                        Button("측정") { measure() }
+                            .controlSize(.small)
+                            .disabled(isMeasuring)
+                    }
+                }
                 LabeledContent("회전", value: "\(Int(display.rotationDegrees))도")
                 LabeledContent("위치", value: "(\(display.originX), \(display.originY))")
                 LabeledContent("메인 디스플레이", value: display.isMain ? "예" : "아니요")
@@ -53,6 +64,21 @@ struct OverviewTab: View {
         }
         .formStyle(.grouped)
         .textSelection(.enabled)
+    }
+
+    /// 2초 동안 화면 갱신 콜백을 모아 주사율 계산. (PRD-MOD-008)
+    private func measure() {
+        guard let meter = RefreshRateMeter(display: display) else {
+            measurement = RefreshMeasurement.compute(nominalHz: display.refreshRate, timestamps: [], reportedDurations: [])
+            return
+        }
+        isMeasuring = true
+        meter.start()
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            measurement = meter.stop()
+            isMeasuring = false
+        }
     }
 
     private static func hex(_ value: UInt32) -> String {

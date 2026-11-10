@@ -3,7 +3,7 @@ import Metal
 import QuartzCore
 import TBDCore
 
-/// XDR 밝기 업스케일. (SRS-BRT-003, PRD-BRT-005)
+/// XDR 밝기 업스케일. (SRS-BRT-002, PRD-BRT-005)
 ///
 /// 2단계 구조:
 /// - (1) EDR 유지 창: 대상 화면 구석의 8포인트 창에 1.0을 넘는 값을 그려 시스템이 EDR 헤드룸을 열어 두게 함.

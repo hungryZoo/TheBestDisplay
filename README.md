@@ -62,7 +62,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | --- | --- |
 | 디스플레이 정보 | 제품 정보, 물리 크기, EDID 해석(기본 블록, CTA-861, DisplayID), 싱크 능력 요약, EDID 원본 저장 |
 | EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, FRL과 TMDS 상한), 사용자 정의 타이밍 추가(CVT-RB, CVT-RB2, 직접 지정), 가상 EDID 적용과 해제, 디스플레이 재감지 |
-| 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시, 사용자 정의 스케일 해상도 등록 |
+| 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시, 사용자 정의 스케일 해상도 등록, 주사율 측정 |
 | 색 모드 | 현재 송출 신호(픽셀 인코딩, 비트 심도, 레인지, EOTF, 색 공간) 표시, 현재 타이밍에서 선택 가능한 색 모드 전환 |
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
 | HDR | 지원 여부, 켜기와 끄기, 지원 EOTF, EDR 헤드룸 |
@@ -159,6 +159,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl modes <디스플레이> [--hidpi] [--outside-default]` | 전체 모드 목록 |
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환 |
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도 조회, 추가, 삭제 |
+| `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 |
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 조회와 전환 |
