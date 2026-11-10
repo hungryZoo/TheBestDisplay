@@ -69,6 +69,8 @@
 | TC-EDO-002 | `edid` 명령의 파일 처리와 거부 확인 | PRD-EDO-001, PRD-EDO-002, PRD-CLI-002, SRS-EDO-001 | EDID 픽스처 파일 | `tbdctl edid builtin check <파일>`, `patch remove-hdr,remove-ycbcr,remove-dsc --in <파일> --out <파일>`, 내장 디스플레이 대상 `patch --apply`와 `reset` | 검증 통과와 능력 요약 출력, 편집 전후 비교 출력, 저장한 편집본의 검증 통과. 내장 디스플레이 대상 적용과 해제는 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 통과 | 수동 실행 |
 | TC-EDO-003 | 가상 EDID 적용과 자동 복귀 확인 | PRD-EDO-003, SRS-EDO-002 | 외장 디스플레이 온라인 | `tbdctl edid <외장> patch remove-hdr --apply` 후 확인 없이 대기, 이어서 `tbdctl hdr <외장>` | 적용 직후 HDR 미지원 표시, 제한 시간 뒤 원본 EDID 복귀와 HDR 지원 표시 | 통합 | macOS 26, Apple Silicon | 미실행 | LG TV 분리 상태. 재연결 후 실행 (화면 변경 시험, U-01 절차) |
 | TC-EDO-004 | 디스플레이 재감지 확인 | PRD-EDO-004, SRS-EDO-002 | 디스플레이 온라인 | `tbdctl redetect` 후 `tbdctl list` | 종료 코드 0. 디스플레이 목록과 현재 모드 유지 | 통합 | macOS 26, Apple Silicon | 통과 | 내장 디스플레이만 온라인인 상태에서 실행 |
+| TC-EDO-005 | 사용자 정의 타이밍 계산과 주입 확인 | PRD-EDO-005, SRS-EDO-003 | 실측 EDID 픽스처와 HDMI 합성 픽스처 | CVT 계산, 서술자 부호화와 재해석, EDID 추가 | 1920x1080 60 Hz 1판은 138.50 MHz와 총 2080 x 1111, 3840x2160 60 Hz 2판은 522.614 MHz와 총 3920 x 2222. 추가 뒤 검증 통과와 기존 타이밍 유지. 655.35 MHz 초과 타이밍은 DisplayID 확장에 기록, 확장이 없으면 새 블록 생성 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-EDO-006 | 사용자 정의 타이밍 적용 확인 | PRD-EDO-005, PRD-EDO-003, SRS-EDO-003 | 외장 디스플레이 온라인 | `tbdctl edid <외장> timing 2560x1440@100 --apply` 후 `tbdctl modes <외장>` | 모드 목록에 2560 x 1440 100 Hz 출현. 확인 없이 대기하면 원본 EDID 복귀 | 통합 | macOS 26, Apple Silicon | 미실행 | LG TV 분리 상태. 재연결 후 실행 (화면 변경 시험, U-01 절차). 파일 입력의 계산과 저장은 수동 실행으로 확인 |
 
 ## 2. 선행 검증 대응 표
 

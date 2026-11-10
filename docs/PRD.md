@@ -80,6 +80,7 @@
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 상태와 전환 가능 여부 조회, 켜기와 끄기 |
 | `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약. 파일 또는 현재 디스플레이의 EDID 대상 |
 | `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | EDID 편집. 편집 목록은 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`. `--apply`는 편집본을 가상 EDID로 적용 |
+| `tbdctl edid <디스플레이> timing <타이밍> [--preferred] [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | 사용자 정의 타이밍 계산과 EDID 추가. 형식은 `<폭>x<높이>@<주사율>[:rb\|:rb2]` 또는 `raw:<수평 활성>,<프런트 포치>,<동기>,<백 포치>,<수직 활성>,<프런트 포치>,<동기>,<백 포치>,<픽셀 클록 kHz>[,+h\|-h][,+v\|-v]` |
 | `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]` | EDID 파일을 가상 EDID로 적용 |
 | `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 (원본 EDID 복귀) |
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
@@ -255,3 +256,4 @@
 | PRD-EDO-002 | EDID 편집: DSC 선언 제거(HDMI), HDR 선언 제거, YCbCr 선언 제거(RGB 전용), YCbCr 4:2:0 선언 제거, VRR 선언 제거(HDMI), FRL과 TMDS 최대 속도 상한. 편집 전후 능력 비교 표시, 편집본 파일 저장 | P6 | 필수 | MRD-SCP-016 |
 | PRD-EDO-003 | 가상 EDID 적용과 해제: 편집본 또는 EDID 파일을 외장 디스플레이에 적용, 원본 EDID로 복원. 적용에 자동 복귀 사용. 디스플레이 저장 장치 쓰기는 제공하지 않음 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 |
 | PRD-EDO-004 | 디스플레이 재감지 요청 | P6 | 권장 | MRD-SCP-016 |
+| PRD-EDO-005 | 사용자 정의 타이밍: 해상도와 주사율에서 CVT 축소 블랭킹(1판, 2판) 타이밍 계산 또는 블랭킹 값 직접 지정. EDID에 상세 타이밍으로 추가하고 선호 타이밍 지정 가능. 18바이트 서술자 범위를 넘는 타이밍은 DisplayID 상세 타이밍으로 기록. 적용은 PRD-EDO-003의 가상 EDID 사용 | P6 | 필수 | MRD-SCP-016 |

@@ -16,6 +16,8 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
     case limitFRLRate(Int)
     /// HDMI TMDS 최대 문자 속도(MHz) 상한.
     case limitTMDSRate(Int)
+    /// 상세 타이밍 추가. `preferred`가 참이면 선호 타이밍으로 지정. (PRD-EDO-005)
+    case addTiming(DetailedTimingSpec, preferred: Bool)
 
     public var title: String {
         switch self {
@@ -26,6 +28,7 @@ public enum EDIDPatch: Hashable, Sendable, Codable {
         case .removeVRR: "VRR 선언 제거 (HDMI)"
         case .limitFRLRate(let rate): "FRL 최대 속도 단계 \(rate) 이하로 제한"
         case .limitTMDSRate(let mhz): "TMDS 최대 속도 \(mhz) MHz 이하로 제한"
+        case .addTiming(let spec, let preferred): "상세 타이밍 추가\(preferred ? " (선호)" : ""): \(spec.label)"
         }
     }
 
@@ -191,6 +194,10 @@ public enum EDIDEditor {
     // MARK: - 편집 구현
 
     static func apply(_ patch: EDIDPatch, to blocks: inout [[UInt8]], changes: inout [String]) throws {
+        if case .addTiming(let spec, let preferred) = patch {
+            try addTiming(spec, preferred: preferred, to: &blocks, changes: &changes)
+            return
+        }
         if patch == .removeYCbCr {
             // 기본 블록: EDID 1.4 디지털 입력의 기능 바이트(24) 비트 4-3이 YCbCr 지원.
             if blocks[0][19] >= 4, blocks[0][20] & 0x80 != 0, blocks[0][24] & 0x18 != 0 {
@@ -256,6 +263,8 @@ public enum EDIDEditor {
                         changes.append("HDMI 블록의 TMDS 최대 클록을 \(limit) MHz 이하로 제한")
                     }
                 }
+            case .addTiming:
+                break
             }
             blocks[index] = try cta.serialized()
         }
@@ -267,6 +276,133 @@ public enum EDIDEditor {
             body(&cta.dataBlocks[i])
             if cta.dataBlocks[i] != before { changes.append(label) }
         }
+    }
+}
+
+// MARK: - 상세 타이밍 주입 (SRS-EDO-003)
+
+extension EDIDEditor {
+    static func slot(_ index: Int) -> Range<Int> { (54 + index * 18)..<(54 + (index + 1) * 18) }
+
+    /// 상세 타이밍 추가.
+    /// - 18바이트 서술자로 표현 가능한 타이밍: 선호 지정이면 기본 블록의 첫 서술자를 교체하고 기존 타이밍을 다른 자리로 이동.
+    ///   자리 우선순위는 기본 블록의 더미 서술자(태그 0x10), CTA 확장 블록의 여유 공간, DisplayID 확장 블록.
+    /// - 표현 범위를 넘는 타이밍(픽셀 클록 655.35 MHz 초과 등): DisplayID 상세 타이밍으로 추가.
+    static func addTiming(_ spec: DetailedTimingSpec, preferred: Bool, to blocks: inout [[UInt8]], changes: inout [String]) throws {
+        guard spec.issues.isEmpty else { throw EDIDEditError.invalid(spec.issues) }
+        guard spec.fitsDescriptor else {
+            let location = try addDisplayIDTiming(spec, preferred: preferred, to: &blocks)
+            changes.append("\(spec.label) 추가 (\(location))\(preferred ? ", 선호 표시" : "")")
+            return
+        }
+        let first = Array(blocks[0][slot(0)])
+        let firstIsTiming = !(first[0] == 0 && first[1] == 0)
+        // 물리 크기는 기존 선호 타이밍의 값 사용.
+        let widthMM = firstIsTiming ? Int(first[12]) | Int(first[14] >> 4) << 8 : 0
+        let heightMM = firstIsTiming ? Int(first[13]) | Int(first[14] & 0x0F) << 8 : 0
+        let descriptor = try spec.descriptor(widthMM: widthMM, heightMM: heightMM)
+        if preferred {
+            blocks[0].replaceSubrange(slot(0), with: descriptor)
+            changes.append("선호 타이밍을 \(spec.label)(으)로 교체")
+            if firstIsTiming {
+                let location = try place(first, in: &blocks)
+                changes.append("기존 선호 타이밍을 \(location)(으)로 이동")
+            }
+        } else {
+            let location = try place(descriptor, in: &blocks)
+            changes.append("\(spec.label) 추가 (\(location))")
+        }
+    }
+
+    /// 18바이트 타이밍 서술자를 빈 자리에 배치.
+    static func place(_ descriptor: [UInt8], in blocks: inout [[UInt8]]) throws -> String {
+        for i in 1..<4 {
+            let d = Array(blocks[0][slot(i)])
+            if d[0] == 0, d[1] == 0, d[3] == 0x10 {
+                blocks[0].replaceSubrange(slot(i), with: descriptor)
+                return "기본 블록 서술자 \(i + 1)"
+            }
+        }
+        for index in blocks.indices.dropFirst() where blocks[index][0] == 0x02 {
+            guard var cta = CTABlock(blocks[index]), cta.freeBytes >= 18 else { continue }
+            cta.descriptors.append(descriptor)
+            blocks[index] = try cta.serialized()
+            return "CTA 확장 블록 \(index)"
+        }
+        guard let spec = DetailedTimingSpec(descriptor: descriptor) else {
+            throw EDIDEditError.overflow("상세 타이밍을 넣을 빈 서술자 자리 없음")
+        }
+        return try addDisplayIDTiming(spec, preferred: false, to: &blocks)
+    }
+
+    /// DisplayID 확장 블록에 20바이트 상세 타이밍 추가. 기존 타이밍 블록에 이어 붙이고, 없으면 새 데이터 블록,
+    /// 공간이 없거나 DisplayID 확장이 없으면 새 확장 블록 생성.
+    static func addDisplayIDTiming(_ spec: DetailedTimingSpec, preferred: Bool, to blocks: inout [[UInt8]]) throws -> String {
+        let capacity = 121
+        for index in blocks.indices.dropFirst() where blocks[index][0] == 0x70 {
+            let b = blocks[index]
+            let isV2 = b[1] >= 0x20
+            let tag: UInt8 = isV2 ? 0x22 : 0x03
+            let timing = try spec.displayIDTiming(preferred: preferred, version2: isV2)
+            // 데이터 블록 분해.
+            var dataBlocks: [[UInt8]] = []
+            var position = 5
+            let end = min(5 + Int(b[2]), 126)
+            var wellFormed = true
+            while position + 3 <= end {
+                let length = Int(b[position + 2])
+                if b[position] == 0, length == 0 { break }
+                guard position + 3 + length <= end else {
+                    wellFormed = false
+                    break
+                }
+                dataBlocks.append(Array(b[position..<position + 3 + length]))
+                position += 3 + length
+            }
+            guard wellFormed else { continue }
+            let used = dataBlocks.reduce(0) { $0 + $1.count }
+            if let target = dataBlocks.firstIndex(where: { $0[0] == tag && $0.count + 20 <= 3 + 248 }), used + 20 <= capacity {
+                dataBlocks[target] += timing
+                dataBlocks[target][2] += 20
+            } else if used + 23 <= capacity {
+                dataBlocks.append([tag, 0x00, 20] + timing)
+            } else {
+                continue
+            }
+            blocks[index] = displayIDBlock(header: Array(b[1...4]), dataBlocks: dataBlocks)
+            return "DisplayID 확장 블록 \(index)"
+        }
+        guard blocks.count < 255 else { throw EDIDEditError.overflow("확장 블록 수 한도") }
+        let timing = try spec.displayIDTiming(preferred: preferred, version2: false)
+        blocks.append(displayIDBlock(header: [0x12, 0x79, 0x00, 0x00], dataBlocks: [[0x03, 0x00, 20] + timing]))
+        blocks[0][126] = UInt8(blocks.count - 1)
+        return "새 DisplayID 확장 블록 \(blocks.count - 1)"
+    }
+
+    /// DisplayID 확장 블록 조립. 구역 길이는 121바이트로 두고 구역 체크섬을 오프셋 126에 기록.
+    static func displayIDBlock(header: [UInt8], dataBlocks: [[UInt8]]) -> [UInt8] {
+        var out: [UInt8] = [0x70] + header
+        out[2] = 0x79
+        out += dataBlocks.flatMap { $0 }
+        out += [UInt8](repeating: 0, count: 128 - out.count)
+        let sum = out[1..<126].reduce(0) { ($0 + Int($1)) & 0xFF }
+        out[126] = UInt8((256 - sum) & 0xFF)
+        return out
+    }
+}
+
+public extension DetailedTimingSpec {
+    /// EDID 18바이트 상세 타이밍 서술자에서 생성. 타이밍 서술자가 아니면 nil.
+    init?(descriptor d: [UInt8]) {
+        guard d.count == 18, let timing = EDIDParser.detailedTiming(d, source: "base"), !timing.interlaced else { return nil }
+        self.init(
+            hActive: timing.hActive, hFrontPorch: timing.hFrontPorch, hSyncWidth: timing.hSyncWidth,
+            hBackPorch: timing.hBlank - timing.hFrontPorch - timing.hSyncWidth,
+            vActive: timing.vActive, vFrontPorch: timing.vFrontPorch, vSyncWidth: timing.vSyncWidth,
+            vBackPorch: timing.vBlank - timing.vFrontPorch - timing.vSyncWidth,
+            pixelClockHz: Int(timing.pixelClockHz),
+            hSyncPositive: d[17] & 0x02 != 0, vSyncPositive: d[17] & 0x04 != 0
+        )
     }
 }
 

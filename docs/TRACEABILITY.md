@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 54 |
-| PRD 요구사항 | 71 |
-| SRS 설계 요구사항 | 45 |
-| TC | 59 |
+| PRD 요구사항 | 72 |
+| SRS 설계 요구사항 | 46 |
+| TC | 61 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -91,5 +91,6 @@
 | PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
 | PRD-EDO-001 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-001 | TC-EDO-001, TC-EDO-002 | `Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
 | PRD-EDO-002 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-001 | TC-EDO-001, TC-EDO-002 | `Sources/TBDCore/EDID/EDIDEditor.swift` | 통과 2 |
-| PRD-EDO-003 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 | SRS-EDO-002 | TC-EDO-003 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 미실행 1 |
+| PRD-EDO-003 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 | SRS-EDO-002 | TC-EDO-003, TC-EDO-006 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 미실행 2 |
 | PRD-EDO-004 | P6 | 권장 | MRD-SCP-016 | SRS-EDO-002 | TC-EDO-004 | `Sources/TBDPlatform/EDIDOverrideService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 1 |
+| PRD-EDO-005 | P6 | 필수 | MRD-SCP-016 | SRS-EDO-003 | TC-EDO-005, TC-EDO-006 | `Sources/TBDCore/EDID/CustomTiming.swift`<br>`Sources/TBDCore/EDID/EDIDEditor.swift` | 미실행 1, 통과 1 |

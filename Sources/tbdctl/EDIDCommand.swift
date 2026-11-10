@@ -51,11 +51,55 @@ private func applyOverride(_ edid: Data, display: DisplaySummary, displays: [Dis
     }
 }
 
+/// 편집 적용, 전후 비교 출력, 저장, 가상 EDID 적용.
+private func runEDIDEdit(_ patches: [EDIDPatch], command: ParsedCommand, display: DisplaySummary, displays: [DisplaySummary], json: Bool) {
+    let (data, source) = sourceEDID(command, display: display, displays: displays)
+    let output: (data: Data, results: [EDIDPatchResult])
+    do {
+        output = try EDIDEditor.apply(patches, to: data)
+    } catch {
+        writeError("오류: \(RevertCoordinator.describe(error))")
+        exit(.failure)
+    }
+    let before = EDIDParser.parse(data).sinkCapabilities
+    let after = EDIDParser.parse(output.data).sinkCapabilities
+    if let path = command.options["--out"] {
+        do {
+            try output.data.write(to: URL(fileURLWithPath: path))
+        } catch {
+            writeError("오류: 파일 저장 실패: \(error.localizedDescription)")
+            exit(.failure)
+        }
+    }
+    let changed = output.results.contains(where: \.changed)
+    if json {
+        printJSON(EDIDPatchOutput(source: source, results: output.results, before: before, after: after, outputPath: command.options["--out"], applied: command.has("--apply") && changed))
+    } else {
+        print("EDID \(source) 편집")
+        for result in output.results {
+            print("  \(result.title): \(result.changed ? result.changes.joined(separator: ", ") : "대상 선언 없음 (변경 없음)")")
+        }
+        print("능력 요약 (편집 전 → 편집 후)")
+        for (a, b) in zip(before.comparisonRows, after.comparisonRows) {
+            print("  \(a.label): \(a.value)\(a.value == b.value ? "" : " → \(b.value)")")
+        }
+        if let path = command.options["--out"] { print("저장: \(path)") }
+    }
+    if command.has("--apply") {
+        guard changed else {
+            print("변경 내용이 없어 적용하지 않음")
+            return
+        }
+        applyOverride(output.data, display: display, displays: displays, detail: patches.map(\.title).joined(separator: ", "), command: command)
+    }
+}
+
 /// `tbdctl edid <디스플레이> check [<파일>]`
 /// `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]`
+/// `tbdctl edid <디스플레이> timing <타이밍> [--preferred] [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]`
 /// `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]`
 /// `tbdctl edid <디스플레이> reset`
-/// (PRD-EDO-001-003, PRD-CLI-002)
+/// (PRD-EDO-001-003, PRD-EDO-005, PRD-CLI-002)
 func runEDID(_ command: ParsedCommand, json: Bool) {
     let (display, displays) = resolveDisplay(command.positionals[0])
     let action = command.positionals[1].lowercased()
@@ -85,45 +129,20 @@ func runEDID(_ command: ParsedCommand, json: Bool) {
             writeError("오류: 편집 목록 형식은 쉼표로 이은 remove-dsc, remove-hdr, remove-ycbcr, remove-420, remove-vrr, limit-frl:<0-6>, limit-tmds:<MHz>")
             exit(.usage)
         }
-        let (data, source) = sourceEDID(command, display: display, displays: displays)
-        let output: (data: Data, results: [EDIDPatchResult])
-        do {
-            output = try EDIDEditor.apply(patches, to: data)
-        } catch {
-            writeError("오류: \(RevertCoordinator.describe(error))")
-            exit(.failure)
+        runEDIDEdit(patches, command: command, display: display, displays: displays, json: json)
+
+    case "timing":
+        guard let value, let spec = DetailedTimingSpec.parse(value) else {
+            writeError("오류: 타이밍 형식은 <폭>x<높이>@<주사율>[:rb|:rb2] 또는 raw:<수평 활성>,<프런트 포치>,<동기>,<백 포치>,<수직 활성>,<프런트 포치>,<동기>,<백 포치>,<픽셀 클록 kHz>[,+h|-h][,+v|-v]")
+            exit(.usage)
         }
-        let before = EDIDParser.parse(data).sinkCapabilities
-        let after = EDIDParser.parse(output.data).sinkCapabilities
-        if let path = command.options["--out"] {
-            do {
-                try output.data.write(to: URL(fileURLWithPath: path))
-            } catch {
-                writeError("오류: 파일 저장 실패: \(error.localizedDescription)")
-                exit(.failure)
-            }
+        if !json {
+            print("타이밍: \(spec.label)")
+            print("  수평: 활성 \(spec.hActive), 프런트 포치 \(spec.hFrontPorch), 동기 \(spec.hSyncWidth), 백 포치 \(spec.hBackPorch), 총 \(spec.hTotal)")
+            print("  수직: 활성 \(spec.vActive), 프런트 포치 \(spec.vFrontPorch), 동기 \(spec.vSyncWidth), 백 포치 \(spec.vBackPorch), 총 \(spec.vTotal)")
+            print("  기록 방식: \(spec.fitsDescriptor ? "EDID 18바이트 상세 타이밍 서술자" : "DisplayID 상세 타이밍 (픽셀 클록 655.35 MHz 초과 또는 서술자 범위 초과)")")
         }
-        let changed = output.results.contains(where: \.changed)
-        if json {
-            printJSON(EDIDPatchOutput(source: source, results: output.results, before: before, after: after, outputPath: command.options["--out"], applied: command.has("--apply") && changed))
-        } else {
-            print("EDID \(source) 편집")
-            for result in output.results {
-                print("  \(result.title): \(result.changed ? result.changes.joined(separator: ", ") : "대상 선언 없음 (변경 없음)")")
-            }
-            print("능력 요약 (편집 전 → 편집 후)")
-            for (a, b) in zip(before.comparisonRows, after.comparisonRows) {
-                print("  \(a.label): \(a.value)\(a.value == b.value ? "" : " → \(b.value)")")
-            }
-            if let path = command.options["--out"] { print("저장: \(path)") }
-        }
-        if command.has("--apply") {
-            guard changed else {
-                print("변경 내용이 없어 적용하지 않음")
-                return
-            }
-            applyOverride(output.data, display: display, displays: displays, detail: patches.map(\.title).joined(separator: ", "), command: command)
-        }
+        runEDIDEdit([.addTiming(spec, preferred: command.has("--preferred"))], command: command, display: display, displays: displays, json: json)
 
     case "apply":
         guard let value else {
@@ -153,7 +172,7 @@ func runEDID(_ command: ParsedCommand, json: Bool) {
         }
 
     default:
-        writeError("오류: 동작은 check, patch, apply, reset 중 하나")
+        writeError("오류: 동작은 check, patch, timing, apply, reset 중 하나")
         exit(.usage)
     }
 }

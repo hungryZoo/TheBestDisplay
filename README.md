@@ -61,7 +61,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 영역 | 내용 |
 | --- | --- |
 | 디스플레이 정보 | 제품 정보, 물리 크기, EDID 해석(기본 블록, CTA-861, DisplayID), 싱크 능력 요약, EDID 원본 저장 |
-| EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, FRL과 TMDS 상한), 가상 EDID 적용과 해제, 디스플레이 재감지 |
+| EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, FRL과 TMDS 상한), 사용자 정의 타이밍 추가(CVT-RB, CVT-RB2, 직접 지정), 가상 EDID 적용과 해제, 디스플레이 재감지 |
 | 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시 |
 | 색 모드 | 현재 송출 신호(픽셀 인코딩, 비트 심도, 레인지, EOTF, 색 공간) 표시, 현재 타이밍에서 선택 가능한 색 모드 전환 |
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
@@ -164,6 +164,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 조회와 전환 |
 | `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약 |
 | `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | EDID 편집, 편집본 저장, 가상 EDID 적용 |
+| `tbdctl edid <디스플레이> timing <타이밍> [--preferred] [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | 사용자 정의 타이밍 계산과 EDID 추가 |
 | `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]` | EDID 파일을 가상 EDID로 적용 |
 | `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 |
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
@@ -189,6 +190,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 - 모드 형식: `<폭>x<높이>[@<주사율>][:hidpi|:lodpi]` 또는 `mode:<번호>`
 - 색 모드 형식: `id:<번호>` 또는 `<rgb|ycbcr444|ycbcr422|ycbcr420>[:<bpc>][:<full|limited>][:<sdr|pq|hlg>]`
 - EDID 편집 목록: 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`
+- 타이밍 형식: `<폭>x<높이>@<주사율>[:rb|:rb2]` (CVT 축소 블랭킹, 기본 rb2) 또는 `raw:<수평 활성>,<프런트 포치>,<동기>,<백 포치>,<수직 활성>,<프런트 포치>,<동기>,<백 포치>,<픽셀 클록 kHz>[,+h|-h][,+v|-v]`
 - 종료 코드: 0 성공, 1 실행 실패, 2 사용법 오류, 3 미지원 기능 또는 대상 없음
 
 ### 자동 복귀 안전장치
@@ -243,7 +245,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | Mac App Store 배포 | 불가 (비공개 API 사용, 샌드박스 미적용) |
 | DSC 강제 | 시스템이 색 모드로 제공하는 범위 안에서만 켜기와 끄기 가능. DSC 미지원 싱크에서 켜기 같은 강제는 불가 |
 | EDID 오버라이드 | 외장 디스플레이 한정. 재시동하면 원본 EDID로 복귀. 디스플레이 저장 장치 쓰기는 미제공. 실제 디스플레이 대상 적용은 미검증 |
-| 사용자 정의 타이밍 | 미제공 |
+| 사용자 정의 타이밍 | 가상 EDID에 상세 타이밍을 추가하는 방식. 시스템과 디스플레이의 수용 여부는 구성에 따라 다름. 실제 디스플레이 대상 적용은 미검증 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
 | 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드 (장비 없음) |
 | 모드 전환 경로 | SkyLight 직접 호출 경로는 독 경유 TV에서 미출력을 유발한 사례가 있어 기본 경로에서 제외 (`docs/adr/0005-mode-switch-path.md`) |

@@ -4,7 +4,7 @@ import TBDCore
 import TBDPlatform
 import UniformTypeIdentifiers
 
-/// 개요 탭의 EDID 오버라이드 구역: 편집 항목 선택, 편집 전후 비교, 가상 EDID 적용과 해제. (PRD-EDO-001-003, PRD-EDO-004)
+/// 개요 탭의 EDID 오버라이드 구역: 편집 항목 선택, 사용자 정의 타이밍, 편집 전후 비교, 가상 EDID 적용과 해제. (PRD-EDO-001-005)
 struct EDIDOverrideSection: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
@@ -14,9 +14,22 @@ struct EDIDOverrideSection: View {
     @State private var selected: Set<EDIDPatch> = []
     @State private var frlLimit: Int?
     @State private var message: String?
+    @State private var timingEnabled = false
+    @State private var timingWidth = ""
+    @State private var timingHeight = ""
+    @State private var timingRate = ""
+    @State private var timingFormula: DetailedTimingSpec.Formula = .reducedBlanking2
+    @State private var timingPreferred = false
+
+    /// 입력한 값으로 계산한 사용자 정의 타이밍.
+    private var customTiming: DetailedTimingSpec? {
+        guard timingEnabled, let width = Int(timingWidth), let height = Int(timingHeight), let rate = Double(timingRate) else { return nil }
+        return DetailedTimingSpec.cvt(width: width, height: height, refreshRate: rate, formula: timingFormula)
+    }
 
     private var patches: [EDIDPatch] {
         EDIDPatch.simpleCases.filter(selected.contains) + (frlLimit.map { [.limitFRLRate($0)] } ?? [])
+            + (customTiming.map { [.addTiming($0, preferred: timingPreferred)] } ?? [])
     }
 
     var body: some View {
@@ -39,6 +52,32 @@ struct EDIDOverrideSection: View {
                     Text("제한 없음").tag(Int?.none)
                     ForEach(0...6, id: \.self) { Text("\($0) 이하").tag(Int?.some($0)) }
                 }
+            }
+            Toggle("사용자 정의 타이밍 추가", isOn: $timingEnabled)
+            if timingEnabled {
+                HStack {
+                    TextField("폭", text: $timingWidth).frame(width: 70)
+                    Text("x")
+                    TextField("높이", text: $timingHeight).frame(width: 70)
+                    Text("@")
+                    TextField("주사율", text: $timingRate).frame(width: 60)
+                    Text("Hz")
+                    Picker("계산식", selection: $timingFormula) {
+                        ForEach(DetailedTimingSpec.Formula.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                    Toggle("선호 타이밍으로 지정", isOn: $timingPreferred)
+                }
+                .textFieldStyle(.roundedBorder)
+                if let timing = customTiming {
+                    LabeledContent("계산 결과", value: "\(timing.label), 총 \(timing.hTotal) x \(timing.vTotal)" + (timing.fitsDescriptor ? "" : ", DisplayID 타이밍으로 기록"))
+                } else {
+                    Text("폭, 높이, 주사율 입력 필요").font(.caption).foregroundStyle(.secondary)
+                }
+                Text("디스플레이와 연결이 지원하지 않는 타이밍은 화면이 나오지 않을 수 있음. 적용 뒤 해상도 탭에 새 모드가 나타나면 선택")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             if let preview {
                 ForEach(preview.results, id: \.title) { result in
