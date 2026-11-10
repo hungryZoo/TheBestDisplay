@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import TBDPlatform
 
 /// 단일 창 앱 진입점. 메뉴 막대 상태 항목 없음. (PRD-APP-001, SRS-UI-002, ADR-0004)
 @main
@@ -41,5 +42,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
+    }
+
+    /// 프로세스 수명에 종속된 화면 조정(전달 테이블)을 종료 시 원래대로 복원. (ADR-0004)
+    func applicationWillTerminate(_ notification: Notification) {
+        GammaService.shared.resetAll()
     }
 }

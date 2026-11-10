@@ -126,6 +126,11 @@
 | T04 | 모드 전환 사고: SkyLight 직접 호출 경로(`SLSConfigureDisplayMode` + `.forSession`)로 LG TV를 120 Hz에서 60 Hz로 바꾼 뒤 TV 미출력. 상세는 ADR-0005. 사고 시점 IORegistry 자료를 `Tests/TBDCoreTests/Fixtures/ioreg_hpd_high_no_link/`에 보관 (HPD High, 싱크 수 0, No Link, 외장 프레임버퍼에 디스플레이 정보 없음) |
 | T04 | 복구 시도 결과: `pmset displaysleepnow` 후 깨우기 2회 실패, `SLSConfigureDisplayEnabled(true)`는 `CGCompleteDisplayConfiguration`에서 1001, `IOAVControllerForceHotPlugDetect`는 0 반환 후 변화 없음. 케이블 재연결로 복구 |
 | T04 | `SLSGetDisplayList`는 온라인이 아닌 디스플레이 ID도 반환 (사고 중 [1, 2, 3], 온라인 목록은 [1]) |
+| T10 | DisplayServices 시그니처(디스어셈블): `DisplayServicesSetBrightness(디스플레이, float)`, `DisplayServicesHasAmbientLightCompensation(디스플레이)`, `DisplayServicesAmbientLightCompensationEnabled(디스플레이, bool *결과)`, `DisplayServicesEnableAmbientLightCompensation(디스플레이, bool)` |
+| T10 | 내장 디스플레이 실측: 밝기 설정 후 재조회 오차 0.02 이내, 자동 밝기 반전과 복원 정상. 자동 밝기를 다시 켜면 시스템이 밝기를 새로 계산(72%에서 82%로 변함)하므로 반전 시험은 밝기도 함께 복원 |
+| T10 | `DisplayServicesCanChangeBrightness`는 LG TV에도 참을 반환(Phase 0 S6)하므로 시스템 밝기 제어 대상은 내장 패널과 Apple 제조사 ID(0x610)로 한정 |
+| T10 | 전달 테이블 실측(M5 내장 패널): `CGSetDisplayTransferByTable`로 디밍 0.8 적용 시 테이블 최댓값이 기준의 0.8배, 항등 값 적용 시 기준 테이블로 복원. 조사 문서의 M5 Pro, M5 Max 색 테이블 오동작 사례는 이 기기(M5)에서 재현되지 않음 |
+| T10 | LG TV가 분리된 상태라 DDC 미응답 탐지(TC-DDC-002)와 TV 대상 소프트웨어 디밍 화면 확인은 미실행 |
 | T09 | 실제 구성 진단 결과: USB-C 4번 포트 6단계 전부 통과. 발견 항목 3건(YCbCr 4:2:2 출력 주의, 대역폭 한계로 선택 불가한 색 형식 10개, 링크 사용률 99.2%). 수집과 진단 1회 0.8초 이내(프로세스 시작 포함) |
 | T09 | 덮개 상태는 `IOPMrootDomain`의 `AppleClamshellState`, 칩 이름은 `machdep.cpu.brand_string`(Apple M5), 모델 식별자는 `hw.model`(Mac17,2) |
 | T09 | 창 앱 실행 중 주사율 전환과 자동 복귀 1회에 모드 변경 이벤트 2건 기록 확인 |

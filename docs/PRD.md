@@ -77,7 +77,9 @@
 | `tbdctl diagnose` | 포트별 점검 단계와 진단 발견 항목(근거, 조치) |
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장. 기본 JSON, `--text`는 텍스트, `--redact`는 일련번호 가림 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 상태와 정보 조회, 켜기와 끄기 |
-| `tbdctl brightness`, `ddc`, `rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
+| `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 시스템 밝기 제어 또는 DDC. 소프트웨어 디밍은 창 앱 전용 |
+| `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
+| `tbdctl rotate`, `mirror`, `profile` | 설정 변경 (각 기능 단계에서 추가) |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정자: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부

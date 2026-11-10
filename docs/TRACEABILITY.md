@@ -59,15 +59,15 @@
 | PRD-DGN-004 | P3 | 필수 | MRD-SCP-008 | SRS-DGN-002 | TC-DGN-004 | `Sources/TBDCore/Diagnostics/EventLog.swift`<br>`Sources/TBDApp/DisplayStore.swift` | 통과 1 |
 | PRD-DGN-005 | P3 | 필수 | MRD-SCP-008, MRD-SCN-007 | SRS-DGN-003 | TC-DGN-005 | `Sources/TBDCore/Diagnostics/ReportExporter.swift`<br>`Sources/TBDCore/Diagnostics/DiagnosticSnapshot.swift` | 통과 1 |
 | PRD-DGN-006 | P3 | 권장 | MRD-SCP-008 | SRS-DGN-001 | TC-DGN-003 | `Sources/TBDCore/Diagnostics/`<br>`Sources/TBDPlatform/SnapshotBuilder.swift` | 통과 1 |
-| PRD-BRT-001 | P4 | 필수 | MRD-SCP-009 | SRS-BRT-001 | TC-BRT-001 | `Sources/TBDPlatform/BrightnessService.swift` | 미실행 1 |
-| PRD-BRT-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
-| PRD-BRT-003 | P4 | 필수 | MRD-SCP-009 | SRS-BRT-001, SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/BrightnessService.swift`<br>`Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 미실행 1 |
-| PRD-BRT-004 | P4 | 권장 | MRD-SCP-009 | SRS-BRT-001 | TC-BRT-003 | `Sources/TBDPlatform/BrightnessService.swift` | 미실행 1 |
+| PRD-BRT-001 | P4 | 필수 | MRD-SCP-009 | SRS-BRT-001 | TC-BRT-001 | `Sources/TBDPlatform/BrightnessService.swift` | 통과 1 |
+| PRD-BRT-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
+| PRD-BRT-003 | P4 | 필수 | MRD-SCP-009 | SRS-BRT-001, SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/BrightnessService.swift`<br>`Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 1 |
+| PRD-BRT-004 | P4 | 권장 | MRD-SCP-009 | SRS-BRT-001 | TC-BRT-003 | `Sources/TBDPlatform/BrightnessService.swift` | 통과 1 |
 | PRD-DDC-001 | P4 | 필수 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-002 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
-| PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
-| PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 미실행 1 |
+| PRD-DDC-002 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 | SRS-DDC-001 | TC-DDC-003 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 보류 1 |
+| PRD-DDC-003 | P4 | 권장 | MRD-SCP-009 | SRS-DDC-001 | TC-DDC-001 | `Sources/TBDPlatform/DDCService.swift`<br>`Sources/TBDCore/DDCPacket.swift` | 통과 1 |
 | PRD-CLR-001 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-002 | TC-CLR-001 | `Sources/TBDPlatform/ColorProfileService.swift` | 미실행 1 |
-| PRD-CLR-002 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 미실행 1 |
+| PRD-CLR-002 | P4 | 필수 | MRD-SCP-010 | SRS-CLR-001 | TC-BRT-002 | `Sources/TBDPlatform/GammaService.swift`<br>`Sources/TBDCore/GammaTable.swift` | 통과 1 |
 | PRD-CLR-003 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 미실행 1 |
 | PRD-CLR-004 | P4 | 권장 | MRD-SCP-010 | SRS-CLR-003 | TC-CLR-002 | `Sources/TBDPlatform/NightShiftService.swift` | 미실행 1 |
 | PRD-ARR-001 | P4 | 필수 | MRD-SCP-011 | SRS-ARR-002 | TC-ARR-001 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
@@ -86,5 +86,5 @@
 | PRD-SAF-002 | P2 | 권장 | MRD-SCP-014 | SRS-SAF-002 | TC-SAF-002 | `Sources/TBDCore/RevertGuard.swift`<br>`Sources/TBDPlatform/PendingRevertApplier.swift` | 통과 1 |
 | PRD-SAF-003 | P4 | 필수 | MRD-SCP-014 | SRS-ARR-003 | TC-ARR-004 | `Sources/TBDPlatform/ArrangementService.swift` | 미실행 1 |
 | PRD-CLI-001 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-001 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
-| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 미실행 1 |
+| PRD-CLI-002 | P2 | 권장 | MRD-SCP-015, MRD-USR-003 | SRS-CLI-001 | TC-CLI-002 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |
 | PRD-CLI-003 | P1 | 필수 | MRD-SCP-015 | SRS-CLI-001 | TC-CLI-003 | `Sources/tbdctl/`<br>`Sources/TBDCore/CommandLineParser.swift` | 통과 1 |

@@ -41,12 +41,12 @@
 | TC-DGN-003 | 시스템 제약 점검 확인 | PRD-DGN-006, SRS-DGN-001 | 합성 스냅샷 (외장 디스플레이 수 한도 도달) | 진단 실행 | 한도 도달 발견 항목 생성 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-DGN-004 | 이벤트 기록 확인 | PRD-DGN-004, SRS-DGN-002 | 스냅샷 2개 (모드 변경 전후, 연결 전후) | 스냅샷 차이로 이벤트 생성. 1,001건 추가 | 모드 변경, 연결, 해제 이벤트 생성. 보관 수 1,000건 유지 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-DGN-005 | 진단 보고서 내보내기 확인 | PRD-DGN-005, SRS-DGN-003 | 스냅샷 픽스처 | JSON과 텍스트 직렬화. 일련번호 가림 옵션 적용. `tbdctl report <경로>` 실행 | JSON 왕복 후 동일. 가림 적용 시 일련번호와 UUID 미포함, EDID 일련번호 바이트 0. 텍스트 보고서에 5개 구역 포함. 파일 생성 | 단위 | macOS 26, Apple Silicon | 통과 | |
-| TC-BRT-001 | 내장 디스플레이 밝기 제어 확인 | PRD-BRT-001, SRS-BRT-001 | 내장 디스플레이 온라인 | 밝기 조회, 0.1 낮춰 설정, 재조회, 원래 값 복원 | 재조회 값이 설정값과 0.02 이내 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
-| TC-BRT-002 | 전달 테이블 합성과 소프트웨어 디밍 확인 | PRD-BRT-003, PRD-CLR-002, SRS-CLR-001 | 없음 | 디밍 0.5, 색온도, 게인, 대비, 감마 조합으로 테이블 합성. 항등 설정 합성 | 항등 설정은 선형 테이블. 디밍 0.5는 최댓값 0.5. 단조 증가 유지. 값 범위 0-1 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-BRT-003 | 자동 밝기 전환 확인 | PRD-BRT-004, SRS-BRT-001 | 내장 디스플레이 온라인 | 자동 밝기 상태 조회, 반전, 재조회, 복원 | 재조회 값이 반전값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DDC-001 | DDC 패킷 구성과 응답 해석 확인 | PRD-DDC-003, SRS-DDC-001 | 없음 | VCP 0x10 읽기 요청 패킷 생성, 쓰기 패킷 생성, 정상 응답과 체크섬 오류 응답 해석 | 요청 바이트열과 체크섬이 기대값과 일치. 정상 응답에서 현재값과 최댓값 추출. 오류 응답 거부 | 단위 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DDC-002 | DDC 미응답 탐지 확인 | PRD-DDC-001, SRS-DDC-001 | DDC 미응답 디스플레이 (LG TV) 온라인 | `tbdctl ddc <외장> probe` | 미응답 판정과 사유 문구 출력. 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 미실행 | |
-| TC-DDC-003 | DDC 제어 확인 | PRD-DDC-002, PRD-BRT-002, SRS-DDC-001 | DDC 지원 모니터 온라인 | 밝기, 대비, 볼륨 읽기와 쓰기 후 복원 | 재조회 값이 설정값과 일치 | 통합 | macOS 26, Apple Silicon | 미실행 | |
+| TC-BRT-001 | 내장 디스플레이 밝기 제어 확인 | PRD-BRT-001, SRS-BRT-001 | 내장 디스플레이 온라인. 사용자에게 사전 알림 | `swift test`의 TC-BRT-001 묶음: 밝기 조회, 0.1 바꿔 설정, 재조회, 원래 값 복원. `tbdctl brightness builtin 72` | 재조회 값이 설정값과 0.02 이내 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 통과 | |
+| TC-BRT-002 | 전달 테이블 합성과 소프트웨어 디밍 확인 | PRD-BRT-003, PRD-CLR-002, SRS-CLR-001 | 없음 | 디밍 0.5, 색온도, 게인, 대비, 감마 조합으로 테이블 합성. 항등 설정 합성 | 항등 설정은 선형 테이블. 디밍 0.5는 최댓값 0.5. 단조 증가 유지. 값 범위 0-1. 실측(`swift test`의 TC-BRT-002 실측 묶음): 디밍 0.8 적용 시 테이블 최댓값이 기준의 0.8배, 재적용 요청에 겹침 없음, 항등 적용 시 기준 테이블 복원 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-BRT-003 | 자동 밝기 전환 확인 | PRD-BRT-004, SRS-BRT-001 | 내장 디스플레이 온라인 | 자동 밝기 상태 조회, 반전, 재조회, 복원 | 재조회 값이 반전값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 통과 | |
+| TC-DDC-001 | DDC 패킷 구성과 응답 해석 확인 | PRD-DDC-003, SRS-DDC-001 | 없음 | VCP 0x10 읽기 요청 패킷 생성, 쓰기 패킷 생성, 정상 응답과 체크섬 오류 응답 해석 | 요청 바이트열과 체크섬이 기대값과 일치. 정상 응답에서 현재값과 최댓값 추출. 오류 응답 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-DDC-002 | DDC 미응답 탐지 확인 | PRD-DDC-001, SRS-DDC-001 | DDC 미응답 디스플레이 (LG TV) 온라인 | `tbdctl ddc <외장> probe` | 미응답 판정과 사유 문구 출력. 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 미실행 | LG TV 분리 상태. 재연결 후 실행 |
+| TC-DDC-003 | DDC 제어 확인 | PRD-DDC-002, PRD-BRT-002, SRS-DDC-001 | DDC 지원 모니터 온라인 | 밝기, 대비, 볼륨 읽기와 쓰기 후 복원 | 재조회 값이 설정값과 일치 | 통합 | macOS 26, Apple Silicon | 보류 | DDC 지원 모니터 필요 |
 | TC-CLR-001 | 색 프로파일 열거와 지정 확인 | PRD-CLR-001, SRS-CLR-002 | 디스플레이 온라인 | 프로파일 목록 조회, 다른 프로파일 지정, 재조회, 복원 | 목록 1개 이상. 재조회 값이 지정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
 | TC-CLR-002 | Night Shift와 True Tone 제어 확인 | PRD-CLR-003, PRD-CLR-004, SRS-CLR-003 | 내장 디스플레이 온라인 | 각 상태 조회, 반전, 재조회, 복원 | 재조회 값이 반전값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | |
 | TC-ARR-001 | 회전 확인 | PRD-ARR-001, SRS-ARR-002 | 회전 지원 외장 디스플레이 온라인 | 90도 회전 후 확인 없이 대기 | 회전 직후 `CGDisplayRotation` 값 90. 제한 시간 뒤 0 복귀 | 통합 | macOS 26, Apple Silicon | 미실행 | |
@@ -61,7 +61,7 @@
 | TC-SAF-001 | 자동 복귀 상태 기계 확인 | PRD-SAF-001, SRS-SAF-001 | 없음 | 가짜 시계와 가짜 적용기로 PRD 3절 전이 9종 실행. 확인 대기 중 새 요청 | 전이 결과가 표와 일치. 타이머 만료 시 복귀 1회 호출. 새 요청 거부 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-SAF-002 | 복귀 정보 파일 확인 | PRD-SAF-002, SRS-SAF-002 | 임시 폴더 | 기록, 조회, 삭제. 손상 파일 조회 | 기록 후 조회값 동일. 삭제 후 없음. 손상 파일은 없음으로 처리 | 단위 | macOS 26, Apple Silicon | 통과 | |
 | TC-CLI-001 | 조회 명령 확인 | PRD-CLI-001, SRS-CLI-001 | 디스플레이 온라인 | `swift test`의 TC-CLI-001 묶음: `list`, `capabilities`, `info`, `modes`, `signal`, `link`, `hdr`, `ports`, `diagnose`를 `--json`으로 실행, `report` 저장 | 전 명령 종료 코드 0. 출력이 유효한 JSON. 사용법 오류는 2, 대상 없음은 3 | 통합 | macOS 26, Apple Silicon | 통과 | |
-| TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 미실행 | set-mode, set-color, hdr는 실측 완료. brightness 명령(T10) 추가 후 마감 |
+| TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 통과 | set-mode, set-color, hdr(T04-T06), brightness(T10) 실측 |
 | TC-CLI-003 | 인자 해석과 종료 코드 확인 | PRD-CLI-003, SRS-CLI-001 | 없음 | 알 수 없는 명령, 인자 누락, 없는 디스플레이 지정, 정상 명령 해석 | 사용법 오류 2, 대상 없음 3, 정상 해석 결과 일치 | 단위 | macOS 26, Apple Silicon | 통과 | |
 
 ## 2. 선행 검증 대응 표

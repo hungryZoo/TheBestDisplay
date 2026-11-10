@@ -5,6 +5,13 @@ import Testing
 import TBDCore
 @testable import TBDPlatform
 
+/// 시험 장비 조건. 조건이 맞지 않는 테스트는 실패가 아니라 건너뜀으로 기록.
+enum Hardware {
+    static var hasExternalDisplay: Bool { DisplayCatalog.displays().contains { !$0.identity.isBuiltin } }
+    static var hasBuiltinDisplay: Bool { DisplayCatalog.displays().contains { $0.identity.isBuiltin } }
+    static var displayCount: Int { DisplayCatalog.onlineDisplayIDs().count }
+}
+
 /// TC-APP-004: 누락 심볼 처리.
 @Suite("TC-APP-004 비공개 심볼 조회")
 struct PrivateSymbolsTests {
@@ -126,7 +133,8 @@ struct DisplayCatalogSystemProfilerTests {
 /// TC-INF-005: EDID 원본 획득. 외장 디스플레이가 없으면 검사 대상 없음.
 @Suite("TC-INF-005 EDID 원본 획득")
 struct EDIDSourceTests {
-    @Test func 외장_디스플레이의_EDID_획득과_식별_정보_일치() throws {
+    @Test(.enabled(if: Hardware.hasExternalDisplay, "외장 디스플레이 필요"))
+    func 외장_디스플레이의_EDID_획득과_식별_정보_일치() throws {
         let displays = DisplayCatalog.displays()
         let externals = displays.filter { !$0.identity.isBuiltin }
         let records = EDIDSource.records(for: displays)
@@ -241,7 +249,8 @@ struct HDRServiceTests {
 /// TC-LNK-001: 링크 정보 조회. 읽기 전용.
 @Suite("TC-LNK-001 링크 정보 조회")
 struct LinkServiceTests {
-    @Test func 외장_디스플레이의_전송_상태가_레지스트리_값과_일치() throws {
+    @Test(.enabled(if: Hardware.hasExternalDisplay, "외장 디스플레이 필요"))
+    func 외장_디스플레이의_전송_상태가_레지스트리_값과_일치() throws {
         let displays = DisplayCatalog.displays()
         let externals = displays.filter { !$0.identity.isBuiltin }
         try #require(!externals.isEmpty, "외장 디스플레이 없음")
@@ -318,5 +327,74 @@ struct PortServiceTests {
         }
         // 디스플레이에 도달한 경로 수는 외장 디스플레이 수 이하.
         #expect(paths.filter(\.reachesDisplay).count <= displays.filter { !$0.identity.isBuiltin }.count)
+    }
+}
+
+/// TC-BRT-001, TC-BRT-003: 내장 디스플레이 밝기와 자동 밝기. 값을 바꾼 뒤 원래 값으로 복원.
+@Suite("TC-BRT-001 내장 디스플레이 밝기", .serialized)
+struct BrightnessServiceTests {
+    @Test(.enabled(if: Hardware.hasBuiltinDisplay, "내장 디스플레이 필요"))
+    func 밝기_조회_설정_복원() throws {
+        let builtin = try #require(DisplayCatalog.displays().first { $0.identity.isBuiltin })
+        #expect(BrightnessService.supportsNative(builtin))
+        #expect(BrightnessService.method(for: builtin, ddc: nil) == .native)
+        let original = try #require(BrightnessService.nativeBrightness(builtin.id))
+        #expect((0...1).contains(original))
+        let target = original > 0.5 ? original - 0.1 : original + 0.1
+        try BrightnessService.setNativeBrightness(target, on: builtin.id)
+        usleep(400_000)
+        let changed = try #require(BrightnessService.nativeBrightness(builtin.id))
+        try BrightnessService.setNativeBrightness(original, on: builtin.id)
+        usleep(400_000)
+        let restored = try #require(BrightnessService.nativeBrightness(builtin.id))
+        #expect(abs(changed - target) < 0.02)
+        #expect(abs(restored - original) < 0.02)
+    }
+
+    @Test(.enabled(if: Hardware.hasBuiltinDisplay, "내장 디스플레이 필요"))
+    func 자동_밝기_반전과_복원() throws {
+        let builtin = try #require(DisplayCatalog.displays().first { $0.identity.isBuiltin })
+        try #require(BrightnessService.hasAutoBrightness(builtin.id), "자동 밝기 미지원 기기")
+        let original = try #require(BrightnessService.autoBrightnessEnabled(builtin.id))
+        // 자동 밝기를 다시 켜면 시스템이 밝기를 새로 계산하므로 시험 전 밝기도 함께 복원.
+        let brightness = BrightnessService.nativeBrightness(builtin.id)
+        try BrightnessService.setAutoBrightness(!original, on: builtin.id)
+        usleep(300_000)
+        let changed = BrightnessService.autoBrightnessEnabled(builtin.id)
+        try BrightnessService.setAutoBrightness(original, on: builtin.id)
+        usleep(300_000)
+        if let brightness { try BrightnessService.setNativeBrightness(brightness, on: builtin.id) }
+        #expect(changed == !original)
+        #expect(BrightnessService.autoBrightnessEnabled(builtin.id) == original)
+    }
+
+    @Test func 내장_패널은_DDC_대상_아님() throws {
+        guard let builtin = DisplayCatalog.displays().first(where: { $0.identity.isBuiltin }) else { return }
+        #expect(DDCService.probe(for: builtin).status == .notApplicable)
+    }
+}
+
+/// TC-BRT-002 실측: 전달 테이블 적용과 복원. 화면이 잠깐 어두워짐.
+@Suite("TC-BRT-002 소프트웨어 디밍 실측", .serialized)
+struct GammaServiceTests {
+    @Test func 디밍_적용_후_복원() throws {
+        let display = try #require(DisplayCatalog.displays().first)
+        let service = GammaService()
+        let before = try #require(GammaService.currentTable(display.id))
+        var adjustment = ColorAdjustment()
+        adjustment.dimming = 0.8
+        try service.apply(adjustment, to: display.id)
+        let dimmed = try #require(GammaService.currentTable(display.id))
+        // 재구성 알림 없이 다시 적용을 요청해도 겹쳐 적용되지 않음.
+        service.reapply(onlineDisplays: [display.id])
+        let afterReapply = try #require(GammaService.currentTable(display.id))
+        try service.apply(.identity, to: display.id)
+        let restored = try #require(GammaService.currentTable(display.id))
+
+        #expect(abs(dimmed.red.last! - before.red.last! * 0.8) < 0.01)
+        #expect(dimmed.isMonotonic)
+        #expect(GammaService.approximatelyEqual(dimmed, afterReapply))
+        #expect(GammaService.approximatelyEqual(before, restored))
+        #expect(service.adjustment(for: display.id).isIdentity)
     }
 }
