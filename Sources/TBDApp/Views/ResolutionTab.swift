@@ -2,13 +2,17 @@ import SwiftUI
 import TBDCore
 import TBDPlatform
 
-/// 해상도 탭: 전체 모드 목록, 필터, 모드 전환, 사용자 정의 스케일 해상도. (PRD-MOD-001-007)
+/// 해상도 탭: 전체 모드 목록, 필터, 모드 전환, 즐겨찾기, 슬라이더, 렌더링 한계, 사용자 정의 스케일 해상도. (PRD-MOD-001-010)
 struct ResolutionTab: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
     let display: DisplaySummary
 
     @State private var filter = ModeFilter()
+    @State private var favorites: [ModeDescriptor] = []
+    @State private var sliderIndex: Double = 0
+
+    private let favoriteStore = ModeFavoritesStore.standard
 
     var body: some View {
         let modes = store.modes[display.id] ?? []
@@ -17,6 +21,8 @@ struct ResolutionTab: View {
 
         VStack(spacing: 0) {
             header(modes: modes, current: current, shown: groups.reduce(0) { $0 + $1.modes.count })
+            Divider()
+            quickAccess(modes: modes, current: current)
             Divider()
             if !store.isVirtual(display.id), let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first {
                 HiDPIScalingSection(display: display, nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight)
@@ -77,6 +83,68 @@ struct ResolutionTab: View {
             }
         }
         .padding(12)
+    }
+
+    /// 즐겨찾기 모드, 해상도 슬라이더, 렌더링 한계. (PRD-MOD-009, PRD-MOD-010)
+    private func quickAccess(modes: [DisplayMode], current: DisplayMode?) -> some View {
+        let steps = current.map { ModeCatalog.sliderSteps(modes, current: $0) } ?? []
+        let currentStep = steps.firstIndex { $0.width == current?.width && $0.height == current?.height } ?? 0
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Text("즐겨찾기").font(.callout.weight(.medium))
+                ForEach(favorites, id: \.self) { favorite in
+                    let match = favorite.find(in: modes)
+                    let isCurrent = match != nil && match?.modeNumber == current?.modeNumber
+                    Button("\(favorite.width) x \(favorite.height)\(favorite.isHiDPI ? " HiDPI" : ""), \(DisplaySummary.formatHz(favorite.refreshRate)) Hz") {
+                        if let match { apply(match, current: current) }
+                    }
+                    .controlSize(.small)
+                    .tint(isCurrent ? .accentColor : nil)
+                    .disabled(match == nil || isCurrent || changes.isBusy || display.mirrorsDisplayID != nil)
+                    .help(match == nil ? "현재 모드 목록에 없음" : "이 모드로 전환")
+                }
+                if favorites.isEmpty { Text("없음").font(.callout).foregroundStyle(.secondary) }
+                Spacer()
+                if let current {
+                    let isFavorite = favorites.contains(current.descriptor)
+                    Button(isFavorite ? "현재 모드 즐겨찾기 해제" : "현재 모드 즐겨찾기 추가") {
+                        if isFavorite {
+                            _ = try? favoriteStore.remove(current.descriptor, for: display.identity)
+                        } else {
+                            _ = try? favoriteStore.add(current.descriptor, for: display.identity)
+                        }
+                        favorites = favoriteStore.favorites(for: display.identity)
+                    }
+                    .controlSize(.small)
+                }
+            }
+            if steps.count > 1 {
+                HStack(spacing: 8) {
+                    Text("해상도").font(.callout.weight(.medium))
+                    Image(systemName: "textformat.size.larger")
+                    Slider(value: $sliderIndex, in: 0...Double(steps.count - 1), step: 1) { editing in
+                        // 손을 뗄 때 한 번만 전환.
+                        guard !editing else { return }
+                        let target = steps[min(max(Int(sliderIndex.rounded()), 0), steps.count - 1)]
+                        if target.modeNumber != current?.modeNumber { apply(target, current: current) }
+                    }
+                    .disabled(changes.isBusy || display.mirrorsDisplayID != nil)
+                    Image(systemName: "textformat.size.smaller")
+                    let selected = steps[min(max(Int(sliderIndex.rounded()), 0), steps.count - 1)]
+                    Text(selected.label).font(.callout.monospacedDigit()).frame(width: 190, alignment: .trailing)
+                }
+            }
+            if let limits = ModeCatalog.renderingLimits(modes) {
+                Text("렌더링 한계 (모드 목록 기준): \(limits.summary)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .task(id: "\(display.id)-\(current?.modeNumber ?? -1)") {
+            favorites = favoriteStore.favorites(for: display.identity)
+            sliderIndex = Double(currentStep)
+        }
     }
 
     private func apply(_ mode: DisplayMode, current: DisplayMode?) {

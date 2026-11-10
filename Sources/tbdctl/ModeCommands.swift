@@ -8,6 +8,7 @@ struct ModesOutput: Encodable {
     var currentModeNumber: Int32?
     var modeCount: Int
     var publicModeCount: Int
+    var renderingLimits: RenderingLimits?
     var modes: [DisplayMode]
 }
 
@@ -23,11 +24,12 @@ func runModes(_ command: ParsedCommand, json: Bool) {
 
     if json {
         let publicCount = (CGDisplayCopyAllDisplayModes(display.id, [kCGDisplayShowDuplicateLowResolutionModes: kCFBooleanTrue] as CFDictionary) as? [CGDisplayMode])?.count ?? 0
-        printJSON(ModesOutput(display: display.identity, currentModeNumber: current?.modeNumber, modeCount: modes.count, publicModeCount: publicCount, modes: modes))
+        printJSON(ModesOutput(display: display.identity, currentModeNumber: current?.modeNumber, modeCount: modes.count, publicModeCount: publicCount, renderingLimits: ModeCatalog.renderingLimits(all), modes: modes))
         return
     }
     print("\(display.identity.name) [id:\(display.id)] 모드 \(modes.count)개 (전체 \(all.count)개)")
     if let current { print("현재: \(current.label) [mode:\(current.modeNumber)]") }
+    if let limits = ModeCatalog.renderingLimits(all) { print("렌더링 한계 (모드 목록 기준): \(limits.summary)") }
     for group in ModeCatalog.groups(modes) {
         let rates = group.modes.map { m in
             "\(DisplaySummary.formatHz(m.refreshRate))\(m.isVRR ? "v" : "")\(m.modeNumber == current?.modeNumber ? "*" : "")"

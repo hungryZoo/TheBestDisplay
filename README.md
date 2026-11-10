@@ -62,7 +62,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | --- | --- |
 | 디스플레이 정보 | 제품 정보, 물리 크기, EDID 해석(기본 블록, CTA-861, DisplayID), 싱크 능력 요약, EDID 원본 저장 |
 | EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, FRL과 TMDS 상한), 사용자 정의 타이밍 추가(CVT-RB, CVT-RB2, 직접 지정), 가상 EDID 적용과 해제, 디스플레이 재감지 |
-| 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시, 사용자 정의 스케일 해상도 등록, 주사율 측정 |
+| 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시, 사용자 정의 스케일 해상도 등록, 주사율 측정, 즐겨찾기 모드, 해상도 슬라이더, 렌더링 한계 표시 |
 | 색 모드 | 현재 송출 신호(픽셀 인코딩, 비트 심도, 레인지, EOTF, 색 공간) 표시, 현재 타이밍에서 선택 가능한 색 모드 전환 |
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
 | HDR | 지원 여부, 켜기와 끄기, 지원 EOTF, EDR 헤드룸 |
@@ -137,7 +137,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | 화면 | 내용 |
 | --- | --- |
 | 개요 | 제품 정보, 현재 상태, 싱크 능력, EDID 해석과 원본, EDID 오버라이드(외장) |
-| 해상도 | 전체 모드 목록과 필터, 주사율 버튼으로 전환, HiDPI 스케일링, 사용자 정의 스케일 해상도 |
+| 해상도 | 전체 모드 목록과 필터, 주사율 버튼으로 전환, 즐겨찾기, 해상도 슬라이더, 렌더링 한계, HiDPI 스케일링, 사용자 정의 스케일 해상도 |
 | 색 모드 | HDR 전환, 현재 송출 신호, DSC 상태, 색 모드 목록과 적용, 싱크 타이밍 |
 | 링크 | 링크 속도와 레인, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD |
 | 밝기 | 밝기, 자동 밝기, XDR 밝기 업스케일, DDC 기능 |
@@ -160,6 +160,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl set-mode <디스플레이> <모드> [--timeout <초>] [--yes] [--method <경로>]` | 모드 전환 |
 | `tbdctl scaled <디스플레이> [list \| add <폭>x<높이> \| remove <폭>x<높이>]` | 사용자 정의 스케일 해상도 조회, 추가, 삭제 |
 | `tbdctl refresh <디스플레이> [--seconds <초>]` | 주사율 측정 |
+| `tbdctl favorites <디스플레이> [list \| add [<모드>] \| remove [<모드>]]` | 즐겨찾기 모드 조회, 추가, 삭제 |
 | `tbdctl signal <디스플레이> [--timings]` | 현재 송출 신호, 색 모드 목록, DSC 판정 |
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 조회와 전환 |
@@ -227,6 +228,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `virtual-displays.json` | 가상 디스플레이 구성 |
 | `pending-revert.json` | 확인 대기 중인 변경의 복귀 정보. 확정하거나 복귀하면 삭제 |
 | `protection.json` | 구성 보호 대상 프로파일과 보호 항목. 보호를 끄면 삭제 |
+| `mode-favorites.json` | 디스플레이별 즐겨찾기 모드 |
 
 - 사용자 정의 스케일 해상도는 `/Library/Displays/Contents/Resources/Overrides/` 아래 오버라이드 파일에 저장 (관리자 인증 필요)
 
