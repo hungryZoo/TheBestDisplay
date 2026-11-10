@@ -408,7 +408,7 @@ uv run scripts/trace_check.py
 - 요구사항 추적: MRD → PRD → SRS → TC. 검사 스크립트가 `docs/TRACEABILITY.md`를 다시 생성하고 누락이 있으면 실패
 - 결정 기록: `docs/adr/`, 작업 순서와 사용자 결정: `docs/ROADMAP.md`
 - 실측 기록: `docs/research/spikes.md`
-- 참고 제품 기능 대조표: `docs/COVERAGE.md`
+- 참고 제품 기능 대조표: `docs/COVERAGE.md`, 남은 일 목록: `docs/REMAINING.md`
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
 

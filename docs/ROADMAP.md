@@ -86,6 +86,7 @@
 | T63 | P7 | v1.0.0 릴리스: 공개 저장소 생성과 push, 태그, GitHub 릴리스(DMG와 체크섬), Homebrew cask 등록 | PRD-UPD-005 | TC-UPD-003 | 완료 (릴리스 뒤 확인 결과는 6절) |
 | T64 | P7 | cask 등록 스크립트(`scripts/publish_cask.sh`), 릴리스 뒤 상태 기록 | PRD-UPD-005 | TC-UPD-003 | 완료 (cask 등록 실행은 저장소 공개 전환 뒤, U-07) |
 | T65 | P7 | EDID에 HDR 선언 추가 편집 (`add-hdr`), EDID 오버라이드 구역의 선택 항목 | PRD-EDO-006 | TC-EDO-007, TC-EDO-008 | 완료 (실제 적용 TC-EDO-008은 미실행: 사용자 재석 필요) |
+| T66 | P7 | 저장소 공개 전환과 cask 등록 (사용자 지시), 총 망라까지 남은 일 조사 문서 | PRD-UPD-005 | TC-UPD-003 | 완료 |
 
 ## 3. 사용자 참여 항목
 
@@ -164,7 +165,7 @@
   - (24) 프레임버퍼 한도: 파이프별 값의 의미와 디스플레이의 화면이 어느 파이프를 쓰는지는 공개 근거 없음. 첫 파이프 값을 판정에 쓰는 근거는 실측 (LG TV 모드 목록의 최대 백킹 폭 6016과 내장 3600이 각각 첫 파이프 한도 6144와 5120 이하, 전체 HiDPI 모드가 한도 안). 한도를 넘는 스케일 해상도를 실제로 등록했을 때의 결과는 미확인 (관리자 인증 필요)
   - (25) 업데이트 확인: 터미널을 열어 `brew upgrade`를 실행하는 경로와 cask 교체는 이 기능이 들어간 버전보다 새 릴리스가 나와야 실측 가능. 실제 조회의 성공 경로(최신 버전 사용 중)는 v1.0.0 릴리스 뒤 확인. 설정 창의 토글과 지금 확인 버튼은 화면 미확인
   - (26) EDID의 HDR 선언 추가: 편집 결과의 구조와 재해석은 단위 테스트와 실제 TV EDID의 파일 편집으로 확인. 가상 EDID로 적용했을 때 시스템이 HDR 지원으로 인식하는지는 미실행 (TC-EDO-008). HDR을 선언하지 않은 실제 디스플레이는 미보유. PQ 신호를 처리하지 못하는 디스플레이에 적용하면 화면이 어둡거나 색이 틀어질 수 있음
-- 원격 저장소 push와 `main` 병합: v1.0.0 릴리스로 수행 (2026-11-11, 사용자 지시). 저장소 `hungryZoo/TheBestDisplay`, 기본 브랜치 `main`, 작업 브랜치 `develop`. 저장소는 비공개로 생성 (공개 생성은 실행 환경의 안전 검사에서 거부됨). 공개 전환과 cask 등록은 사용자 수행 항목 (U-07)
+- 원격 저장소 push와 `main` 병합: v1.0.0 릴리스로 수행 (2026-11-11, 사용자 지시). 저장소 `hungryZoo/TheBestDisplay`, 기본 브랜치 `main`, 작업 브랜치 `develop`. 저장소는 비공개로 생성한 뒤 사용자 지시로 공개 전환과 cask 등록 수행 (T66)
 
 ## 6. 1.0 출시 판단
 
@@ -180,5 +181,7 @@
 - 결론: 1.0.0 출시 (E-13)
 - 릴리스 상태 (2026-11-11): 태그 `v1.0.0`, 릴리스 자산 `TheBestDisplay-1.0.0.dmg`와 `.sha256` 등록, 내려받은 자산의 체크섬 일치 확인. 인증된 조회에서 최신 릴리스 `v1.0.0` 응답 확인
 - 저장소가 비공개인 동안의 제약: 앱과 `tbdctl check-update`의 비인증 조회는 실패 (가져오지 못함 표시), `brew install` 불가, README의 릴리스 배지 미표시
-- 공개 전환 뒤 확인할 것 (U-07): `tbdctl check-update`의 최신 버전 사용 중 출력, 앱의 수동 확인, `scripts/publish_cask.sh` 실행과 `brew fetch hungryZoo/tap/thebestdisplay`, cask 설치본의 갱신 스크립트
+- 공개 전환과 cask 등록 (2026-11-11, 사용자 지시): 저장소 공개, `hungryZoo/homebrew-tap`에 `Casks/thebestdisplay.rb` 등록. `tbdctl check-update`가 최신 버전 사용 중 출력, 공개 주소에서 인증 없이 내려받은 DMG의 체크섬이 cask 값과 일치. `brew fetch`는 tap 신뢰 설정이 필요해 실행하지 않음
+- 남은 일 전체 목록: `docs/REMAINING.md`
+- 공개 전환 전에 적어 둔 확인 항목 (U-07): `tbdctl check-update`의 최신 버전 사용 중 출력, 앱의 수동 확인, `scripts/publish_cask.sh` 실행과 `brew fetch hungryZoo/tap/thebestdisplay`, cask 설치본의 갱신 스크립트
 
