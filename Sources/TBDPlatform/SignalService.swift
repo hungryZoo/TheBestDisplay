@@ -147,6 +147,19 @@ public enum SignalService {
         try setColorMode(colorID: element.id, timingID: timing, for: display)
     }
 
+    /// 서술과 일치하는 타이밍과 색 모드로 전환. 타이밍 직접 선택의 복귀에 사용. (SRS-COL-007)
+    public static func setTiming(matching timing: TimingDescriptor, color: ColorDescriptor, for display: DisplaySummary) throws {
+        guard ModeService.isOnline(display.id), let info = signalInfo(for: display) else { throw DisplayChangeError.displayNotFound }
+        guard let target = timing.find(in: info.timings) else {
+            throw DisplayChangeError.modeNotFound("\(timing.hActive) x \(timing.vActive), \(DisplaySummary.formatHz(timing.refreshRate)) Hz")
+        }
+        let candidates = target.colorModes.filter { !$0.isVirtual }
+        guard let element = color.find(in: candidates) ?? candidates.max(by: { ($0.score ?? 0) < ($1.score ?? 0) }) else {
+            throw DisplayChangeError.modeNotFound(color.label)
+        }
+        try setColorMode(colorID: element.id, timingID: target.id, for: display)
+    }
+
     /// DP 송신기의 DSC 지원. 송신기 노드가 없으면 nil.
     public static func sourceSupportsDSC() -> Bool? {
         let values = IORegistry.forEachService(matching: "AppleDPTXController") { IORegistry.property($0, "SupportsDSC") as? Bool }

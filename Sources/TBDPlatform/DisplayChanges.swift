@@ -126,6 +126,26 @@ public enum DisplayChanges {
         )
     }
 
+    /// 연결 수준 타이밍 직접 선택. 복귀는 이전 타이밍과 색 모드의 서술로 수행. (SRS-COL-007)
+    public static func timingChange(display: DisplaySummary, from previous: TimingElement, previousColor: ColorElement, to target: TimingElement, color: ColorElement) -> RevertCoordinator.Change {
+        let name = display.identity.name
+        let previousTiming = TimingDescriptor(previous)
+        return RevertCoordinator.Change(
+            summary: "\(name): 타이밍 \(previous.label) → \(target.label) (\(color.label))",
+            pending: PendingRevert(
+                createdAt: Date(),
+                summary: "\(name) 타이밍을 \(previous.label)(으)로 복귀",
+                actions: [.timing(target: DisplayRef(display.identity), timing: previousTiming, color: previousColor.descriptor)]
+            ),
+            apply: { try SignalService.setColorMode(colorID: color.id, timingID: target.id, for: display) },
+            commit: { guard ModeService.isOnline(display.id) else { throw DisplayChangeError.displayNotFound } },
+            restore: {
+                guard ModeService.isOnline(display.id) else { throw DisplayChangeError.displayNotFound }
+                try SignalService.setTiming(matching: previousTiming, color: previousColor.descriptor, for: display)
+            }
+        )
+    }
+
     /// 디스플레이 프리셋 전환. 복귀는 이전 프리셋 재적용. (SRS-CLR-004)
     public static func presetChange(display: DisplaySummary, from previous: DisplayPreset, to target: DisplayPreset) -> RevertCoordinator.Change {
         let name = display.identity.name

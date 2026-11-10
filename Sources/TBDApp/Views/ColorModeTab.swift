@@ -2,7 +2,7 @@ import SwiftUI
 import TBDCore
 import TBDPlatform
 
-/// 색 모드 탭: 현재 신호 형식, 색 모드 선택, DSC 정보, 타이밍 목록. (PRD-COL-001-005)
+/// 색 모드 탭: 현재 신호 형식, 색 모드 선택, DSC 정보와 전환, 타이밍 목록과 직접 선택. (PRD-COL-001-007)
 struct ColorModeTab: View {
     @Environment(DisplayStore.self) private var store
     @Environment(ChangeController.self) private var changes
@@ -220,8 +220,16 @@ struct ColorModeTab: View {
                 let sorted = info.timings.sorted { ($0.hActive * $0.vActive, $0.refreshRate, $0.id) > ($1.hActive * $1.vActive, $1.refreshRate, $1.id) }
                 ForEach(sorted) { t in
                     LabeledContent {
-                        Text("총 \(t.hTotal) x \(t.vTotal), \(String(format: "%.2f", t.pixelClockHz / 1e6)) MHz, 색 모드 \(t.colorModes.filter { !$0.isVirtual }.count)개" + (t.dscRequiredColorElementIDs.isEmpty ? "" : ", DSC 필요 \(t.dscRequiredColorElementIDs.count)개"))
-                            .font(.caption.monospacedDigit())
+                        HStack(spacing: 8) {
+                            Text("총 \(t.hTotal) x \(t.vTotal), \(String(format: "%.2f", t.pixelClockHz / 1e6)) MHz, 색 모드 \(t.colorModes.filter { !$0.isVirtual }.count)개" + (t.dscRequiredColorElementIDs.isEmpty ? "" : ", DSC 필요 \(t.dscRequiredColorElementIDs.count)개"))
+                                .font(.caption.monospacedDigit())
+                            if !display.identity.isBuiltin, !t.isVirtual {
+                                Button("적용") { applyTiming(t, info: info) }
+                                    .controlSize(.small)
+                                    .disabled(changes.isBusy || t.id == info.currentTimingID)
+                                    .help("이 타이밍을 직접 선택. 시스템 모드 목록에 없는 주사율의 타이밍도 선택 가능")
+                            }
+                        }
                     } label: {
                         HStack(spacing: 6) {
                             Text(t.label).monospacedDigit()
@@ -232,6 +240,12 @@ struct ColorModeTab: View {
                 }
             }
         }
+    }
+
+    /// 연결 수준 타이밍 직접 선택. (PRD-COL-007)
+    private func applyTiming(_ target: TimingElement, info: SignalInfo) {
+        guard case .success(let color) = TimingSelection.plan(signal: info, target: target), let current = info.currentTiming, let currentColor = info.currentColor else { return }
+        changes.request(DisplayChanges.timingChange(display: display, from: current, previousColor: currentColor, to: target, color: color), targetDisplayID: display.id)
     }
 
     private func apply(_ element: ColorElement, info: SignalInfo) {

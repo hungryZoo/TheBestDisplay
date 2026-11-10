@@ -121,6 +121,8 @@ public enum RevertAction: Codable, Hashable, Sendable {
     case edidReset(serviceEntryID: UInt64, name: String)
     /// 디스플레이 프리셋 복귀.
     case preset(target: DisplayRef, index: Int, name: String)
+    /// 연결 수준 타이밍과 색 모드 복귀.
+    case timing(target: DisplayRef, timing: TimingDescriptor, color: ColorDescriptor)
 }
 
 public struct PendingRevert: Codable, Hashable, Sendable {

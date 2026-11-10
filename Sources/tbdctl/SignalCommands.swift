@@ -87,6 +87,36 @@ func colorOrder(_ a: ColorElement, _ b: ColorElement) -> Bool {
     return key(a) < key(b)
 }
 
+/// `tbdctl set-timing <디스플레이> <id:번호 | 폭x높이@주사율> [--timeout <초>] [--yes]` (PRD-COL-007, PRD-CLI-002)
+/// 타이밍 목록은 `tbdctl signal <디스플레이> --timings`로 확인.
+func runSetTiming(_ command: ParsedCommand) {
+    let (display, displays) = resolveDisplay(command.positionals[0])
+    guard !display.identity.isBuiltin else {
+        writeError("오류: 내장 디스플레이는 타이밍 직접 선택 대상이 아님")
+        exit(.unsupported)
+    }
+    let (info, _) = loadSignal(display, displays: displays)
+    guard let target = TimingSelection.resolve(command.positionals[1], in: info.timings) else {
+        writeError("오류: 일치하는 타이밍 없음: \(command.positionals[1]). 형식은 id:<번호> 또는 <폭>x<높이>@<주사율>, 목록은 `tbdctl signal --timings`")
+        exit(.unsupported)
+    }
+    switch TimingSelection.plan(signal: info, target: target) {
+    case .failure(.alreadyCurrent):
+        print("이미 현재 타이밍: \(target.label)")
+    case .failure(let error):
+        writeError("오류: \(error.localizedDescription)")
+        exit(.unsupported)
+    case .success(let color):
+        guard let current = info.currentTiming, let currentColor = info.currentColor else {
+            writeError("오류: 현재 타이밍과 색 모드를 확인할 수 없음")
+            exit(.unsupported)
+        }
+        print("타이밍 [id:\(target.id)] \(target.label), 색 모드 [id:\(color.id)] \(color.label)")
+        let change = DisplayChanges.timingChange(display: display, from: current, previousColor: currentColor, to: target, color: color)
+        performGuardedChange(change, timeout: timeoutOption(command), assumeYes: command.has("--yes"))
+    }
+}
+
 /// `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` (PRD-COL-003, PRD-CLI-002)
 func runSetColor(_ command: ParsedCommand) {
     let (display, displays) = resolveDisplay(command.positionals[0])
