@@ -144,6 +144,7 @@ final class DisplayStore {
         refreshCount += 1
         // 재구성 뒤 시스템이 전달 테이블을 초기화하므로 소프트웨어 조정 값 재적용.
         GammaService.shared.reapply(onlineDisplays: snapshot.displays.map(\.id))
+        XDRBoostService.shared.refresh(onlineDisplays: snapshot.displays.map(\.id))
         onDisplaysChanged(Set(snapshot.displays.map(\.id)))
     }
 

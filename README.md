@@ -69,7 +69,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 링크 | 링크 속도, 레인 수, 터널링, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD, 링크 훈련 결과 |
 | 포트와 케이블 | 포트별 지원 전송, 케이블 e-marker(속도, 전류, 전압), 독, 연결 경로 |
 | 진단 | 포트별 화면 출력 점검 6단계, 발견 항목(근거와 조치), 이벤트 기록, 진단 보고서 내보내기 |
-| 밝기와 DDC | 시스템 밝기, DDC 밝기, 소프트웨어 디밍, 자동 밝기, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
+| 밝기와 DDC | 시스템 밝기, DDC 밝기, 소프트웨어 디밍, 자동 밝기, XDR 밝기 업스케일, DDC 대비와 볼륨과 입력과 전원, 임의 VCP |
 | 색 조정 | 색 프로파일, 감마, 대비, 색온도, 채널 게인, Night Shift, True Tone |
 | 배치 | 회전, 미러, 메인 지정, 위치 편집, 논리적 연결 해제와 재연결, 언더스캔 |
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
@@ -140,7 +140,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | 해상도 | 전체 모드 목록과 필터, 주사율 버튼으로 전환, HiDPI 스케일링, 사용자 정의 스케일 해상도 |
 | 색 모드 | HDR 전환, 현재 송출 신호, DSC 상태, 색 모드 목록과 적용, 싱크 타이밍 |
 | 링크 | 링크 속도와 레인, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD |
-| 밝기 | 밝기, 자동 밝기, DDC 기능 |
+| 밝기 | 밝기, 자동 밝기, XDR 밝기 업스케일, DDC 기능 |
 | 색 조정 | 색 프로파일, 소프트웨어 조정, Night Shift, True Tone |
 | 배치 | 위치 편집, 회전, 메인 지정, 미러, 연결 해제 |
 | 연결 진단 | 발견 항목, 포트와 연결 경로, 이벤트 기록, 보고서 내보내기 |
@@ -174,6 +174,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl diagnose` | 포트 점검과 발견 항목 |
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정 |
+| `tbdctl xdr <디스플레이> [<배율 %>] [--seconds <초>]` | XDR 밝기 업스케일 조회, 지정 시간 동안 적용 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 |
 | `tbdctl arrangement` | 위치, 회전, 미러 상태 |
@@ -224,7 +225,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 
 - 사용자 정의 스케일 해상도는 `/Library/Displays/Contents/Resources/Overrides/` 아래 오버라이드 파일에 저장 (관리자 인증 필요)
 
-- 가상 디스플레이, HiDPI 스케일링, 소프트웨어 디밍, 소프트웨어 색 조정은 앱 실행 중에만 유지
+- 가상 디스플레이, HiDPI 스케일링, 소프트웨어 디밍, 소프트웨어 색 조정, XDR 밝기 업스케일은 앱 실행 중에만 유지
 - 가상 EDID는 재시동 전까지 유지
 - 모드, 색 프로파일, HDR, 회전, 배치는 시스템이 저장하므로 앱을 종료해도 유지
 

@@ -19,11 +19,20 @@ final class BrightnessViewModel {
     var rawCode = "0x10"
     var rawValue = ""
     var rawResult: String?
+    /// XDR 밝기 업스케일. (PRD-BRT-005)
+    var xdrSupported = false
+    var xdrMaximum = 1.0
+    var xdrBoost = 1.0
+    var xdrMessage: String?
 
     @ObservationIgnored private var pendingWrite: Task<Void, Never>?
 
     func load(_ display: DisplaySummary) async {
         message = nil
+        xdrSupported = XDRBoostService.isSupported(display.id)
+        xdrMaximum = XDRBoostService.maximumBoost(display.id)
+        xdrBoost = XDRBoostService.shared.boost(for: display.id)
+        xdrMessage = nil
         rawResult = nil
         autoAvailable = BrightnessService.hasAutoBrightness(display.id)
         autoEnabled = BrightnessService.autoBrightnessEnabled(display.id) ?? false
@@ -68,6 +77,16 @@ final class BrightnessViewModel {
             message = nil
         } catch {
             message = RevertCoordinator.describe(error)
+        }
+    }
+
+    func setXDRBoost(_ value: Double, display: DisplaySummary) {
+        xdrBoost = value
+        do {
+            try XDRBoostService.shared.setBoost(value, for: display.id)
+            xdrMessage = nil
+        } catch {
+            xdrMessage = RevertCoordinator.describe(error)
         }
     }
 
@@ -117,7 +136,7 @@ final class BrightnessViewModel {
     }
 }
 
-/// 밝기 탭: 밝기, 자동 밝기, DDC 기능. (PRD-BRT-001-004, PRD-DDC-001-003)
+/// 밝기 탭: 밝기, 자동 밝기, XDR 밝기 업스케일, DDC 기능. (PRD-BRT-001-005, PRD-DDC-001-003)
 struct BrightnessTab: View {
     @Environment(ChangeController.self) private var changes
     let display: DisplaySummary
@@ -146,6 +165,26 @@ struct BrightnessTab: View {
                 }
                 if let message = model.message {
                     Label(message, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
+                }
+            }
+            if model.xdrSupported {
+                Section("XDR 밝기 업스케일") {
+                    HStack(spacing: 10) {
+                        Image(systemName: "sun.max")
+                        Slider(value: Binding(get: { model.xdrBoost }, set: { model.setXDRBoost($0, display: display) }), in: 1.0...max(1.01, model.xdrMaximum))
+                        Image(systemName: "sun.max.fill")
+                        Text("\(Int((model.xdrBoost * 100).rounded()))%")
+                            .monospacedDigit()
+                            .frame(width: 44, alignment: .trailing)
+                        Button("끄기") { model.setXDRBoost(1, display: display) }
+                            .disabled(model.xdrBoost <= 1.001)
+                    }
+                    Text("EDR 헤드룸을 써서 SDR 화면을 최대 밝기보다 밝게 출력. HDR 콘텐츠의 밝은 영역은 잘릴 수 있고 전력 소모와 발열이 늘어남. 앱을 종료하면 해제")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    if let message = model.xdrMessage {
+                        Label(message, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
+                    }
                 }
             }
             Section("DDC") {

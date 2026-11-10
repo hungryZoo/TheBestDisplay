@@ -29,6 +29,12 @@ public final class GammaService: @unchecked Sendable {
         return GammaTable(red: Array(red.prefix(Int(count))), green: Array(green.prefix(Int(count))), blue: Array(blue.prefix(Int(count))))
     }
 
+    /// 현재 전달 테이블의 최댓값. XDR 밝기 업스케일 적용 확인에 사용.
+    public static func currentTableMaximum(_ display: CGDirectDisplayID) -> Double? {
+        guard let table = currentTable(display) else { return nil }
+        return (table.red + table.green + table.blue).max().map(Double.init)
+    }
+
     /// 마지막으로 적용한 테이블. 시스템이 테이블을 초기화했는지 판별하는 데 사용.
     private var applied: [CGDirectDisplayID: GammaTable] = [:]
 
@@ -45,7 +51,8 @@ public final class GammaService: @unchecked Sendable {
             baselines[display] = Self.currentTable(display) ?? .linear()
         }
         let baseline = baselines[display] ?? .linear()
-        let table = clamped.isIdentity ? baseline : GammaTable.make(clamped, size: baseline.red.count).composed(over: baseline)
+        // XDR 배율은 기준 테이블 합성 뒤에 곱함 (합성 단계의 조회가 0-1 범위로 자르기 때문).
+        let table = clamped.isIdentity ? baseline : GammaTable.make(clamped, size: baseline.red.count).composed(over: baseline).scaled(by: clamped.xdrBoost)
         let result = CGSetDisplayTransferByTable(display, UInt32(table.red.count), table.red, table.green, table.blue)
         guard result == .success else { throw DisplayChangeError.system(operation: "전달 테이블 지정", code: result.rawValue) }
         if clamped.isIdentity {

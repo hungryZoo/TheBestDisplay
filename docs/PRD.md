@@ -86,6 +86,7 @@
 | `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 (원본 EDID 복귀) |
 | `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 시스템 밝기 제어 또는 DDC. 소프트웨어 디밍은 창 앱 전용 |
+| `tbdctl xdr <디스플레이> [<배율 %>] [--seconds <초>]` | XDR 밝기 업스케일 가능 여부와 EDR 헤드룸 조회. 배율(100-200)을 주면 지정 시간(기본 10초) 동안 적용한 뒤 해제 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 조회 |
 | `tbdctl arrangement` | 디스플레이별 위치, 크기, 회전, 미러 상태 조회 |
@@ -189,6 +190,7 @@
 | PRD-BRT-002 | DDC 지원 외장 디스플레이의 밝기 조회와 설정 | P4 | 필수 | MRD-SCP-009, MRD-SCN-005 |
 | PRD-BRT-003 | 소프트웨어 디밍: 하드웨어 밝기 제어 불가 디스플레이의 대체 수단 | P4 | 필수 | MRD-SCP-009 |
 | PRD-BRT-004 | 내장 디스플레이의 자동 밝기 켜기와 끄기 | P4 | 권장 | MRD-SCP-009 |
+| PRD-BRT-005 | XDR 밝기 업스케일: EDR 헤드룸이 있는 디스플레이에서 SDR 화면을 최대 밝기보다 밝게 출력 (100-200%, 잠재 헤드룸 이내). 앱 실행 중에만 유지, 종료 시 해제 | P6 | 권장 | MRD-SCP-009 |
 
 ### 6.10 DDC (DDC)
 

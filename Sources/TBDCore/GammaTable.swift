@@ -13,6 +13,8 @@ public struct ColorAdjustment: Codable, Hashable, Sendable {
     public var redGain: Double = 1
     public var greenGain: Double = 1
     public var blueGain: Double = 1
+    /// XDR 밝기 업스케일 배율. 1은 끔. EDR 헤드룸이 열린 상태에서 전달 테이블 출력값을 1.0 위로 올림. (PRD-BRT-005)
+    public var xdrBoost: Double = 1
 
     public init() {}
 
@@ -24,6 +26,7 @@ public struct ColorAdjustment: Codable, Hashable, Sendable {
     public static let contrastRange = 0.5...1.5
     public static let temperatureRange = 2700.0...9300.0
     public static let gainRange = 0.5...1.0
+    public static let xdrBoostRange = 1.0...2.0
 
     /// 허용 범위로 자른 사본.
     public func clamped() -> ColorAdjustment {
@@ -35,6 +38,7 @@ public struct ColorAdjustment: Codable, Hashable, Sendable {
         c.redGain = min(max(redGain, Self.gainRange.lowerBound), Self.gainRange.upperBound)
         c.greenGain = min(max(greenGain, Self.gainRange.lowerBound), Self.gainRange.upperBound)
         c.blueGain = min(max(blueGain, Self.gainRange.lowerBound), Self.gainRange.upperBound)
+        c.xdrBoost = min(max(xdrBoost, Self.xdrBoostRange.lowerBound), Self.xdrBoostRange.upperBound)
         return c
     }
 }
@@ -127,6 +131,12 @@ public extension GammaTable {
             green: green.map { lookup(baseline.green, $0) },
             blue: blue.map { lookup(baseline.blue, $0) }
         )
+    }
+
+    /// 전 채널에 배율 적용. XDR 밝기 업스케일에서 기준 테이블 합성 뒤 사용하며 결과가 1.0을 넘음.
+    func scaled(by factor: Double) -> GammaTable {
+        let f = Float(factor)
+        return GammaTable(red: red.map { $0 * f }, green: green.map { $0 * f }, blue: blue.map { $0 * f })
     }
 
     static func linear(size: Int = defaultSize) -> GammaTable {

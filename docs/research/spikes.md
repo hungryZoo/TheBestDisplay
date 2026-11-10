@@ -170,3 +170,4 @@
 | T17 | `IOAVServiceSetVirtualEDIDMode` 역어셈블: `IOConnectCallMethod` 선택자 0x17, 스칼라 입력 1개(둘째 인자, 32비트 모드), 구조체 입력은 셋째 인자 `CFData`의 바이트와 길이(nil이면 길이 0). 공개 소스 avedid.swift는 모드 1을 적용, 0을 해제로 사용하고 호출 뒤 `SLSDetectDisplays`(인자 없음)를 호출. 적용 상태는 재시동 시 소멸한다는 서술. 실제 적용은 외장 디스플레이 분리 상태라 미실행 (TC-EDO-003) |
 | T17 | `SLSDetectDisplays` 실행: 내장 디스플레이만 온라인인 상태에서 반환값 0, 디스플레이 목록과 모드 유지 |
 | T19 | 시스템 오버라이드 폴더(`/System/Library/Displays/Contents/Resources/Overrides`)의 `scale-resolutions` 항목은 12바이트(폭, 높이, 플래그 0x1) 형식. `/Library/Displays` 폴더는 실험 기기에 없음. 내장 패널 식별값은 제조사 0x610, 제품 0xa05e |
+| T20 | 실험 03 (`spikes/03_xdr_probe`): 내장 XDR 패널의 잠재 EDR 헤드룸 16.0. EDR 창 표시와 1.4배 전달 테이블 지정 시 `CGGetDisplayTransferByTable` 최댓값 1.4 유지, 복원 뒤 1.0. `NSScreen`의 헤드룸 값은 프로세스가 화면 정보를 읽은 시점 값이라 적용 중 변화는 별도 프로세스로 측정: 적용 중 6.17배, 해제 약 25초 뒤 1.00배 |
