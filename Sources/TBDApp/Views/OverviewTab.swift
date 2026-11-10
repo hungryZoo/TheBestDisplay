@@ -39,6 +39,9 @@ struct OverviewTab: View {
                 }
             }
             EDIDSections(display: display, record: store.edidRecords[display.id])
+            if !display.identity.isBuiltin, let record = store.edidRecords[display.id] {
+                EDIDOverrideSection(display: display, record: record)
+            }
             let unavailable = Capability.allCases.map(store.status).filter { !$0.isAvailable }
             if !unavailable.isEmpty {
                 Section("사용할 수 없는 기능") {

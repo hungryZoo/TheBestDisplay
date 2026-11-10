@@ -24,7 +24,7 @@
 | 화면 | 위치 | 내용 |
 | --- | --- | --- |
 | 사이드바 | 창 왼쪽 | 디스플레이 목록(이름, 내장 또는 외장, 해상도와 주사율 요약), 가상 디스플레이, 연결 진단, 프로파일 |
-| 개요 탭 | 디스플레이 상세 | 제품 정보, 현재 모드와 신호 요약, 싱크 능력 요약, EDID 해석과 원본 |
+| 개요 탭 | 디스플레이 상세 | 제품 정보, 현재 모드와 신호 요약, 싱크 능력 요약, EDID 해석과 원본, EDID 오버라이드(외장) |
 | 해상도 탭 | 디스플레이 상세 | 전체 모드 목록, 필터, 주사율 선택, HiDPI 스케일링 |
 | 색 모드 탭 | 디스플레이 상세 | 현재 신호 형식, 색 모드 목록, DSC 표시, HDR 전환과 정보, 타이밍 목록 |
 | 링크 탭 | 디스플레이 상세 | 링크 속도, 레인, 대역폭 사용률, DSC와 FEC 상태, DPCD 정보, 연결 경로 |
@@ -78,6 +78,11 @@
 | `tbdctl report <경로> [--redact] [--text]` | 진단 보고서 저장. 기본 JSON, `--text`는 텍스트, `--redact`는 일련번호 가림 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 상태와 정보 조회, 켜기와 끄기 |
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 상태와 전환 가능 여부 조회, 켜기와 끄기 |
+| `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약. 파일 또는 현재 디스플레이의 EDID 대상 |
+| `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | EDID 편집. 편집 목록은 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`. `--apply`는 편집본을 가상 EDID로 적용 |
+| `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]` | EDID 파일을 가상 EDID로 적용 |
+| `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 (원본 EDID 복귀) |
+| `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl brightness <디스플레이> [0-100]` | 밝기 조회와 설정. 시스템 밝기 제어 또는 DDC. 소프트웨어 디밍은 창 앱 전용 |
 | `tbdctl ddc <디스플레이> probe \| get <코드> \| set <코드> <값>` | DDC 탐지, VCP 읽기와 쓰기. 코드는 이름(brightness, contrast, volume, mute, input, power) 또는 숫자 |
 | `tbdctl color <디스플레이> [--profiles]` | 색 프로파일, Night Shift, True Tone 상태 조회 |
@@ -241,3 +246,12 @@
 | PRD-CLI-001 | 조회 명령 제공: `list`, `capabilities`, `info`, `modes`, `signal`, `link`, `ports`, `diagnose`, `report`. `--json` 출력 지원 | P1 | 필수 | MRD-SCP-015, MRD-USR-003 |
 | PRD-CLI-002 | 설정 명령 제공: `set-mode`, `set-color`, `hdr`, `brightness`, `ddc`, `rotate`, `mirror`, `profile` | P2 | 권장 | MRD-SCP-015, MRD-USR-003 |
 | PRD-CLI-003 | 종료 코드 규약 준수: 0 성공, 1 실행 실패, 2 사용법 오류, 3 미지원 기능 또는 대상 없음 | P1 | 필수 | MRD-SCP-015 |
+
+### 6.17 EDID 오버라이드 (EDO)
+
+| ID | 요구사항 | 단계 | 우선순위 | MRD 근거 |
+| --- | --- | --- | --- | --- |
+| PRD-EDO-001 | EDID 구조 검증(길이, 머리, 확장 블록 수, 블록별 체크섬)과 능력 요약 표시. 대상은 EDID 파일과 현재 디스플레이의 EDID | P6 | 필수 | MRD-SCP-016 |
+| PRD-EDO-002 | EDID 편집: DSC 선언 제거(HDMI), HDR 선언 제거, YCbCr 선언 제거(RGB 전용), YCbCr 4:2:0 선언 제거, VRR 선언 제거(HDMI), FRL과 TMDS 최대 속도 상한. 편집 전후 능력 비교 표시, 편집본 파일 저장 | P6 | 필수 | MRD-SCP-016 |
+| PRD-EDO-003 | 가상 EDID 적용과 해제: 편집본 또는 EDID 파일을 외장 디스플레이에 적용, 원본 EDID로 복원. 적용에 자동 복귀 사용. 디스플레이 저장 장치 쓰기는 제공하지 않음 | P6 | 필수 | MRD-SCP-016, MRD-SCP-014 |
+| PRD-EDO-004 | 디스플레이 재감지 요청 | P6 | 권장 | MRD-SCP-016 |

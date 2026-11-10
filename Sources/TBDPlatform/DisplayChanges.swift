@@ -125,4 +125,20 @@ public enum DisplayChanges {
             restore: { try ArrangementService.reconnect(displayID) }
         )
     }
+
+    /// 가상 EDID 적용. 복귀는 가상 EDID 해제(원본 EDID 복귀). (SRS-EDO-002)
+    /// 적용 뒤 시스템이 디스플레이를 다시 감지하므로 디스플레이 ID와 식별 정보가 바뀔 수 있음.
+    public static func edidOverrideChange(display: DisplaySummary, among displays: [DisplaySummary], edid: Data, detail: String) throws -> RevertCoordinator.Change {
+        guard !display.identity.isBuiltin else { throw EDIDOverrideService.OverrideError.builtinNotSupported }
+        guard let service = EDIDOverrideService.service(for: display, among: displays) else { throw EDIDOverrideService.OverrideError.serviceNotFound }
+        let name = display.identity.name
+        let entryID = service.registryEntryID
+        return RevertCoordinator.Change(
+            summary: "\(name): EDID 오버라이드 (\(detail))",
+            pending: PendingRevert(createdAt: Date(), summary: "\(name) 원본 EDID 복귀", actions: [.edidReset(serviceEntryID: entryID, name: name)]),
+            apply: { try EDIDOverrideService.apply(edid, to: display, among: displays) },
+            commit: {},
+            restore: { try EDIDOverrideService.reset(registryEntryID: entryID) }
+        )
+    }
 }

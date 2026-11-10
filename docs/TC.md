@@ -65,6 +65,10 @@
 | TC-CLI-001 | 조회 명령 확인 | PRD-CLI-001, SRS-CLI-001 | 디스플레이 온라인 | `swift test`의 TC-CLI-001 묶음: `list`, `capabilities`, `info`, `modes`, `signal`, `link`, `hdr`, `ports`, `diagnose`를 `--json`으로 실행, `report` 저장 | 전 명령 종료 코드 0. 출력이 유효한 JSON. 사용법 오류는 2, 대상 없음은 3 | 통합 | macOS 26, Apple Silicon | 통과 | |
 | TC-CLI-002 | 설정 명령 확인 | PRD-CLI-002, SRS-CLI-001 | 외장 디스플레이 온라인 | `set-mode`, `set-color`, `hdr`, `brightness`로 변경 후 복원 | 변경 후 조회값이 설정값과 일치. 복원 완료 | 통합 | macOS 26, Apple Silicon | 통과 | set-mode, set-color, hdr(T04-T06), brightness(T10) 실측 |
 | TC-CLI-003 | 인자 해석과 종료 코드 확인 | PRD-CLI-003, SRS-CLI-001 | 없음 | 알 수 없는 명령, 인자 누락, 없는 디스플레이 지정, 정상 명령 해석 | 사용법 오류 2, 대상 없음 3, 정상 해석 결과 일치 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-EDO-001 | EDID 검증과 편집 확인 | PRD-EDO-001, PRD-EDO-002, SRS-EDO-001 | 실측 EDID 픽스처와 HDMI 합성 픽스처 (HF-VSDB, HDR, Dolby Vision, 4:2:0 블록 포함) | 검증, 편집 7종 적용 후 재해석 | 손상 EDID는 문제 목록 반환. 편집본은 검증 통과, 대상 선언만 제거, 상세 타이밍과 식별 정보 유지. 실측 EDID는 HDMI 선언이 없어 DSC 편집 변경 없음 | 단위 | macOS 26, Apple Silicon | 통과 | |
+| TC-EDO-002 | `edid` 명령의 파일 처리와 거부 확인 | PRD-EDO-001, PRD-EDO-002, PRD-CLI-002, SRS-EDO-001 | EDID 픽스처 파일 | `tbdctl edid builtin check <파일>`, `patch remove-hdr,remove-ycbcr,remove-dsc --in <파일> --out <파일>`, 내장 디스플레이 대상 `patch --apply`와 `reset` | 검증 통과와 능력 요약 출력, 편집 전후 비교 출력, 저장한 편집본의 검증 통과. 내장 디스플레이 대상 적용과 해제는 종료 코드 3 | 통합 | macOS 26, Apple Silicon | 통과 | 수동 실행 |
+| TC-EDO-003 | 가상 EDID 적용과 자동 복귀 확인 | PRD-EDO-003, SRS-EDO-002 | 외장 디스플레이 온라인 | `tbdctl edid <외장> patch remove-hdr --apply` 후 확인 없이 대기, 이어서 `tbdctl hdr <외장>` | 적용 직후 HDR 미지원 표시, 제한 시간 뒤 원본 EDID 복귀와 HDR 지원 표시 | 통합 | macOS 26, Apple Silicon | 미실행 | LG TV 분리 상태. 재연결 후 실행 (화면 변경 시험, U-01 절차) |
+| TC-EDO-004 | 디스플레이 재감지 확인 | PRD-EDO-004, SRS-EDO-002 | 디스플레이 온라인 | `tbdctl redetect` 후 `tbdctl list` | 종료 코드 0. 디스플레이 목록과 현재 모드 유지 | 통합 | macOS 26, Apple Silicon | 통과 | 내장 디스플레이만 온라인인 상태에서 실행 |
 
 ## 2. 선행 검증 대응 표
 

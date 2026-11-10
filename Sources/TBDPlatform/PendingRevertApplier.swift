@@ -23,6 +23,8 @@ public enum PendingRevertApplier {
                 try ArrangementService.setMirror(display.id, master: master?.resolve(in: displays)?.id)
             case .reconnect(let displayID, _):
                 try ArrangementService.reconnect(displayID)
+            case .edidReset(let serviceEntryID, _):
+                try EDIDOverrideService.reset(registryEntryID: serviceEntryID)
             }
         }
     }

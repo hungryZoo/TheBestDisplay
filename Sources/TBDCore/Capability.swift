@@ -52,6 +52,8 @@ public enum Capability: String, Codable, CaseIterable, Sendable {
     case virtualDisplay
     case nightShift
     case trueTone
+    case edidOverride
+    case redetect
 
     public var title: String {
         switch self {
@@ -70,6 +72,8 @@ public enum Capability: String, Codable, CaseIterable, Sendable {
         case .virtualDisplay: "가상 디스플레이"
         case .nightShift: "Night Shift"
         case .trueTone: "True Tone"
+        case .edidOverride: "EDID 오버라이드"
+        case .redetect: "디스플레이 재감지"
         }
     }
 
@@ -105,6 +109,10 @@ public enum Capability: String, Codable, CaseIterable, Sendable {
             [.objcClass(.coreBrightness, "CBBlueLightClient")]
         case .trueTone:
             [.objcClass(.coreBrightness, "CBTrueToneClient")]
+        case .edidOverride:
+            [.function(.ioKit, "IOAVServiceCreateWithService"), .function(.ioKit, "IOAVServiceSetVirtualEDIDMode")]
+        case .redetect:
+            [.function(.skyLight, "SLSDetectDisplays")]
         }
     }
 }

@@ -61,6 +61,7 @@ scripts/build_app.sh && open build/TheBestDisplay.app
 | 영역 | 내용 |
 | --- | --- |
 | 디스플레이 정보 | 제품 정보, 물리 크기, EDID 해석(기본 블록, CTA-861, DisplayID), 싱크 능력 요약, EDID 원본 저장 |
+| EDID 오버라이드 | EDID 검증, 편집(DSC, HDR, YCbCr, 4:2:0, VRR 선언 제거, FRL과 TMDS 상한), 가상 EDID 적용과 해제, 디스플레이 재감지 |
 | 해상도와 주사율 | 숨은 모드를 포함한 전체 모드 열거, 필터, 전환, 시스템 설정 목록 밖 모드 표시 |
 | 색 모드 | 현재 송출 신호(픽셀 인코딩, 비트 심도, 레인지, EOTF, 색 공간) 표시, 현재 타이밍에서 선택 가능한 색 모드 전환 |
 | DSC | 소스와 싱크의 지원 여부, 현재 사용 여부, 모드별 DSC 필요 여부 표시. DSC 사용 색 모드와 미사용 색 모드 간 전환으로 켜기와 끄기 |
@@ -135,7 +136,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 
 | 화면 | 내용 |
 | --- | --- |
-| 개요 | 제품 정보, 현재 상태, 싱크 능력, EDID 해석과 원본 |
+| 개요 | 제품 정보, 현재 상태, 싱크 능력, EDID 해석과 원본, EDID 오버라이드(외장) |
 | 해상도 | 전체 모드 목록과 필터, 주사율 버튼으로 전환, HiDPI 스케일링 |
 | 색 모드 | HDR 전환, 현재 송출 신호, DSC 상태, 색 모드 목록과 적용, 싱크 타이밍 |
 | 링크 | 링크 속도와 레인, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD |
@@ -161,6 +162,11 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `tbdctl set-color <디스플레이> <색 모드> [--timeout <초>] [--yes]` | 색 모드 전환 |
 | `tbdctl hdr <디스플레이> [on\|off] [--timeout <초>] [--yes]` | HDR 조회와 전환 |
 | `tbdctl dsc <디스플레이> [on\|off] [--timeout <초>] [--yes]` | DSC 조회와 전환 |
+| `tbdctl edid <디스플레이> check [<파일>]` | EDID 구조 검증과 능력 요약 |
+| `tbdctl edid <디스플레이> patch <편집 목록> [--in <파일>] [--out <파일>] [--apply] [--timeout <초>] [--yes]` | EDID 편집, 편집본 저장, 가상 EDID 적용 |
+| `tbdctl edid <디스플레이> apply <파일> [--timeout <초>] [--yes]` | EDID 파일을 가상 EDID로 적용 |
+| `tbdctl edid <디스플레이> reset` | 가상 EDID 해제 |
+| `tbdctl redetect` | 디스플레이 재감지 요청 |
 | `tbdctl link <디스플레이>` | 링크 정보, 대역폭, DPCD |
 | `tbdctl ports` | 포트, 케이블, 독, 연결 경로 |
 | `tbdctl diagnose` | 포트 점검과 발견 항목 |
@@ -182,11 +188,12 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 - 디스플레이 지정: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
 - 모드 형식: `<폭>x<높이>[@<주사율>][:hidpi|:lodpi]` 또는 `mode:<번호>`
 - 색 모드 형식: `id:<번호>` 또는 `<rgb|ycbcr444|ycbcr422|ycbcr420>[:<bpc>][:<full|limited>][:<sdr|pq|hlg>]`
+- EDID 편집 목록: 쉼표로 이은 `remove-dsc`, `remove-hdr`, `remove-ycbcr`, `remove-420`, `remove-vrr`, `limit-frl:<0-6>`, `limit-tmds:<MHz>`
 - 종료 코드: 0 성공, 1 실행 실패, 2 사용법 오류, 3 미지원 기능 또는 대상 없음
 
 ### 자동 복귀 안전장치
 
-- 대상: 모드, 색 모드, DSC, HDR, 회전, 미러, 연결 해제, HiDPI 스케일링, 프로파일 적용
+- 대상: 모드, 색 모드, DSC, HDR, EDID 오버라이드, 회전, 미러, 연결 해제, HiDPI 스케일링, 프로파일 적용
 - 창 앱: 확인 대화상자에서 15초 안에 유지를 누르지 않으면 이전 설정으로 복귀
 - 명령행: Return을 입력하면 확정, 제한 시간(`--timeout`, 기본 15초) 안에 입력이 없으면 복귀. `--yes`는 확인 없이 확정
 - 확인 전에 앱이 종료되면 다음 실행 시 복귀 제안 표시. 명령행은 `tbdctl revert-pending`
@@ -213,6 +220,7 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | `pending-revert.json` | 확인 대기 중인 변경의 복귀 정보. 확정하거나 복귀하면 삭제 |
 
 - 가상 디스플레이, HiDPI 스케일링, 소프트웨어 디밍, 소프트웨어 색 조정은 앱 실행 중에만 유지
+- 가상 EDID는 재시동 전까지 유지
 - 모드, 색 프로파일, HDR, 회전, 배치는 시스템이 저장하므로 앱을 종료해도 유지
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
@@ -234,7 +242,8 @@ build/TheBestDisplay.app/Contents/MacOS/tbdctl diagnose
 | Intel Mac | 미지원 |
 | Mac App Store 배포 | 불가 (비공개 API 사용, 샌드박스 미적용) |
 | DSC 강제 | 시스템이 색 모드로 제공하는 범위 안에서만 켜기와 끄기 가능. DSC 미지원 싱크에서 켜기 같은 강제는 불가 |
-| EDID 오버라이드, 사용자 정의 타이밍 | 미제공 |
+| EDID 오버라이드 | 외장 디스플레이 한정. 재시동하면 원본 EDID로 복귀. 디스플레이 저장 장치 쓰기는 미제공. 실제 디스플레이 대상 적용은 미검증 |
+| 사용자 정의 타이밍 | 미제공 |
 | 내장 디스플레이 회전 | 대상에서 제외 |
 | 미검증 구성 | HDMI 직결 링크 정보, DDC 지원 모니터 제어, DSC 사용 모드 (장비 없음) |
 | 모드 전환 경로 | SkyLight 직접 호출 경로는 독 경유 TV에서 미출력을 유발한 사례가 있어 기본 경로에서 제외 (`docs/adr/0005-mode-switch-path.md`) |

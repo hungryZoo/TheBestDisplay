@@ -117,6 +117,8 @@ public enum RevertAction: Codable, Hashable, Sendable {
     case mirror(target: DisplayRef, master: DisplayRef?)
     /// 연결 해제한 디스플레이의 재연결. 해제된 디스플레이는 온라인 목록에 없으므로 ID로 지정.
     case reconnect(displayID: UInt32, name: String)
+    /// 가상 EDID 해제. 적용 뒤 식별 정보가 바뀔 수 있어 AV 서비스의 레지스트리 항목 ID로 지정.
+    case edidReset(serviceEntryID: UInt64, name: String)
 }
 
 public struct PendingRevert: Codable, Hashable, Sendable {

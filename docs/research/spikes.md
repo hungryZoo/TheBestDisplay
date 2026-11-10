@@ -167,3 +167,5 @@
 | T05 | 내장 패널의 정밀 주사율은 120.0005 Hz (`PreciseSyncRate` 7864351) |
 | T04 | MonitorPanel 경로 실측: 주사율 전환 3회, 해상도 전환 2회(2560x1440 HiDPI, 시스템 설정 목록 밖 1344x756 HiDPI), 창 앱 전환 1회 모두 디스플레이 온라인 유지와 자동 복귀 정상 |
 | T16 | DSC 제어 심볼 조사 (`dyld_info -exports`): IOKit에 DSC 계산용 `IOAVDSCCapabilitiesGetMaxSlicesPerLine`, `IOAVDSCModeForPixelEncoding`, `IOAVVideoColorMinimumBitsPerPixelDSC`만 있고 DSC 설정 함수 없음. IOMobileFramebuffer, SkyLight, CoreDisplay, MonitorPanel, DisplayServices에는 DSC 이름의 심볼 없음. 관련 설정 계열로 `IOAVServiceSetVirtualEDIDMode`, `IODPPortSetVirtualEDID`, `IODPPortSetVirtualDPCD`, `IODPControllerSetMaxLinkRate`, `IODPControllerSetMaxLaneCount`, `IODPServiceRetrainLink`, `IOAVServiceSetFRLMaxRate` 존재 확인 (호출 가능 여부는 T17, T20에서 실측) |
+| T17 | `IOAVServiceSetVirtualEDIDMode` 역어셈블: `IOConnectCallMethod` 선택자 0x17, 스칼라 입력 1개(둘째 인자, 32비트 모드), 구조체 입력은 셋째 인자 `CFData`의 바이트와 길이(nil이면 길이 0). 공개 소스 avedid.swift는 모드 1을 적용, 0을 해제로 사용하고 호출 뒤 `SLSDetectDisplays`(인자 없음)를 호출. 적용 상태는 재시동 시 소멸한다는 서술. 실제 적용은 외장 디스플레이 분리 상태라 미실행 (TC-EDO-003) |
+| T17 | `SLSDetectDisplays` 실행: 내장 디스플레이만 온라인인 상태에서 반환값 0, 디스플레이 목록과 모드 유지 |
