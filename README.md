@@ -428,7 +428,8 @@ uv run scripts/trace_check.py
 - [x] P7 출시: 버전 정보와 업데이트 확인, 릴리스 빌드, Homebrew cask
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
 - [ ] 미구현 기능 3행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
-- [x] EDID에 HDR 선언 추가 편집 (1.0.0 이후 추가, 다음 릴리스에 포함)
+- [x] EDID에 HDR 선언 추가 편집 (1.0.1)
+- [x] 해상도 탭의 빠른 설정과 디스플레이 오버라이드 (1.0.1)
 - [x] HDR 선언 추가의 실제 적용 실측 (LG TV)
 - [ ] Developer ID 서명과 공증
 
