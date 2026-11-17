@@ -77,6 +77,10 @@ struct ResolutionTab: View {
                         .padding(16)
                     }
             }
+            if let current {
+                quickSettings(modes: modes, current: current)
+            }
+            Text("전체 모드 목록").font(.callout.weight(.medium))
             HStack(spacing: 14) {
                 Picker("배율", selection: $filter.hiDPI) {
                     ForEach(ModeFilter.HiDPI.allCases, id: \.self) { Text($0.title).tag($0) }
@@ -103,6 +107,77 @@ struct ResolutionTab: View {
             }
         }
         .padding(12)
+    }
+
+    /// 빠른 설정: 현재 해상도에서 주사율만 바꾸기, HiDPI 켜기, 해상도 구성(보이는 해상도, 배율, 렌더링, 전송) 표시. (PRD-MOD-015)
+    private func quickSettings(modes: [DisplayMode], current: DisplayMode) -> some View {
+        let rates = ModeCatalog.refreshOptions(modes, current: current)
+        let native = ModeCatalog.nativeModes(modes, nativeWidth: display.pixelWidth, nativeHeight: display.pixelHeight).first
+        let counterpart = ModeCatalog.hiDPICounterpart(modes, current: current, nativeWidth: native?.pixelWidth ?? display.pixelWidth, nativeHeight: native?.pixelHeight ?? display.pixelHeight)
+        let timing = store.signals[display.id]?.currentTiming
+        let breakdown = ResolutionBreakdown(mode: current, transmitWidth: timing?.hActive, transmitHeight: timing?.vActive, transmitRefreshRate: timing?.refreshRate)
+        let locked = changes.isBusy || display.mirrorsDisplayID != nil
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                Text("주사율").font(.callout.weight(.medium)).frame(width: 96, alignment: .leading)
+                ForEach(rates) { mode in
+                    let isCurrent = mode.modeNumber == current.modeNumber
+                    let title = "\(DisplaySummary.formatHz(mode.refreshRate)) Hz\(mode.isVRR ? " (가변)" : "")"
+                    // 현재 주사율은 강조 표시. 눌러도 변화 없음.
+                    if isCurrent {
+                        Button(title) {}
+                            .buttonStyle(.borderedProminent)
+                            .help("현재 주사율")
+                    } else {
+                        Button(title) { apply(mode, current: current) }
+                            .buttonStyle(.bordered)
+                            .disabled(locked)
+                            .help("해상도는 그대로 두고 주사율만 \(DisplaySummary.formatHz(mode.refreshRate)) Hz로 전환")
+                    }
+                }
+                if rates.count <= 1 {
+                    Text("이 해상도에서 고를 수 있는 다른 주사율 없음").font(.callout).foregroundStyle(.secondary)
+                }
+            }
+            HStack(spacing: 8) {
+                Toggle("HiDPI 켜기 (권장)", isOn: Binding(get: { current.isHiDPI }, set: { _ in
+                    if let counterpart { apply(counterpart, current: current) }
+                }))
+                .toggleStyle(.checkbox)
+                .disabled(counterpart == nil || locked)
+                if let counterpart {
+                    let keepsSize = counterpart.width == current.width && counterpart.height == current.height
+                    Text((current.isHiDPI ? "끄면 " : "켜면 ") + (keepsSize ? "보이는 크기는 그대로, 렌더링 \(counterpart.pixelWidth) x \(counterpart.pixelHeight) 픽셀" : "\(counterpart.label)로 전환 (같은 크기의 \(current.isHiDPI ? "HiDPI 꺼짐" : "HiDPI") 모드 없음)"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(current.isHiDPI ? "HiDPI를 끈 모드 없음" : "이 디스플레이에 HiDPI 모드 없음").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .help("HiDPI는 글자와 화면 요소를 2배 픽셀로 그려 선명하게 표시. 대부분의 경우 켜는 쪽 권장")
+            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 4) {
+                GridRow {
+                    Text("보이는 해상도").foregroundStyle(.secondary)
+                    Text(breakdown.logicalText + " (창과 글자 크기의 기준)")
+                }
+                GridRow {
+                    Text("배율").foregroundStyle(.secondary)
+                    Text(breakdown.scaleText)
+                }
+                GridRow {
+                    Text("렌더링 해상도").foregroundStyle(.secondary)
+                    Text(breakdown.renderText + " (시스템이 실제로 그리는 크기)")
+                }
+                GridRow {
+                    Text("전송 해상도").foregroundStyle(.secondary)
+                    Text((breakdown.transmitText ?? "확인 불가") + (breakdown.transmitNote.map { ". \($0)" } ?? ""))
+                }
+            }
+            .font(.callout.monospacedDigit())
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
     }
 
     /// 즐겨찾기 모드, 해상도 슬라이더, 렌더링 한계. (PRD-MOD-009, PRD-MOD-010)
