@@ -82,7 +82,8 @@ public struct DisplayOverrideFile: Sendable {
         }
         dict["DisplayVendorID"] = Int(vendorID)
         dict["DisplayProductID"] = Int(productID)
-        dict["scale-resolutions"] = entries.map(\.raw)
+        // 항목이 없으면 키를 쓰지 않음: 빈 배열이 시스템 제공 목록을 가리지 않도록 함.
+        if entries.isEmpty { dict["scale-resolutions"] = nil } else { dict["scale-resolutions"] = entries.map(\.raw) }
         return try PropertyListSerialization.data(fromPropertyList: dict, format: .xml, options: 0)
     }
 

@@ -34,6 +34,8 @@ struct ResolutionTab: View {
                 if !store.isVirtual(display.id) {
                     ScaledResolutionSection(display: display)
                         .listRowInsets(EdgeInsets())
+                    DisplayOverrideKeysSection(display: display)
+                        .listRowInsets(EdgeInsets())
                 }
                 if groups.isEmpty {
                     ContentUnavailableView("조건에 맞는 모드 없음", systemImage: "line.3.horizontal.decrease.circle")
