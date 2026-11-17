@@ -352,8 +352,8 @@ tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 129건 중 통과 123건, 미실행 1건, 보류 5건 (`docs/TC.md`) |
-| 참고 제품 기능 대조 | 58행 중 구현 51행, 부분 4행, 미구현 3행 (`docs/COVERAGE.md`) |
+| 검증 결과 | TC 129건 중 통과 124건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 참고 제품 기능 대조 | 58행 중 구현 52행, 부분 3행, 미구현 3행 (`docs/COVERAGE.md`) |
 
 ### 제약
 
@@ -428,7 +428,7 @@ uv run scripts/trace_check.py
 - [ ] 장비 확보 후 실측: HDMI 직결 링크, DDC 지원 모니터, DSC 사용 모드와 DSC 전환, 언더스캔 변경
 - [ ] 미구현 기능 3행 (`docs/COVERAGE.md` 3절의 진행 조건 참고)
 - [x] EDID에 HDR 선언 추가 편집 (1.0.0 이후 추가, 다음 릴리스에 포함)
-- [ ] HDR 선언 추가의 실제 적용 실측
+- [x] HDR 선언 추가의 실제 적용 실측 (LG TV)
 - [ ] Developer ID 서명과 공증
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>

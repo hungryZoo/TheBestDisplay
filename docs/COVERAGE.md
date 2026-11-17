@@ -3,7 +3,7 @@
 - 대상: 조사 문서 `docs/research/competitors.md` 4절 기능 후보 총괄표의 58행 (BetterDisplay, WhatCable 등 참고 제품의 기능)
 - 구분: 구현(해당 기능 제공), 부분(일부만 제공), 미구현
 - 요구사항 열은 PRD의 요구사항 ID. 검증 상태는 `docs/TC.md`와 `docs/TRACEABILITY.md` 기준
-- 집계: 구현 51행, 부분 4행, 미구현 3행
+- 집계: 구현 52행, 부분 3행, 미구현 3행
 
 ## 1. 대조표
 
@@ -21,7 +21,7 @@
 | 10 | 주사율 | 현재 모드 기준 주사율 목록, VRR 표기 | 구현 | PRD-MOD-005 |  |
 | 11 | 주사율 | 연결 수준 비노출 주사율 선택 | 구현 | PRD-COL-007 | LG TV에서 59.94 Hz 전환 확인 (TC-COL-009) |
 | 12 | 주사율 | 주사율 측정 표시 | 구현 | PRD-MOD-008 |  |
-| 13 | HDR | HDR 토글과 상태 표시 | 부분 | PRD-HDR-001-003 | 토글, EOTF, 최대 휘도, EDR 헤드룸 제공. HDR 미선언 디스플레이용 EDID HDR 선언 추가 편집 제공 (PRD-EDO-006), 실제 적용은 미실행 (TC-EDO-008) |
+| 13 | HDR | HDR 토글과 상태 표시 | 구현 | PRD-HDR-001-003, PRD-EDO-006 | 토글, EOTF, 최대 휘도, EDR 헤드룸 제공. HDR 미선언 디스플레이용 EDID HDR 선언 추가 제공: LG TV에서 선언을 뺀 뒤 다시 추가한 EDID로 시스템의 HDR 인식과 켜기 확인 (TC-EDO-008). HDR을 선언하지 않은 실제 디스플레이는 미검증 |
 | 14 | HDR | XDR 프리셋 선택 | 구현 | PRD-CLR-005 |  |
 | 15 | HDR | XDR/HDR 밝기 업스케일 | 구현 | PRD-BRT-005 | 색 테이블 방식. 육안 확인 미수행 |
 | 16 | 색 모드 | RGB 또는 YCbCr, chroma, range, 비트 심도, EOTF 조합 목록과 선택 | 구현 | PRD-COL-002, PRD-COL-003 |  |
