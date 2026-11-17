@@ -147,11 +147,13 @@ public extension DisplayOverrideFile {
     }
 
     /// 다단계 목록을 항목으로 추가. 이미 있는 항목은 건너뜀. 추가한 개수 반환.
+    /// `limits`가 있으면 백킹 크기(논리 해상도의 2배)가 프레임버퍼 소스 한도를 넘는 항목은 넣지 않음. (PRD-MOD-014)
     @discardableResult
-    mutating func addLadder(nativeWidth: Int, nativeHeight: Int, steps: Int) -> Int {
+    mutating func addLadder(nativeWidth: Int, nativeHeight: Int, steps: Int, limits: FramebufferLimits? = nil) -> Int {
         var added = 0
         for size in Self.ladder(nativeWidth: nativeWidth, nativeHeight: nativeHeight, steps: steps) {
             let entry = ScaleResolutionEntry(logicalWidth: size.width, logicalHeight: size.height)
+            if limits?.allows(pixelWidth: size.width * 2, pixelHeight: size.height * 2) == false { continue }
             guard Self.validate(logicalWidth: size.width, logicalHeight: size.height) == nil, !entries.contains(entry) else { continue }
             entries.append(entry)
             added += 1

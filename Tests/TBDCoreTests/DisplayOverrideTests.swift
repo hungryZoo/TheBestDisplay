@@ -89,6 +89,11 @@ struct ScaleLadderTests {
         #expect(file.addLadder(nativeWidth: 3840, nativeHeight: 2160, steps: 5) == 4)
         #expect(file.entries.count == 5)
         #expect(file.addLadder(nativeWidth: 3840, nativeHeight: 2160, steps: 5) == 0)
+        // 프레임버퍼 소스 한도(6144 x 4320)를 넘는 단계(3360 x 1890, 3840 x 2160의 백킹)는 제외.
+        var limited = DisplayOverrideFile(vendorID: 0x1E6D, productID: 0xC0C8)
+        let limits = FramebufferLimits(maxSourceWidths: [6144], maxSourceHeights: [4320])
+        #expect(limited.addLadder(nativeWidth: 3840, nativeHeight: 2160, steps: 5, limits: limits) == 3)
+        #expect(limited.entries.map(\.label) == ["1920 x 1080 HiDPI (백킹 3840 x 2160)", "2400 x 1350 HiDPI (백킹 4800 x 2700)", "2880 x 1620 HiDPI (백킹 5760 x 3240)"])
         #expect(file.entries.last?.label == "3840 x 2160 HiDPI (백킹 7680 x 4320)")
     }
 }

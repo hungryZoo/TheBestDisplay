@@ -102,7 +102,8 @@ struct ScaledResolutionSection: View {
             message = "패널 원본 해상도를 확인할 수 없음"
             return
         }
-        let added = edited.addLadder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: 5)
+        // 프레임버퍼 소스 한도를 넘는 단계는 넣지 않음.
+        let added = edited.addLadder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: 5, limits: ModeService.framebufferLimits(for: display))
         guard added > 0 else {
             message = "추가할 항목 없음 (이미 등록됨)"
             return

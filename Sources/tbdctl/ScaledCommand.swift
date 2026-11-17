@@ -59,7 +59,12 @@ func runScaled(_ command: ParsedCommand, json: Bool) {
         }
         let sizes = DisplayOverrideFile.ladder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: steps)
         print("패널 \(native.pixelWidth) x \(native.pixelHeight) 기준 \(sizes.count)단계: " + sizes.map { "\($0.width)x\($0.height)" }.joined(separator: ", "))
-        let added = file.addLadder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: steps)
+        let limits = ModeService.framebufferLimits(for: display)
+        let excluded = sizes.filter { limits?.allows(pixelWidth: $0.width * 2, pixelHeight: $0.height * 2) == false }
+        if !excluded.isEmpty, let limits, let w = limits.primarySourceWidth, let h = limits.primarySourceHeight {
+            print("프레임버퍼 소스 한도 \(w) x \(h)를 넘는 단계 제외: " + excluded.map { "\($0.width)x\($0.height)" }.joined(separator: ", "))
+        }
+        let added = file.addLadder(nativeWidth: native.pixelWidth, nativeHeight: native.pixelHeight, steps: steps, limits: limits)
         guard added > 0 else {
             print("추가할 항목 없음 (이미 등록됨)")
             return
