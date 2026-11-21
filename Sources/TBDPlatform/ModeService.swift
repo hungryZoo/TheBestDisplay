@@ -13,7 +13,11 @@ public enum DisplayChangeError: Error, LocalizedError, Equatable {
         case .unavailable(let reason): "사용할 수 없는 기능: \(reason)"
         case .displayNotFound: "대상 디스플레이를 찾을 수 없음"
         case .modeNotFound(let text): "일치하는 모드 없음: \(text)"
-        case .system(let operation, let code): "\(operation) 실패 (오류 코드 \(code))"
+        case .system(let operation, let code):
+            // 권한 부족은 원인과 대처를 함께 안내. (T72: macOS 27에서 색 모드 지정이 일반 권한 프로세스에 거부됨)
+            SystemErrorCode.isPermissionDenied(code)
+                ? "\(operation) 실패: 시스템이 거부함. \(SystemErrorCode.describe(code)). 이 macOS 판에서는 일반 권한의 앱이 이 설정을 바꿀 수 없음"
+                : "\(operation) 실패: \(SystemErrorCode.describe(code))"
         }
     }
 }
