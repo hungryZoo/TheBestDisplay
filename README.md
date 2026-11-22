@@ -224,7 +224,7 @@ tbdctl diagnose
 | 링크 | 링크 속도와 레인, 대역폭 사용률, 색 형식별 필요 대역폭, DPCD |
 | 밝기 | 밝기, 내장 패널 휘도, 결합 밝기, 자동 밝기, 밝기 동기화, XDR 밝기 업스케일, DDC 기능 |
 | 색 조정 | 디스플레이 프리셋, 색 프로파일, 채도, 소프트웨어 조정, Night Shift, True Tone |
-| 배치 | 위치 편집, 회전, 메인 지정, 미러, 연결 해제 |
+| 배치 | 위치 편집, 회전, 메인 지정, 미러, 연결 해제 (사이드바 오른쪽 클릭과 도구 막대 버튼도 같은 동작) |
 | 연결 진단 | 발견 항목, 포트와 연결 경로, 이벤트 기록, 보고서 내보내기 |
 | 가상 디스플레이 | 가상 디스플레이 추가, 켜기와 끄기, 삭제 |
 | 프로파일 | 현재 구성 저장, 적용, 이름 변경, 삭제, 구성 보호 |
@@ -283,7 +283,7 @@ tbdctl diagnose
 | `tbdctl auto-disconnect [on\|off]` | 외장 연결 시 내장 자동 연결 해제 설정 |
 | `tbdctl reinit <디스플레이>` | 디스플레이 재초기화 (연결 해제 뒤 재연결) |
 | `tbdctl disconnect <디스플레이> [--timeout <초>] [--yes]` | 논리적 연결 해제 |
-| `tbdctl reconnect [<디스플레이 ID>]` | 연결 해제한 디스플레이 재연결 |
+| `tbdctl reconnect [<디스플레이 ID 또는 이름>]` | 연결 해제한 디스플레이 재연결. 생략하면 온라인이 아닌 디스플레이 전부 |
 | `tbdctl virtual <폭>x<높이> [--hidpi] [--hdr] [--name <이름>] [--seconds <초>]` | 가상 디스플레이 생성과 유지 |
 | `tbdctl profile <list\|show\|save\|apply\|rename\|delete> [<이름>] [<새 이름>] [--replace] [--timeout <초>] [--yes]` | 구성 프로파일 |
 | `tbdctl profile check <이름>` | 프로파일과 현재 구성의 차이 조회 |
@@ -331,6 +331,7 @@ tbdctl diagnose
 | `protection.json` | 구성 보호 대상 프로파일과 보호 항목. 보호를 끄면 삭제 |
 | `mode-favorites.json` | 디스플레이별 즐겨찾기 모드 |
 | `auto-disconnect.json` | 내장 자동 연결 해제 설정과 해제해 둔 내장 디스플레이 ID |
+| `disconnected.json` | 이 앱에서 연결 해제해 둔 디스플레이 기록 (ID, 이름, 해제 시각). 재연결되면 삭제 |
 | `hdr-profiles.json` | 디스플레이별 SDR과 HDR 상태의 색 프로파일 지정 |
 | `luminance-reference.json` | 디스플레이별 최대 휘도 기준값 |
 | `saturation.json`, `Profiles/` | 채도 조정의 기준 프로파일 기록과 만들어 지정한 색 프로파일 파일 |
@@ -353,7 +354,7 @@ tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 135건 중 통과 130건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 검증 결과 | TC 137건 중 통과 132건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
 | 참고 제품 기능 대조 | 58행 중 구현 52행, 부분 4행, 미구현 2행 (`docs/COVERAGE.md`) |
 
 ### 제약

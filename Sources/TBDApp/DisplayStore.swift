@@ -82,8 +82,8 @@ final class DisplayStore {
 
     func refresh() {
         snapshot = DisplayCatalog.snapshot()
-        // 다시 온라인이 된 디스플레이는 연결 해제 목록에서 제거.
-        for display in snapshot.displays { disconnected[display.id] = nil }
+        // 연결 해제 목록은 기록 파일 기준: 앱을 다시 열어도 유지, 다시 온라인이 된 디스플레이는 빠짐. (SRS-ARR-008)
+        disconnected = Dictionary(ArrangementService.disconnectedDisplays().map { ($0.displayID, $0.name) }, uniquingKeysWith: { first, _ in first })
         edidRecords = Dictionary(EDIDSource.records(for: snapshot.displays).map { ($0.displayID, $0) }, uniquingKeysWith: { first, _ in first })
         var allModes: [UInt32: [DisplayMode]] = [:]
         var current: [UInt32: DisplayMode] = [:]
@@ -244,16 +244,30 @@ final class DisplayStore {
         )
     }
 
-    func rememberDisconnected(_ display: DisplaySummary) {
-        disconnected[display.id] = display.identity.name
+    /// 연결 해제 요청. 확인 창과 자동 복귀를 거침. 거부 사유가 있으면 요청하지 않고 사유 반환. (PRD-ARR-010)
+    @discardableResult
+    func requestDisconnect(_ display: DisplaySummary, changes: ChangeController) -> String? {
+        if let refusal = ArrangementPlanner.disconnectRefusal(display.id, online: displays.map(\.id)) { return refusal }
+        // 해제된 디스플레이는 온라인 목록에서 사라지므로 대상 사라짐 감시는 사용하지 않음.
+        changes.request(DisplayChanges.disconnectChange(display: display), targetDisplayID: nil)
+        return nil
+    }
+
+    /// 연결 해제해 둔 디스플레이 전체 재연결. 실패한 디스플레이의 이름 반환.
+    func reconnectAll() -> [String] {
+        var failed: [String] = []
+        for (id, name) in disconnected.sorted(by: { $0.key < $1.key }) {
+            do { try ArrangementService.reconnect(id, timeout: 8) } catch { failed.append(name) }
+        }
+        refresh()
+        return failed
     }
 
     /// 연결 해제한 디스플레이 재연결. 실패 사유 반환.
     func reconnect(_ id: UInt32) -> String? {
         do {
             try ArrangementService.reconnect(id, timeout: 8)
-            disconnected[id] = nil
-            scheduleRefresh()
+            refresh()
             return nil
         } catch {
             scheduleRefresh()

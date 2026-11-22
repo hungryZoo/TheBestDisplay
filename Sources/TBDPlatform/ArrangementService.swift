@@ -93,6 +93,11 @@ public enum ArrangementService {
         return knownDisplayIDs(symbols: symbols).filter { !online.contains($0) }
     }
 
+    /// 이 앱이 연결 해제해 둔 디스플레이 목록. 다시 온라인이 된 항목과 시스템이 잊은 항목은 제외. (SRS-ARR-008)
+    public static func disconnectedDisplays(store: DisconnectedDisplayStore = .standard, symbols: PrivateSymbols = .shared) -> [DisconnectedDisplayRecord] {
+        store.current(online: DisplayCatalog.onlineDisplayIDs(), known: knownDisplayIDs(symbols: symbols))
+    }
+
     static func setEnabled(_ enabled: Bool, display: CGDirectDisplayID, symbols: PrivateSymbols) throws {
         guard let configure = symbols.function("SLSConfigureDisplayEnabled", in: .skyLight, as: ConfigureEnabledFn.self) else {
             throw DisplayChangeError.unavailable("SLSConfigureDisplayEnabled 없음")

@@ -120,7 +120,11 @@ public enum DisplayChanges {
         return RevertCoordinator.Change(
             summary: "\(name): 연결 해제",
             pending: PendingRevert(createdAt: Date(), summary: "\(name) 재연결", actions: [.reconnect(displayID: displayID, name: name)]),
-            apply: { try ArrangementService.disconnect(displayID) },
+            apply: {
+                try ArrangementService.disconnect(displayID)
+                // 창 앱과 명령이 함께 쓰는 기록. 재연결되면 목록 조회 때 빠짐. (SRS-ARR-008)
+                try? DisconnectedDisplayStore.standard.remember(DisconnectedDisplayRecord(displayID: displayID, name: name, isBuiltin: display.identity.isBuiltin, disconnectedAt: Date()))
+            },
             commit: {},
             restore: { try ArrangementService.reconnect(displayID) }
         )

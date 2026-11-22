@@ -105,14 +105,10 @@ struct ArrangementTab: View {
                     .help("화면이 이상하게 나오거나 설정이 반영되지 않을 때 디스플레이를 다시 구성. 몇 초 동안 화면이 꺼짐")
                 }
                 LabeledContent("논리적 연결 해제") {
-                    Button("연결 해제") {
-                        // 해제된 디스플레이는 온라인 목록에서 사라지므로 대상 사라짐 감시는 사용하지 않음.
-                        store.rememberDisconnected(display)
-                        changes.request(DisplayChanges.disconnectChange(display: display), targetDisplayID: nil)
-                    }
+                    Button("연결 해제") { store.requestDisconnect(display, changes: changes) }
                     .disabled(refusal != nil || changes.isBusy)
                 }
-                Text(refusal ?? "케이블을 뽑지 않고 디스플레이를 시스템에서 분리. 창은 남은 디스플레이로 이동. 재연결은 사이드바의 연결 해제됨 항목 또는 케이블 재연결")
+                Text(refusal ?? "케이블을 뽑지 않고 디스플레이를 시스템에서 분리. 창은 남은 디스플레이로 이동. 재연결은 사이드바의 연결 해제됨 항목 또는 케이블 재연결. 사이드바의 디스플레이 오른쪽 클릭과 도구 막대의 연결 해제 버튼도 같은 동작")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

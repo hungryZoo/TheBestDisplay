@@ -140,6 +140,10 @@ case "list":
             print("\(index + 1). \(d.identity.name) [id:\(d.identity.displayID)] (\(tags.joined(separator: ", ")))")
             print("   \(d.modeDescription), 픽셀 \(d.pixelWidth) x \(d.pixelHeight), 위치 (\(d.originX), \(d.originY))")
         }
+        // 이 앱에서 연결 해제해 둔 디스플레이. (PRD-ARR-010)
+        for record in ArrangementService.disconnectedDisplays() {
+            print("연결 해제됨: \(record.name) [id:\(record.displayID)] (재연결: tbdctl reconnect id:\(record.displayID))")
+        }
     }
 
 case "capabilities":

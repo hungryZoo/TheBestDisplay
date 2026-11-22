@@ -1,5 +1,6 @@
 import SwiftUI
 import TBDCore
+import TBDPlatform
 
 /// 사이드바 선택 항목.
 enum SidebarItem: Hashable {
@@ -25,6 +26,16 @@ struct ContentView: View {
                     ForEach(store.displays) { display in
                         DisplayRow(display: display)
                             .tag(SidebarItem.display(display.id))
+                            .contextMenu {
+                                let refusal = ArrangementPlanner.disconnectRefusal(display.id, online: store.displays.map(\.id))
+                                Button("연결 해제") { store.requestDisconnect(display, changes: changes) }
+                                    .disabled(refusal != nil || changes.isBusy)
+                                Button("연결 해제 뒤 재연결 (재초기화)") {
+                                    do { try ArrangementService.reinitialize(display.id) } catch { reconnectFailure = RevertCoordinator.describe(error) }
+                                    store.scheduleRefresh()
+                                }
+                                .disabled(refusal != nil || changes.isBusy)
+                            }
                     }
                     if store.displays.isEmpty {
                         Text("온라인 디스플레이 없음")
@@ -32,7 +43,7 @@ struct ContentView: View {
                     }
                 }
                 if !store.disconnected.isEmpty {
-                    Section("연결 해제됨") {
+                    Section {
                         ForEach(store.disconnected.sorted(by: { $0.key < $1.key }), id: \.key) { id, name in
                             HStack {
                                 Label(name, systemImage: "display.trianglebadge.exclamationmark")
@@ -40,6 +51,18 @@ struct ContentView: View {
                                 Spacer()
                                 Button("재연결") {
                                     if let failure = store.reconnect(id) { reconnectFailure = failure }
+                                }
+                                .controlSize(.small)
+                            }
+                        }
+                    } header: {
+                        HStack {
+                            Text("연결 해제됨")
+                            Spacer()
+                            if store.disconnected.count > 1 {
+                                Button("모두 재연결") {
+                                    let failed = store.reconnectAll()
+                                    if !failed.isEmpty { reconnectFailure = "재연결되지 않은 디스플레이: " + failed.joined(separator: ", ") }
                                 }
                                 .controlSize(.small)
                             }
@@ -82,6 +105,15 @@ struct ContentView: View {
             ToolbarItem {
                 Button("새로 고침", systemImage: "arrow.clockwise") { store.refresh() }
                     .help("디스플레이 상태 다시 읽기 (Command + R)")
+            }
+            // 선택한 디스플레이의 논리적 연결 해제. (PRD-ARR-010)
+            if case .display(let id) = selection, let display = store.display(id: id) {
+                ToolbarItem {
+                    let refusal = ArrangementPlanner.disconnectRefusal(display.id, online: store.displays.map(\.id))
+                    Button("연결 해제", systemImage: "eject") { store.requestDisconnect(display, changes: changes) }
+                        .disabled(refusal != nil || changes.isBusy)
+                        .help(refusal ?? "케이블을 뽑지 않고 \(display.identity.name)을(를) 시스템에서 분리. 재연결은 사이드바의 연결 해제됨 항목")
+                }
             }
         }
         .onAppear(perform: selectDefault)

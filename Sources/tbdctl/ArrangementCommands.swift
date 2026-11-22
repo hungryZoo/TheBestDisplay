@@ -129,11 +129,15 @@ func runDisconnect(_ command: ParsedCommand) {
 func runReconnect(_ command: ParsedCommand) {
     var targets = ArrangementService.offlineDisplayIDs()
     if let text = command.positionals.first {
-        guard let id = UInt32(text.lowercased().replacingOccurrences(of: "id:", with: "")) else {
-            writeError("오류: 디스플레이 ID는 숫자")
+        if let id = UInt32(text.lowercased().replacingOccurrences(of: "id:", with: "")) {
+            targets = [id]
+        } else if let record = DisconnectedDisplayList.resolve(text, in: ArrangementService.disconnectedDisplays()) {
+            // 이 앱에서 해제한 디스플레이는 이름으로도 지정 가능.
+            targets = [record.displayID]
+        } else {
+            writeError("오류: 재연결 대상은 디스플레이 ID 또는 연결 해제해 둔 디스플레이의 이름. `tbdctl list`로 확인")
             exit(.usage)
         }
-        targets = [id]
     }
     if targets.isEmpty {
         print("재연결할 디스플레이 없음")
