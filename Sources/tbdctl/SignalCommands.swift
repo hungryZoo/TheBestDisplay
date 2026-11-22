@@ -12,6 +12,8 @@ struct SignalOutput: Encodable {
     var linkData: VideoLinkData?
     var selectableColorModes: [ColorElement]
     var dsc: DSCAssessment
+    /// 시스템 출력 모드 목록. 조회 불가 시 생략. (PRD-COL-010)
+    var outputModes: OutputModeList?
     var timings: [TimingElement]?
 }
 
@@ -37,6 +39,7 @@ func runSignal(_ command: ParsedCommand, json: Bool) {
             currentTimingID: info.currentTimingID, currentColorID: info.currentColorID,
             currentTiming: timing, currentColor: current, linkData: info.linkData,
             selectableColorModes: info.selectableColorModes, dsc: dsc,
+            outputModes: OutputModeService.list(for: display.id),
             timings: command.has("--timings") ? info.timings : nil
         ))
         return
@@ -60,14 +63,22 @@ func runSignal(_ command: ParsedCommand, json: Bool) {
         print("심도 비교: \(DepthComparison.note(framebufferBits: mode.bitsPerSample, linkBits: bits))")
     }
     print("DSC: \(dsc.summary). 소스 \(describe(dsc.sourceSupportsDSC)), 싱크 \(describe(dsc.sinkSupportsDSC)). DSC 필요 모드 \(dsc.dscRequiredModeCount)개, 불필요 모드 \(dsc.dscFreeModeCount)개")
+    let offered = OutputModeService.list(for: display.id)
     print("선택 가능한 색 모드 \(info.selectableColorModes.count)개 (현재 타이밍 기준)")
     for element in info.selectableColorModes.sorted(by: colorOrder) {
         var tags: [String] = []
         if element.id == info.currentColorID { tags.append("현재") }
         if timing?.requiresDSC(element.id) == true { tags.append("DSC") }
         if timing?.unsafeColorElementIDs.contains(element.id) == true { tags.append("안전하지 않음") }
+        if offered?.offers(element) == true { tags.append("시스템 제공") }
         let idText = "id:\(element.id)".padding(toLength: 7, withPad: " ", startingAt: 0)
         print("  \(idText) \(element.label), \(Colorimetry.name(element.colorimetry))\(tags.isEmpty ? "" : "  [\(tags.joined(separator: ", "))]")")
+    }
+    if let offered {
+        print("시스템 출력 모드 \(offered.modes.count)개 (현재 모드 기준)")
+        for (index, mode) in offered.modes.enumerated() {
+            print("  \(index + 1). \(mode.label)\(index == offered.currentIndex ? "  [현재]" : "")")
+        }
     }
     if command.has("--timings") {
         print("타이밍 \(info.timings.count)개")

@@ -123,7 +123,31 @@ public enum SignalService {
     }
 
     /// 색 모드 전환. 타이밍 ID는 현재 값을 유지. (SRS-COL-003)
+    /// 프레임버퍼 경로가 권한 부족으로 거부되면 윈도 서버의 출력 모드 경로로 대체. (SRS-COL-011)
     public static func setColorMode(colorID: Int, timingID: Int, for display: DisplaySummary, symbols: PrivateSymbols = .shared) throws {
+        do {
+            try setDigitalOutMode(colorID: colorID, timingID: timingID, for: display, symbols: symbols)
+        } catch let error as DisplayChangeError {
+            guard case .system(_, let code) = error, SystemErrorCode.isPermissionDenied(code) else { throw error }
+            try setColorModeThroughOutputMode(colorID: colorID, timingID: timingID, for: display, cause: error, symbols: symbols)
+        }
+    }
+
+    /// 윈도 서버의 출력 모드로 색 모드 전환. 타이밍 변경은 이 경로로 불가하므로 현재 타이밍일 때만 수행.
+    /// 대체할 수 없으면 원래 오류(`cause`)를 던짐.
+    static func setColorModeThroughOutputMode(colorID: Int, timingID: Int, for display: DisplaySummary, cause: DisplayChangeError, symbols: PrivateSymbols) throws {
+        guard let info = signalInfo(for: display, symbols: symbols), info.currentTimingID == timingID,
+              let element = info.currentTiming?.colorModes.first(where: { $0.id == colorID }),
+              let offered = OutputModeService.list(for: display.id, symbols: symbols)
+        else { throw cause }
+        guard let mode = offered.mode(matching: element.descriptor) else {
+            throw DisplayChangeError.unavailable("이 macOS 판은 시스템 출력 모드 목록의 형식으로만 전환 가능. 요청 형식: \(element.label). 제공 형식: \(offered.summary)")
+        }
+        try OutputModeService.set(mode, for: display.id, symbols: symbols)
+    }
+
+    /// 프레임버퍼의 디지털 출력 모드 직접 지정.
+    static func setDigitalOutMode(colorID: Int, timingID: Int, for display: DisplaySummary, symbols: PrivateSymbols) throws {
         guard let set = symbols.function("IOMobileFramebufferSetDigitalOutMode", in: .ioMobileFramebuffer, as: SetModeFn.self) else {
             throw DisplayChangeError.unavailable("IOMobileFramebufferSetDigitalOutMode 없음")
         }

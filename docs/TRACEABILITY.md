@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 55 |
-| PRD 요구사항 | 117 |
-| SRS 설계 요구사항 | 87 |
-| TC | 132 |
+| PRD 요구사항 | 118 |
+| SRS 설계 요구사항 | 88 |
+| TC | 134 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -51,13 +51,14 @@
 | PRD-MOD-016 | P7 | 권장 | MRD-SCP-003 | SRS-MOD-011 | TC-MOD-019, TC-MOD-020 | `Sources/TBDCore/DisplayOverrideKeys.swift`<br>`Sources/TBDApp/Views/DisplayOverrideKeysSection.swift`<br>`Sources/tbdctl/OverrideCommand.swift` | 통과 2 |
 | PRD-COL-001 | P2 | 필수 | MRD-SCP-004, MRD-PRB-002, MRD-KPI-002 | SRS-COL-002 | TC-COL-002 | `Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-002 | P2 | 필수 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/Signal.swift` | 통과 1 |
-| PRD-COL-003 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-003, SRS-COL-010 | TC-COL-004, TC-COL-012 | `Sources/TBDCore/SystemErrorCode.swift`<br>`Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 2 |
+| PRD-COL-003 | P2 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-003, SRS-COL-010, SRS-COL-011 | TC-COL-004, TC-COL-012, TC-COL-014 | `Sources/TBDCore/OutputMode.swift`<br>`Sources/TBDPlatform/OutputModeService.swift`<br>`Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDApp/Views/ColorModeTab.swift`<br>`Sources/tbdctl/SignalCommands.swift`<br>`Sources/TBDCore/SystemErrorCode.swift`<br>`Sources/TBDPlatform/ModeService.swift`<br>`Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDPlatform/DisplayChanges.swift` | 통과 3 |
 | PRD-COL-004 | P2 | 필수 | MRD-SCP-004 | SRS-COL-004 | TC-COL-005 | `Sources/TBDCore/DSCAssessment.swift` | 통과 1 |
 | PRD-COL-005 | P2 | 권장 | MRD-SCP-004 | SRS-COL-001 | TC-COL-001 | `Sources/TBDCore/Signal.swift` | 통과 1 |
 | PRD-COL-006 | P6 | 필수 | MRD-SCP-004 | SRS-COL-006 | TC-COL-006, TC-COL-007 | `Sources/TBDCore/DSCControl.swift` | 보류 1, 통과 1 |
 | PRD-COL-007 | P6 | 권장 | MRD-SCP-004 | SRS-COL-007 | TC-COL-008, TC-COL-009 | `Sources/TBDCore/TimingSelection.swift`<br>`Sources/TBDPlatform/SignalService.swift` | 통과 2 |
 | PRD-COL-008 | P6 | 권장 | MRD-SCP-004 | SRS-COL-008 | TC-COL-010 | `Sources/TBDPlatform/DitherService.swift` | 통과 1 |
 | PRD-COL-009 | P6 | 권장 | MRD-SCP-004 | SRS-COL-009 | TC-COL-011 | `Sources/TBDCore/Signal.swift`<br>`Sources/TBDApp/Views/ResolutionTab.swift` | 통과 1 |
+| PRD-COL-010 | P7 | 필수 | MRD-SCP-004, MRD-SCN-001 | SRS-COL-011 | TC-COL-013, TC-COL-014 | `Sources/TBDCore/OutputMode.swift`<br>`Sources/TBDPlatform/OutputModeService.swift`<br>`Sources/TBDPlatform/SignalService.swift`<br>`Sources/TBDApp/Views/ColorModeTab.swift`<br>`Sources/tbdctl/SignalCommands.swift` | 통과 2 |
 | PRD-HDR-001 | P2 | 필수 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-001 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
 | PRD-HDR-002 | P2 | 필수 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-002 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |
 | PRD-HDR-003 | P2 | 권장 | MRD-SCP-005 | SRS-HDR-001 | TC-HDR-001 | `Sources/TBDPlatform/HDRService.swift` | 통과 1 |

@@ -33,6 +33,9 @@ struct ColorModeTab: View {
     @State private var rangeFilter: RangeFilter = .all
     @State private var dscFilter: DSCFilter = .all
     @State private var dither: Bool?
+    /// 시스템 출력 모드 목록. 프레임버퍼 직접 지정이 거부되는 macOS 판에서 전환 가능한 형식의 기준. (PRD-COL-010)
+    @State private var outputModes: OutputModeList?
+    @State private var offeredOnly = true
     @State private var ditherMessage: String?
 
     var body: some View {
@@ -46,6 +49,9 @@ struct ColorModeTab: View {
             }
             .formStyle(.grouped)
             .task(id: display.id) { dither = DitherService.isEnabled(for: display) }
+            .task(id: OutputModeKey(display: display.id, timing: info.currentTimingID, color: info.currentColorID, mode: display.modeDescription)) {
+                outputModes = OutputModeService.list(for: display.id)
+            }
         } else {
             ContentUnavailableView("신호 정보를 읽을 수 없음", systemImage: "waveform.slash", description: Text("이 디스플레이의 프레임버퍼 노드를 찾지 못함"))
         }
@@ -180,6 +186,7 @@ struct ColorModeTab: View {
             case .sdr: if element.eotf.isHDR { return false }
             case .hdr: if !element.eotf.isHDR { return false }
             }
+            if offeredOnly, let outputModes, element.id != info.currentColorID, !outputModes.offers(element) { return false }
             let needsDSC = timing?.requiresDSC(element.id) ?? false
             switch dscFilter {
             case .all: return true
@@ -206,6 +213,10 @@ struct ColorModeTab: View {
                 .labelsHidden()
                 .fixedSize()
             }
+            if outputModes != nil {
+                Toggle("시스템 제공 형식만 표시", isOn: $offeredOnly)
+                    .help("시스템 출력 모드 목록에 있는 형식만 표시. 이 macOS 판에서 전환 가능한 형식")
+            }
             if elements.isEmpty {
                 Text("조건에 맞는 색 모드 없음").foregroundStyle(.secondary)
             }
@@ -216,6 +227,7 @@ struct ColorModeTab: View {
                     needsDSC: timing?.requiresDSC(element.id) ?? false,
                     isUnsafe: timing?.unsafeColorElementIDs.contains(element.id) ?? false,
                     isMismatched: store.hdrStatuses[display.id]?.isMismatched(with: element.eotf) ?? false,
+                    isOffered: outputModes?.offers(element) ?? false,
                     isDisabled: changes.isBusy || !store.status(.signalWrite).isAvailable
                 ) {
                     apply(element, info: info)
@@ -228,6 +240,9 @@ struct ColorModeTab: View {
                 Text("목록은 현재 해상도와 주사율에서 연결이 제공하는 형식. 주사율을 낮추면 선택 가능한 형식이 늘어날 수 있음")
                 Text("해상도나 주사율 변경, 재연결 뒤에는 시스템이 색 모드를 선호값으로 되돌릴 수 있음")
                 Text("HDR 불일치 표시가 있는 형식은 현재 HDR 상태와 전달 함수가 달라 화면 이상 가능. HDR 전환을 먼저 권장")
+                if let outputModes {
+                    Text("시스템 제공 표시는 시스템 출력 모드 목록(\(outputModes.modes.count)개)에 있는 형식. macOS 27은 그 밖의 형식 지정을 거부하고, 색 공간은 시스템이 정함")
+                }
                 if let reason = store.status(.signalWrite).unavailableReason { Text(reason) }
             }
             .font(.caption)
@@ -289,12 +304,21 @@ struct ColorModeTab: View {
     }
 }
 
+/// 출력 모드 목록을 다시 읽는 조건: 디스플레이, 타이밍, 색 모드, 해상도 모드 중 하나가 바뀜.
+private struct OutputModeKey: Hashable {
+    var display: UInt32
+    var timing: Int?
+    var color: Int?
+    var mode: String
+}
+
 private struct ColorModeRow: View {
     let element: ColorElement
     let isCurrent: Bool
     let needsDSC: Bool
     let isUnsafe: Bool
     let isMismatched: Bool
+    var isOffered = false
     let isDisabled: Bool
     let select: () -> Void
 
@@ -309,6 +333,7 @@ private struct ColorModeRow: View {
                     if needsDSC { Badge(text: "DSC", color: .orange) }
                     if isUnsafe { Badge(text: "안전하지 않음", color: .red) }
                     if isMismatched { Badge(text: "HDR 불일치", color: .red) }
+                    if isOffered { Badge(text: "시스템 제공", color: .green) }
                     if isCurrent { Badge(text: "현재", color: .accentColor) }
                 }
                 Text("색 공간 \(Colorimetry.name(element.colorimetry)), 픽셀당 \(ColorModeTab.trim(element.bitsPerPixel))비트, 색 모드 번호 \(element.id)")

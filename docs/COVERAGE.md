@@ -24,7 +24,7 @@
 | 13 | HDR | HDR 토글과 상태 표시 | 구현 | PRD-HDR-001-003, PRD-EDO-006 | 토글, EOTF, 최대 휘도, EDR 헤드룸 제공. HDR 미선언 디스플레이용 EDID HDR 선언 추가 제공: LG TV에서 선언을 뺀 뒤 다시 추가한 EDID로 시스템의 HDR 인식과 켜기 확인 (TC-EDO-008). HDR을 선언하지 않은 실제 디스플레이는 미검증 |
 | 14 | HDR | XDR 프리셋 선택 | 구현 | PRD-CLR-005 |  |
 | 15 | HDR | XDR/HDR 밝기 업스케일 | 구현 | PRD-BRT-005 | 색 테이블 방식. 육안 확인 미수행 |
-| 16 | 색 모드 | RGB 또는 YCbCr, chroma, range, 비트 심도, EOTF 조합 목록과 선택 | 구현 | PRD-COL-002, PRD-COL-003 |  |
+| 16 | 색 모드 | RGB 또는 YCbCr, chroma, range, 비트 심도, EOTF 조합 목록과 선택 | 구현 | PRD-COL-002, PRD-COL-003, PRD-COL-010 | macOS 27은 시스템 출력 모드 목록의 형식만 전환 가능 |
 | 17 | 색 모드 | 선호 모드와 현재 모드 구분 표시, 심도 불일치 안내 | 구현 | PRD-COL-001, PRD-HDR-003, PRD-COL-009 |  |
 | 18 | 색 모드 | 색 모드 유지(변경 감지 후 복원) | 구현 | PRD-PRF-004 | 프로파일 단위 구성 보호. 색 모드 복원 실측 없음 |
 | 19 | 색 모드 | GPU 디더링 토글 | 구현 | PRD-COL-008 | 프레임버퍼 노드의 `enableDither` 속성 사용. 화면의 계조 변화는 측정하지 않음 |
