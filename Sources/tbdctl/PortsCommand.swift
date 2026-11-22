@@ -24,7 +24,7 @@ func runPorts(_ command: ParsedCommand, json: Bool) {
         return
     }
     for path in paths {
-        print("\(path.port.key.label) [\(path.port.portDescription)]")
+        print("\(path.label) [\(path.port.portDescription)]")
         print("  지원 전송: \(path.port.transportsSupported.isEmpty ? "없음" : path.port.transportsSupported.joined(separator: ", "))")
         for step in path.steps {
             let mark: String

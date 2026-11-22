@@ -15,10 +15,10 @@ func runDiagnose(_ command: ParsedCommand, json: Bool) {
     print("포트 점검")
     for d in result.portDiagnoses {
         if d.isIdle {
-            print("  \(d.port.label): 연결 없음")
+            print("  \(d.label): 연결 없음")
             continue
         }
-        print("  \(d.port.label): \(d.isFullyPassed ? "전 단계 통과" : "\(d.firstFailure?.title ?? "") 단계 미통과")")
+        print("  \(d.label): \(d.isFullyPassed ? "전 단계 통과" : "\(d.firstFailure?.title ?? "") 단계 미통과")")
         for c in d.checks {
             let mark = c.result == .pass ? "통과" : c.result == .fail ? "실패" : "생략"
             print("    [\(mark)] \(c.stage.title): \(c.detail)")

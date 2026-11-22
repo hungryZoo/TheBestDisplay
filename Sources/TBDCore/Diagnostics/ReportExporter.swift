@@ -63,7 +63,7 @@ public enum ReportExporter {
         lines.append("[포트 점검]")
         for d in report.result.portDiagnoses {
             let state = d.isIdle ? "연결 없음" : d.isFullyPassed ? "전 단계 통과" : "\(d.firstFailure?.title ?? "") 단계 미통과"
-            lines.append("  \(d.port.label): \(state)")
+            lines.append("  \(d.label): \(state)")
             guard !d.isIdle else { continue }
             for c in d.checks {
                 let mark = c.result == .pass ? "통과" : c.result == .fail ? "실패" : "생략"

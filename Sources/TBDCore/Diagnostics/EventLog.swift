@@ -63,7 +63,14 @@ public struct EventState: Hashable, Sendable {
         var ports: [PortKey: Port] = [:]
         for path in snapshot.paths {
             let link = path.dp.flatMap { $0.hasLink && $0.isActive ? "\($0.linkRateDescription), 레인 \($0.laneCount)개" : nil }
-            ports[path.port.key] = Port(connected: path.port.connectionActive, hpd: path.dp?.hpdAsserted == true || path.port.hpdAsserted == true, link: link)
+            var port = Port(connected: path.port.connectionActive, hpd: path.dp?.hpdAsserted == true || path.port.hpdReported, link: link)
+            // 링크가 여러 개인 포트는 경로가 여러 개: HPD는 하나라도 감지면 참, 링크 표기는 이어 붙임.
+            if let known = ports[path.port.key] {
+                port.hpd = port.hpd || known.hpd
+                let joined = [known.link, link].compactMap { $0 }.joined(separator: " / ")
+                port.link = joined.isEmpty ? nil : joined
+            }
+            ports[path.port.key] = port
         }
         self.displays = displays
         self.ports = ports

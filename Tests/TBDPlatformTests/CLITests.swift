@@ -78,7 +78,7 @@ struct LiveDiagnosisTests {
         #expect(!snapshot.system.osVersion.isEmpty)
         for display in snapshot.displays where !display.summary.identity.isBuiltin {
             let path = try #require(snapshot.paths.first { $0.displayID == display.id }, "경로 없음: \(display.summary.identity.name)")
-            let diagnosis = try #require(result.portDiagnoses.first { $0.port == path.port.key })
+            let diagnosis = try #require(result.portDiagnoses.first { $0.id == path.id })
             #expect(diagnosis.isFullyPassed, "\(diagnosis.checks)")
         }
         // 온라인 디스플레이가 있는 포트에는 오류 등급 발견 항목 없음.

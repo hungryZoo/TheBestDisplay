@@ -314,7 +314,14 @@ struct PortServiceTests {
 
         let displays = DisplayCatalog.displays()
         let paths = ConnectionPathBuilder.build(inventory: inventory, displays: displays)
-        #expect(paths.count == inventory.ports.count)
+        // 포트마다 경로 1개 이상. 활성 DP 링크가 여러 개인 포트(독의 DP 터널 2개 등)는 링크마다 1개.
+        #expect(paths.count >= inventory.ports.count)
+        #expect(Set(paths.map(\.port.portDescription)) == Set(inventory.ports.map(\.portDescription)))
+        #expect(Set(paths.map(\.id)).count == paths.count)
+        // 연결이 없는 USB-C 포트는 컨트롤러에 HPD 값이 남아 있어도 연결로 보지 않음.
+        for path in paths where path.port.key.type == "USB-C" && !path.port.connectionActive && path.dp?.hpdAsserted != true {
+            #expect(!path.isConnected, "\(path.port.portDescription)")
+        }
         // 외장 디스플레이마다 경로 1개가 도달.
         for display in displays where !display.identity.isBuiltin {
             let reaching = paths.filter { $0.displayID == display.id }

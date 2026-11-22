@@ -68,8 +68,19 @@ public struct PortDiagnosis: Codable, Hashable, Sendable, Identifiable {
 
     public var port: PortKey
     public var checks: [Check]
+    /// 대응하는 연결 경로의 ID. 링크가 여러 개인 포트의 구분에 사용.
+    public var pathID: String?
+    /// 표시 이름. 링크가 여러 개인 포트는 디스플레이 이름 포함.
+    public var label: String
 
-    public var id: String { "\(port.type)-\(port.number)" }
+    public init(port: PortKey, checks: [Check], pathID: String? = nil, label: String? = nil) {
+        self.port = port
+        self.checks = checks
+        self.pathID = pathID
+        self.label = label ?? port.label
+    }
+
+    public var id: String { pathID ?? "\(port.type)-\(port.number)" }
     public var firstFailure: Stage? { checks.first { $0.result == .fail }?.stage }
     public var isFullyPassed: Bool { checks.allSatisfy { $0.result == .pass } }
     /// 포트에 아무것도 연결되지 않아 점검 대상이 아닌 경우.
@@ -123,9 +134,9 @@ public enum DiagnosticEngine {
             }
         }
         let dp = path.dp
-        let physical = path.port.connectionActive || path.port.hpdAsserted == true || dp?.hpdAsserted == true
+        let physical = path.port.connectionActive || path.port.hpdReported || dp?.hpdAsserted == true
         add(.physical, physical, pass: "연결 감지" + (path.port.partnerManufacturer.map { " (상대 장치: \($0))" } ?? ""), fail: "연결된 장치 없음")
-        let hpd = dp?.hpdAsserted == true || path.port.hpdAsserted == true
+        let hpd = dp?.hpdAsserted == true || path.port.hpdReported
         add(.hpd, hpd, pass: "디스플레이 연결 신호 감지" + (dp.map { " (\($0.hpdDescription))" } ?? ""), fail: "디스플레이 연결 신호 없음")
         let edidBytes = dp?.edid?.count ?? 0
         add(.edid, edidBytes >= 128, pass: "\(edidBytes)바이트 수신" + (dp?.productName.map { " (\($0))" } ?? ""), fail: "EDID 미수신")
@@ -138,7 +149,7 @@ public enum DiagnosticEngine {
         }
         add(.framebuffer, attached, pass: "디스플레이 파이프 할당됨", fail: "링크는 수립되었으나 디스플레이 파이프 미할당")
         add(.online, path.reachesDisplay, pass: path.displayName.map { "\($0) 온라인" } ?? "온라인", fail: "시스템의 온라인 디스플레이 목록에 없음")
-        return PortDiagnosis(port: path.port.key, checks: checks)
+        return PortDiagnosis(port: path.port.key, checks: checks, pathID: path.id, label: path.label)
     }
 
     static func portFindings(path: ConnectionPath, diagnosis: PortDiagnosis, snapshot: DiagnosticSnapshot) -> [Finding] {

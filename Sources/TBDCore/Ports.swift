@@ -43,6 +43,10 @@ public struct PortInfo: Codable, Hashable, Sendable, Identifiable {
     public var plugEventCount: Int?
     public var connectionCount: Int?
     public var overcurrentCount: Int?
+    /// 포트 컨트롤러의 HPD 보고를 인정할지. USB-C 포트는 분리 뒤에도 값이 남는 경우가 있어 연결이 활성일 때만 인정.
+    /// (T74 실측: `ConnectionActive` No, `HPDAsserted` Yes인 빈 포트)
+    public var hpdReported: Bool { hpdAsserted == true && (connectionActive || key.type != "USB-C") }
+
     /// 플러그 방향 원시 값. 연결이 없으면 0, 연결 시 1 또는 2 (실측: 연결된 포트에서 2). 없는 포트 종류는 nil. (PRD-PRT-004)
     public var plugOrientation: Int?
 
@@ -517,12 +521,19 @@ public struct ConnectionPath: Codable, Hashable, Sendable, Identifiable {
     public var displayID: UInt32?
     public var displayName: String?
     public var steps: [PathStep]
+    /// 포트 1개에 활성 DP 링크가 여러 개일 때(독의 DP 터널 2개 등) 그 순번. 링크가 1개 이하면 nil.
+    public var linkIndex: Int?
 
-    public var id: String { port.portDescription }
+    public var id: String { linkIndex.map { "\(port.portDescription)#\($0)" } ?? port.portDescription }
+    /// 표시 이름. 링크가 여러 개인 포트는 디스플레이 이름을 덧붙임. 예: "USB-C 4번 (Legion 27-10)"
+    public var label: String {
+        guard let linkIndex else { return port.key.label }
+        return "\(port.key.label) (\(displayName ?? dp?.productName ?? "링크 \(linkIndex + 1)"))"
+    }
     /// 디스플레이까지 이어진 경로인지.
     public var reachesDisplay: Bool { displayID != nil }
     /// 포트에 무언가 연결되었는지.
-    public var isConnected: Bool { port.connectionActive || port.hpdAsserted == true || dp?.hpdAsserted == true }
+    public var isConnected: Bool { port.connectionActive || port.hpdReported || dp?.hpdAsserted == true }
 
     /// 한 줄 요약. 예: "USB-C 4번 → Parade Technologies PS9010 → HBR3 x 4 → LG TV SSCR2"
     public var summary: String {
@@ -531,31 +542,37 @@ public struct ConnectionPath: Codable, Hashable, Sendable, Identifiable {
 }
 
 public enum ConnectionPathBuilder {
-    /// 포트마다 연결 경로 1개 구성. 디스플레이 대응은 전송 상태의 제품 정보와 디스플레이 식별 정보 대조.
+    /// 포트마다 연결 경로 구성. 활성 DP 링크가 여러 개인 포트는 링크마다 경로 1개.
+    /// 디스플레이 대응은 전송 상태의 제품 정보와 디스플레이 식별 정보 대조.
     public static func build(inventory: PortInventory, displays: [DisplaySummary]) -> [ConnectionPath] {
-        inventory.ports.map { port in
+        inventory.ports.flatMap { port -> [ConnectionPath] in
             let cable = inventory.cables.first { $0.port == port.key }
             let cio = inventory.cioStates.first { $0.port == port.key && $0.isActive } ?? inventory.cioStates.first { $0.port == port.key }
             let usb = inventory.usbStates.filter { $0.port == port.key && $0.isActive }
             let candidates = inventory.dpStates.filter { $0.parentPortType == port.key.type && $0.parentPortNumber == port.key.number }
-            let dp = candidates.first(where: \.isActive) ?? candidates.first(where: \.hpdAsserted) ?? candidates.first
+            let active = candidates.filter(\.isActive).sorted { $0.transportDescription < $1.transportDescription }
+            // 활성 링크가 2개 이상이면 전부, 아니면 대표 1개 (활성, HPD 감지, 첫 항목 순서).
+            let links: [DPTransportState?] = active.count > 1 ? active : [active.first ?? candidates.first(where: \.hpdAsserted) ?? candidates.first]
             let externals = displays.filter { !$0.identity.isBuiltin }
-            var display: DisplaySummary?
-            if let dp, dp.isActive {
-                let activeCount = inventory.dpStates.filter(\.isActive).count
-                display = externals.first { dp.matches($0.identity) } ?? (activeCount == 1 && externals.count == 1 ? externals.first : nil)
+            let activeCount = inventory.dpStates.filter(\.isActive).count
+            return links.enumerated().map { index, dp in
+                var display: DisplaySummary?
+                if let dp, dp.isActive {
+                    display = externals.first { dp.matches($0.identity) } ?? (activeCount == 1 && externals.count == 1 ? externals.first : nil)
+                }
+                return ConnectionPath(
+                    port: port, cable: cable, cio: cio, usb: usb, dp: dp,
+                    displayID: display?.id, displayName: display?.identity.name,
+                    steps: steps(port: port, cable: cable, cio: cio, usb: usb, dp: dp, display: display, phy: port.key.type == "USB-C" ? inventory.phys.first { $0.portNumber == port.key.number } : nil),
+                    linkIndex: links.count > 1 ? index : nil
+                )
             }
-            return ConnectionPath(
-                port: port, cable: cable, cio: cio, usb: usb, dp: dp,
-                displayID: display?.id, displayName: display?.identity.name,
-                steps: steps(port: port, cable: cable, cio: cio, usb: usb, dp: dp, display: display, phy: port.key.type == "USB-C" ? inventory.phys.first { $0.portNumber == port.key.number } : nil)
-            )
         }
     }
 
     static func steps(port: PortInfo, cable: CableEMarker?, cio: CIOState?, usb: [USBState], dp: DPTransportState?, display: DisplaySummary?, phy: PhyInfo? = nil) -> [PathStep] {
         var result: [PathStep] = []
-        let connected = port.connectionActive || port.hpdAsserted == true || dp?.hpdAsserted == true
+        let connected = port.connectionActive || port.hpdReported || dp?.hpdAsserted == true
 
         // (1) 포트
         var portDetail = connected ? "연결 감지" : "연결 없음"

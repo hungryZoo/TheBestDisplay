@@ -143,6 +143,45 @@ struct ConnectionPathTests {
         #expect(path.steps.prefix(3).allSatisfy { $0.status == .ok })
     }
 
+    /// T74 실측 구성: 독 1개의 DP 터널 2개에 디스플레이 2대, 빈 USB-C 포트에 HPD 값이 남음.
+    @Test func 포트_하나에_링크_여러_개와_남은_HPD_값() throws {
+        var inventory = try RegistryFixture.inventory(RegistryFixture.normal)
+        var second = try #require(inventory.dpStates.first { $0.isActive })
+        second.transportDescription = "Port-USB-C@4/CIO/DisplayPort@9"
+        second.productName = "Legion 27-10"
+        second.productID = 26821
+        second.serialNumber = 0
+        second.edid = nil
+        inventory.dpStates.append(second)
+        let stale = try #require(inventory.ports.firstIndex { $0.key == PortKey(type: "USB-C", number: 1) })
+        inventory.ports[stale].hpdAsserted = true
+        let legion = DisplaySummary(
+            identity: DisplayIdentity(displayID: 3, uuid: "TESTUUID3", vendorID: 12462, productID: 26821, serialNumber: 0, name: "Legion 27-10", isBuiltin: false),
+            isMain: false, isActive: true, mirrorsDisplayID: nil, pointWidth: 720, pointHeight: 1280, pixelWidth: 1440, pixelHeight: 2560,
+            refreshRate: 120, rotationDegrees: 270, originX: 2304, originY: 0, physicalWidthMM: 338, physicalHeightMM: 602
+        )
+        let paths = ConnectionPathBuilder.build(inventory: inventory, displays: [RegistryFixture.lgTV, RegistryFixture.builtin, legion])
+        // 포트 5개 중 4번 포트는 링크마다 경로 1개.
+        #expect(paths.count == 6)
+        #expect(Set(paths.map(\.id)).count == 6)
+        let port4 = paths.filter { $0.port.key == PortKey(type: "USB-C", number: 4) }
+        // 경로 순서는 전송 상태 이름 순서.
+        #expect(port4.map(\.displayID) == [2, 3])
+        #expect(port4.map(\.label) == ["USB-C 4번 (LG TV SSCR2)", "USB-C 4번 (Legion 27-10)"])
+        #expect(port4.map(\.id) == ["Port-USB-C@4#0", "Port-USB-C@4#1"])
+        #expect(port4.allSatisfy { $0.steps.last?.kind == .display && $0.steps.allSatisfy { $0.status == .ok } })
+        // 링크가 1개 이하인 포트는 순번 없음.
+        #expect(paths.filter { $0.port.key != PortKey(type: "USB-C", number: 4) }.allSatisfy { $0.linkIndex == nil })
+
+        // 연결이 없는 USB-C 포트의 HPD 값은 인정하지 않음.
+        let empty = try #require(paths.first { $0.port.key == PortKey(type: "USB-C", number: 1) })
+        #expect(empty.port.hpdAsserted == true)
+        #expect(!empty.port.hpdReported)
+        #expect(!empty.isConnected)
+        #expect(empty.steps.map(\.kind) == [.port])
+        #expect(empty.label == "USB-C 1번")
+    }
+
     @Test func 링크는_있으나_온라인_목록에_없는_디스플레이() throws {
         let inventory = try RegistryFixture.inventory(RegistryFixture.normal)
         let paths = ConnectionPathBuilder.build(inventory: inventory, displays: [RegistryFixture.builtin])

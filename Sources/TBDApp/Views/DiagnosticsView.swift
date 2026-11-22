@@ -53,7 +53,7 @@ struct DiagnosticsView: View {
                 Text("이 기기의 포트 컨트롤러 노드를 찾지 못함").foregroundStyle(.secondary)
             }
             ForEach(store.connectionPaths) { path in
-                PortPathCard(path: path, diagnosis: store.diagnosis.portDiagnoses.first { $0.port == path.port.key })
+                PortPathCard(path: path, diagnosis: store.diagnosis.portDiagnoses.first { $0.id == path.id } ?? store.diagnosis.portDiagnoses.first { $0.port == path.port.key })
             }
             ForEach(store.thunderboltSwitches.filter { !$0.isHost }) { device in
                 Label("Thunderbolt 또는 USB4 장치: \(device.summary)", systemImage: "bolt.horizontal")
@@ -177,7 +177,7 @@ private struct PortPathCard: View {
                 Image(systemName: icon)
                     .font(.title3)
                     .foregroundStyle(path.isConnected ? Color.accentColor : .secondary)
-                Text(path.port.key.label).font(.headline)
+                Text(path.label).font(.headline)
                 if path.reachesDisplay {
                     Badge(text: "디스플레이 연결", color: .green)
                 } else if path.steps.contains(where: { $0.status == .broken }) {
