@@ -17,13 +17,24 @@ final class ManualTimer: RevertTimer {
 /// 표준 입력에서 한 줄이 들어올 때까지 최대 `seconds`초 대기. 줄 입력이 있으면 참.
 /// 줄 내용이 `revert`이면 기다리지 않고 거짓 (즉시 복귀. MCP 서버의 복귀 요청에 사용).
 /// 표준 입력이 닫혀 있으면(EOF) 남은 시간을 기다린 뒤 거짓.
+/// 기다리는 동안 `tbdctl resolve`가 남긴 결정 파일도 확인: keep이면 참, revert이면 거짓. (SRS-AGT-003)
 func waitForReturn(seconds: TimeInterval) -> Bool {
     let deadline = Date().addingTimeInterval(seconds)
     var descriptor = pollfd(fd: STDIN_FILENO, events: Int16(POLLIN), revents: 0)
     var line: [UInt8] = []
+    let decisions = GuardedDecisionStore.standard
+    // 이전 실행이 남긴 결정은 이번 변경과 무관.
+    decisions.clear()
+    var inputClosed = false
     while true {
         let remaining = deadline.timeIntervalSinceNow
         if remaining <= 0 { return false }
+        if let decision = decisions.take() { return decision == .keep }
+        if inputClosed {
+            // 입력이 닫힌 뒤에는 결정 파일만 확인.
+            Thread.sleep(forTimeInterval: min(remaining, 0.3))
+            continue
+        }
         let ready = poll(&descriptor, 1, Int32(min(remaining, 0.5) * 1000))
         if ready > 0 {
             var byte: UInt8 = 0
@@ -34,9 +45,8 @@ func waitForReturn(seconds: TimeInterval) -> Bool {
                 }
                 line.append(byte)
             } else {
-                // EOF 또는 오류: 확인 없음으로 처리하고 제한 시간까지 대기.
-                Thread.sleep(forTimeInterval: max(0, deadline.timeIntervalSinceNow))
-                return false
+                // EOF 또는 오류: 입력으로는 확인을 받을 수 없음. 제한 시간까지 결정 파일을 기다림.
+                inputClosed = true
             }
         }
     }
@@ -105,4 +115,36 @@ func timeoutOption(_ command: ParsedCommand) -> TimeInterval {
         exit(.usage)
     }
     return value
+}
+
+/// `tbdctl resolve <keep|revert>` (PRD-AGT-002): 확인을 기다리는 변경을 다른 셸에서 확정하거나 복귀.
+/// 변경 명령은 `--timeout`과 함께 백그라운드로 실행해 둔 상태여야 함.
+func runResolve(_ command: ParsedCommand) {
+    guard let decision = GuardedDecisionStore.Decision(rawValue: command.positionals[0].lowercased()) else {
+        writeError("오류: resolve의 인자는 keep 또는 revert")
+        exit(.usage)
+    }
+    let pending = PendingRevertStore.standard
+    guard let record = pending.load() else {
+        writeError("확인을 기다리는 변경 없음 (제한 시간이 지나 이미 복귀되었을 수 있음)")
+        exit(.unsupported)
+    }
+    do {
+        try GuardedDecisionStore.standard.write(decision)
+    } catch {
+        writeError("오류: 결정 기록 실패: \(error.localizedDescription)")
+        exit(.failure)
+    }
+    // 기다리던 프로세스가 결정을 처리하면 복귀 정보 파일이 사라짐. 재연결을 포함하는 복귀는 15초까지 걸림.
+    let deadline = Date().addingTimeInterval(25)
+    while Date() < deadline {
+        if pending.load() == nil {
+            print(decision == .keep ? "유지 확정" : "복귀 완료: \(record.summary)")
+            return
+        }
+        Thread.sleep(forTimeInterval: 0.2)
+    }
+    GuardedDecisionStore.standard.clear()
+    writeError("확인을 기다리는 프로세스가 응답하지 않음. 변경 명령이 이미 끝났다면 `tbdctl revert-pending`으로 복귀하거나 `tbdctl revert-pending --discard`로 현재 설정 유지")
+    exit(.failure)
 }

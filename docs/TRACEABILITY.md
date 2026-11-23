@@ -8,9 +8,9 @@
 | 항목 | 값 |
 | --- | --- |
 | MRD 항목 | 56 |
-| PRD 요구사항 | 120 |
-| SRS 설계 요구사항 | 92 |
-| TC | 140 |
+| PRD 요구사항 | 121 |
+| SRS 설계 요구사항 | 93 |
+| TC | 142 |
 | 오류 (누락, 불일치) | 0 |
 | 경고 (TC 미연결 SRS) | 0 |
 
@@ -142,3 +142,4 @@
 | PRD-UPD-004 | P7 | 권장 | MRD-SCP-017, MRD-SCP-015 | SRS-UPD-001 | TC-UPD-001 | `Sources/TBDCore/Update/`<br>`scripts/build_app.sh`<br>`Sources/tbdctl/UpdateCommand.swift` | 통과 1 |
 | PRD-UPD-005 | P7 | 필수 | MRD-SCP-017 | SRS-UPD-003 | TC-UPD-003 | `scripts/build_dmg.sh`<br>`scripts/make_icon.swift`<br>`scripts/build_app.sh`<br>`.github/release-notes/` | 통과 1 |
 | PRD-AGT-001 | P7 | 권장 | MRD-SCP-018, MRD-SCP-015, MRD-SCP-014 | SRS-AGT-001, SRS-AGT-002 | TC-AGT-001, TC-AGT-002, TC-AGT-003 | `Sources/TBDCore/MCP/MCPSession.swift`<br>`Sources/TBDCore/MCP/MCPToolCatalog.swift`<br>`Sources/tbdctl/MCPCommand.swift`<br>`Sources/tbdctl/GuardedChange.swift`<br>`Sources/tbdctl/main.swift` | 통과 3 |
+| PRD-AGT-002 | P7 | 권장 | MRD-SCP-018, MRD-SCP-014 | SRS-AGT-003 | TC-AGT-004, TC-AGT-005 | `Sources/TBDCore/GuardedDecision.swift`<br>`Sources/tbdctl/GuardedChange.swift`<br>`skills/thebestdisplay/SKILL.md` | 통과 2 |

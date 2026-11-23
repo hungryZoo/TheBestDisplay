@@ -65,6 +65,8 @@ struct CLIReadCommandTests {
         #expect(try CLI.run(["set-mode", "main", "1x1"]).status == 3)
         #expect(try CLI.run(["set-mode", "main", "잘못된형식"]).status == 2)
         #expect(try CLI.run(["set-color", "main", "rgb:99"]).status == 2)
+        #expect(try CLI.run(["resolve", "maybe"]).status == 2)
+        #expect(try CLI.run(["resolve"]).status == 2)
     }
 }
 

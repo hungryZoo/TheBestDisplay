@@ -86,7 +86,7 @@ open -a "TheBestDisplay"
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
 | 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
 | 업데이트 | 하루 1회 새 버전 확인, 업데이트 창(패치 노트, 이 버전 건너뛰기, 다음에, 예), Homebrew 설치본의 자동 갱신 |
-| 에이전트 연동 | AI 에이전트용 MCP 서버(`tbdctl mcp`): 진단, 조회, 자동 복귀 변경, 복구 도구 5개 |
+| 에이전트 연동 | AI 에이전트용 MCP 서버(`tbdctl mcp`, 도구 5개), 셸 기반 에이전트용 스킬 문서와 `tbdctl resolve` |
 
 ### 동작 구조
 
@@ -291,6 +291,7 @@ tbdctl diagnose
 | `tbdctl profile check <이름>` | 프로파일과 현재 구성의 차이 조회 |
 | `tbdctl profile protect <이름>`, `profile unprotect`, `profile protection` | 구성 보호 설정, 해제, 상태 조회 |
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 |
+| `tbdctl resolve <keep\|revert>` | 백그라운드에서 확인을 기다리는 변경의 유지 또는 복귀 |
 | `tbdctl --version`, `tbdctl version` | 버전 표시 |
 | `tbdctl check-update` | GitHub 최신 릴리스 조회와 현재 버전 비교 |
 | `tbdctl mcp` | MCP 서버 실행 (표준 입출력). AI 에이전트 클라이언트가 실행 |
@@ -343,6 +344,15 @@ Claude 데스크톱은 `~/Library/Application Support/Claude/claude_desktop_conf
 - 에이전트는 화면을 볼 수 없으므로 변경을 적용한 뒤 사용자에게 화면 상태를 물어 확정하는 2단계 구조
 - 도구 정의는 약 4,000자. 명령 출력은 한국어
 
+셸을 쓰는 에이전트(Claude Code 등)는 MCP 없이 스킬 문서로 `tbdctl`을 직접 사용. 저장소의 `skills/thebestdisplay`를 스킬 폴더에 연결:
+
+```bash
+ln -s "$(pwd)/skills/thebestdisplay" ~/.claude/skills/thebestdisplay
+```
+
+- 스킬 문서 내용: 증상별 조회 명령, 변경 규칙(이름 지정, 자동 복귀, 사용자 확인), macOS 27 제약
+- 셸에서의 2단계 변경: 변경 명령을 `--timeout`과 함께 백그라운드로 실행하고, 사용자 확인 뒤 `tbdctl resolve keep` 또는 `tbdctl resolve revert`
+
 ### 단축키
 
 | 키 | 동작 |
@@ -364,6 +374,7 @@ Claude 데스크톱은 `~/Library/Application Support/Claude/claude_desktop_conf
 | `profiles.json` | 구성 프로파일 |
 | `virtual-displays.json` | 가상 디스플레이 구성 |
 | `pending-revert.json` | 확인 대기 중인 변경의 복귀 정보. 확정하거나 복귀하면 삭제 |
+| `pending-decision` | `tbdctl resolve`가 확인 대기 중인 변경에 전하는 결정. 읽히면 삭제 |
 | `protection.json` | 구성 보호 대상 프로파일과 보호 항목. 보호를 끄면 삭제 |
 | `mode-favorites.json` | 디스플레이별 즐겨찾기 모드 |
 | `auto-disconnect.json` | 내장 자동 연결 해제 설정과 해제해 둔 내장 디스플레이 ID |
@@ -390,7 +401,7 @@ Claude 데스크톱은 `~/Library/Application Support/Claude/claude_desktop_conf
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 140건 중 통과 135건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 검증 결과 | TC 142건 중 통과 137건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
 | 참고 제품 기능 대조 | 58행 중 구현 52행, 부분 4행, 미구현 2행 (`docs/COVERAGE.md`) |
 
 ### 제약
@@ -426,6 +437,7 @@ Claude 데스크톱은 `~/Library/Application Support/Claude/claude_desktop_conf
 | `docs` | 명세(MRD, PRD, SRS, TC), ADR, 조사 문서, 로드맵 |
 | `scripts` | 앱 번들 조립, DMG와 cask 생성, 테스트 실행, 추적성 검사 |
 | `.github/release-notes` | 버전별 릴리스 노트 |
+| `skills/thebestdisplay` | AI 에이전트용 스킬 문서 |
 | `spikes` | 선행 실험 코드 |
 
 ### 테스트
