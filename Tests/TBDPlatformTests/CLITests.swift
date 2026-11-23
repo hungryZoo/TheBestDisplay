@@ -68,6 +68,49 @@ struct CLIReadCommandTests {
     }
 }
 
+/// TC-AGT-003: MCP 서버 실행. 읽기 전용 도구만 호출.
+@Suite("TC-AGT-003 MCP 서버 실행")
+struct MCPServerTests {
+    @Test func 초기화와_도구_목록과_진단_호출() throws {
+        try #require(FileManager.default.isExecutableFile(atPath: CLI.binary.path), "tbdctl 미빌드: swift build 후 실행")
+        let process = Process()
+        process.executableURL = CLI.binary
+        process.arguments = ["mcp"]
+        let input = Pipe(), output = Pipe()
+        process.standardInput = input
+        process.standardOutput = output
+        process.standardError = FileHandle.nullDevice
+        try process.run()
+        let requests = [
+            #"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"test","version":"0"}}}"#,
+            #"{"jsonrpc":"2.0","method":"notifications/initialized"}"#,
+            #"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#,
+            #"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"display_diagnose","arguments":{}}}"#,
+            #"{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"display_change","arguments":{"action":"set_hdr","display":"id:1","value":"on"}}}"#,
+        ]
+        try input.fileHandleForWriting.write(contentsOf: Data((requests.joined(separator: "\n") + "\n").utf8))
+        // 입력을 닫으면 서버 종료.
+        try input.fileHandleForWriting.close()
+        let lines = String(decoding: output.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).split(separator: "\n").map(String.init)
+        process.waitUntilExit()
+        #expect(process.terminationStatus == 0)
+        // 알림에는 응답이 없으므로 응답은 4줄. 표준 출력에 다른 글은 없음.
+        try #require(lines.count == 4)
+        let replies = try lines.map { try #require(try JSONSerialization.jsonObject(with: Data($0.utf8)) as? [String: Any]) }
+        #expect(replies.map { $0["id"] as? Int } == [1, 2, 3, 4])
+        #expect(((replies[0]["result"] as? [String: Any])?["serverInfo"] as? [String: Any])?["version"] as? String == AppVersion.current)
+        #expect(((replies[1]["result"] as? [String: Any])?["tools"] as? [[String: Any]])?.count == 5)
+        let diagnose = try #require(replies[2]["result"] as? [String: Any])
+        #expect(diagnose["isError"] as? Bool == false)
+        let text = try #require(((diagnose["content"] as? [[String: Any]])?.first)?["text"] as? String)
+        #expect(text.contains("포트 점검"))
+        #expect(text.contains("[id:"))
+        // 번호 지정 변경은 실행하지 않고 거부.
+        let refused = try #require(replies[3]["result"] as? [String: Any])
+        #expect(refused["isError"] as? Bool == true)
+    }
+}
+
 /// TC-DGN-001 실측: 현재 연결 구성의 진단.
 @Suite("TC-DGN-001 실제 구성 진단")
 struct LiveDiagnosisTests {

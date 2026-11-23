@@ -50,6 +50,7 @@ open -a "TheBestDisplay"
    - [창 앱](#창-앱)
    - [명령행 도구](#명령행-도구)
    - [자동 복귀 안전장치](#자동-복귀-안전장치)
+   - [AI 에이전트 연동](#ai-에이전트-연동)
    - [단축키](#단축키)
 5. [설정 파일](#5-설정-파일)
 6. [지원 범위](#6-지원-범위)
@@ -85,6 +86,7 @@ open -a "TheBestDisplay"
 | 가상 디스플레이 | 가상 디스플레이 생성과 삭제, HiDPI 스케일링, 실행 시 복원 |
 | 프로파일 | 디스플레이 구성 저장, 적용, 이름 변경, 삭제, 구성 보호(프로파일에서 벗어나면 다시 적용) |
 | 업데이트 | 하루 1회 새 버전 확인, 업데이트 창(패치 노트, 이 버전 건너뛰기, 다음에, 예), Homebrew 설치본의 자동 갱신 |
+| 에이전트 연동 | AI 에이전트용 MCP 서버(`tbdctl mcp`): 진단, 조회, 자동 복귀 변경, 복구 도구 5개 |
 
 ### 동작 구조
 
@@ -291,6 +293,7 @@ tbdctl diagnose
 | `tbdctl revert-pending [--discard]` | 확인 없이 종료된 변경의 복귀 |
 | `tbdctl --version`, `tbdctl version` | 버전 표시 |
 | `tbdctl check-update` | GitHub 최신 릴리스 조회와 현재 버전 비교 |
+| `tbdctl mcp` | MCP 서버 실행 (표준 입출력). AI 에이전트 클라이언트가 실행 |
 
 - 공통 옵션: `--json`
 - 디스플레이 지정: 1부터 시작하는 순번, `id:<디스플레이 ID>`, `main`, `builtin`, `external`, 이름 일부
@@ -306,6 +309,39 @@ tbdctl diagnose
 - 창 앱: 확인 대화상자에서 15초 안에 유지를 누르지 않으면 이전 설정으로 복귀
 - 명령행: Return을 입력하면 확정, 제한 시간(`--timeout`, 기본 15초) 안에 입력이 없으면 복귀. `--yes`는 확인 없이 확정
 - 확인 전에 앱이 종료되면 다음 실행 시 복귀 제안 표시. 명령행은 `tbdctl revert-pending`
+
+### AI 에이전트 연동
+
+AI 에이전트가 화면 조작 없이 디스플레이를 진단하고 설정을 바꾸는 MCP 서버. 에이전트 클라이언트가 필요할 때 `tbdctl mcp`를 실행하며 상주 프로세스 없음.
+
+| 도구 | 내용 |
+| --- | --- |
+| `display_diagnose` | 디스플레이 목록, 포트별 점검 단계, 발견 항목과 조치. 문제 확인의 시작점 |
+| `display_query` | 주제별 조회: `info`, `modes`, `signal`, `link`, `hdr`, `brightness`, `ports`, `arrangement`, `capabilities` |
+| `display_change` | 모드, 색 모드, HDR, 회전, 연결 해제를 적용. 확정하지 않으면 제한 시간(10-120초, 기본 60초) 뒤 자동 복귀 |
+| `display_change_resolve` | 대기 중인 변경의 유지 또는 즉시 복귀 |
+| `display_recover` | 재연결, 모두 재연결, 재초기화, 재감지, 미확인 변경 복귀 |
+
+Claude Code 등록 (Homebrew 설치본 기준. 소스 빌드는 `tbdctl`의 전체 경로 사용):
+
+```bash
+claude mcp add thebestdisplay -s user -- tbdctl mcp
+```
+
+Claude 데스크톱은 `~/Library/Application Support/Claude/claude_desktop_config.json`에 추가:
+
+```json
+{
+  "mcpServers": {
+    "thebestdisplay": { "command": "/opt/homebrew/bin/tbdctl", "args": ["mcp"] }
+  }
+}
+```
+
+- 그 밖의 클라이언트는 표준 입출력 방식의 MCP 서버로 `tbdctl mcp`를 등록
+- 변경 도구는 디스플레이를 이름으로만 받음. 디스플레이 ID는 재연결 때 바뀜
+- 에이전트는 화면을 볼 수 없으므로 변경을 적용한 뒤 사용자에게 화면 상태를 물어 확정하는 2단계 구조
+- 도구 정의는 약 4,000자. 명령 출력은 한국어
 
 ### 단축키
 
@@ -354,7 +390,7 @@ tbdctl diagnose
 | --- | --- |
 | 기기 | MacBook Pro (Apple M5), macOS 26.5.2 |
 | 외장 디스플레이 | LG TV (3840x2160, 120 Hz, HDR), USB-C 포트의 Thunderbolt 독 경유 |
-| 검증 결과 | TC 137건 중 통과 132건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
+| 검증 결과 | TC 140건 중 통과 135건, 미실행 0건, 보류 5건 (`docs/TC.md`) |
 | 참고 제품 기능 대조 | 58행 중 구현 52행, 부분 4행, 미구현 2행 (`docs/COVERAGE.md`) |
 
 ### 제약

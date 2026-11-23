@@ -15,10 +15,12 @@ final class ManualTimer: RevertTimer {
 }
 
 /// 표준 입력에서 한 줄이 들어올 때까지 최대 `seconds`초 대기. 줄 입력이 있으면 참.
+/// 줄 내용이 `revert`이면 기다리지 않고 거짓 (즉시 복귀. MCP 서버의 복귀 요청에 사용).
 /// 표준 입력이 닫혀 있으면(EOF) 남은 시간을 기다린 뒤 거짓.
 func waitForReturn(seconds: TimeInterval) -> Bool {
     let deadline = Date().addingTimeInterval(seconds)
     var descriptor = pollfd(fd: STDIN_FILENO, events: Int16(POLLIN), revents: 0)
+    var line: [UInt8] = []
     while true {
         let remaining = deadline.timeIntervalSinceNow
         if remaining <= 0 { return false }
@@ -27,7 +29,10 @@ func waitForReturn(seconds: TimeInterval) -> Bool {
             var byte: UInt8 = 0
             let count = read(STDIN_FILENO, &byte, 1)
             if count == 1 {
-                if byte == 0x0A { return true }
+                if byte == 0x0A {
+                    return GuardedInput.keeps(String(decoding: line, as: UTF8.self))
+                }
+                line.append(byte)
             } else {
                 // EOF 또는 오류: 확인 없음으로 처리하고 제한 시간까지 대기.
                 Thread.sleep(forTimeInterval: max(0, deadline.timeIntervalSinceNow))

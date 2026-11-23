@@ -55,8 +55,12 @@ let parser = CommandLineParser(specs: [
     CommandSpec(name: "revert-pending", summary: "확인 없이 종료된 변경의 복귀", flags: ["--discard"]),
     CommandSpec(name: "version", summary: "버전 표시 (--version과 같음)"),
     CommandSpec(name: "check-update", summary: "GitHub 최신 릴리스 조회와 현재 버전 비교"),
+    CommandSpec(name: "mcp", summary: "MCP 서버 실행 (표준 입출력, AI 에이전트 연동용)"),
     CommandSpec(name: "help", summary: "사용법"),
 ])
+
+// 출력이 파이프일 때도 줄 단위로 내보냄: 확인 대기 안내문을 MCP 서버와 로그가 바로 읽을 수 있게 함. (SRS-AGT-002)
+setlinebuf(stdout)
 
 func writeError(_ text: String) {
     FileHandle.standardError.write(Data((text + "\n").utf8))
@@ -118,6 +122,9 @@ let json = command.has("--json")
 switch command.name {
 case "help":
     print(parser.usage)
+
+case "mcp":
+    runMCPServer()
 
 case "version":
     if json { printJSON(["version": AppVersion.current]) } else { print("tbdctl \(AppVersion.current)") }
