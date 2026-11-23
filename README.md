@@ -482,6 +482,7 @@ uv run scripts/trace_check.py
 - [x] 해상도 탭의 빠른 설정과 디스플레이 오버라이드 (1.0.1)
 - [x] HDR 선언 추가의 실제 적용 실측 (LG TV)
 - [x] macOS 27의 색 모드 전환 복구, 연결 해제 진입 위치와 기록 유지, 독 경유 2대 구성의 진단 수정 (1.0.2)
+- [x] AI 에이전트 연동: MCP 서버, 스킬 문서, `tbdctl resolve` (1.0.3)
 - [ ] Developer ID 서명과 공증
 
 <p align="right"><a href="#목차">↑ 목차로</a></p>
